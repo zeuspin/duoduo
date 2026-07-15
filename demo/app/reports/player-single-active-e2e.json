@@ -1,0 +1,37 @@
+{
+  "version": "0.3.0",
+  "steps": [
+    {
+      "action": "initial",
+      "state": {
+        "activeRoomId": null,
+        "status": "stopped"
+      },
+      "resources": 0
+    },
+    {
+      "action": "play-first",
+      "state": {
+        "activeRoomId": "440",
+        "status": "playing"
+      },
+      "resources": 1
+    },
+    {
+      "action": "switch-second",
+      "state": {
+        "activeRoomId": "660",
+        "status": "playing"
+      },
+      "resources": 1
+    },
+    {
+      "action": "stop",
+      "state": {
+        "activeRoomId": null,
+        "status": "stopped"
+      },
+      "resources": 0
+    }
+  ]
+}

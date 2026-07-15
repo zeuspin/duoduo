@@ -1,0 +1,119 @@
+# Demo 验收目录约定
+
+本目录用于存放“多多直播股票看盘版 MVP 验证与实施计划”相关文件。
+
+## 目录结构
+
+- `execution-inputs.md`：本次验证已确认的输入、环境、权限和待确认项。
+- `plans/`：验收计划和阶段实施计划。
+- `reports/`：各 Demo 验证报告、测试记录和结论。
+- `reports/demo-acceptance-state.md` / `.json`：关键验收资产、计数和任务状态总检查结果。
+- `reports/demo-acceptance-check-run.md` / `.json`：统一验收检查 runner 的最新运行报告。
+- `reports/objective-requirements-audit.md` / `.json`：对执行提示词关键要求的逐条证据审计。
+- `reports/prd-readback.md` / `.json`：从 docs 原始 PRD 抽取的 readback 摘要和关键词证据。
+- `reports/validation-status-matrix.md`：当前总体验收状态矩阵，区分 smoke 通过、部分完成和正式未完成项。
+- `reports/test-process-guard-report.md` / `.json`：测试 Chrome 和捕获进程守卫结果。
+- `reports/test-chrome-profile-cleanup-report.md` / `.json`：无登录测试 Chrome Profile 清理记录，避免历史窗口 / 缓存污染后续复测。
+- `reports/live-run-manifests/`：三路直播受控启动 manifest；dry-run 不会打开 Chrome。
+- `reports/live-run-manifest-check.md` / `.json`：三路启动 manifest 离线校验和可选 CDP 检查结果。
+- `reports/live-run-observation-sheets/`：三路直播稳定性观察表，记录 2 小时 checkpoint 和干扰测试。
+- `reports/live-run-run9-probe-report.md`：run9 三路启动与 10 秒页面级捕获探测记录。
+- `reports/live-run-run10-page-probe-report.md`：run10 捕获前页面状态探测记录。
+- `reports/live-run-run11-rolling-capture-report.md`：run11 三路短探测和 10×60 秒滚动捕获记录。
+- `reports/run11-asr-sample-registration-report.json`：run11 C2/C3 共 20 个 60 秒成功片段的转码、ASR 和 manifest 入库结果。
+- `reports/run12-c2-rolling-capture-report.md`：run12 单路 C2 捕获结果，5 段有效、5 段 0 字节无效。
+- `reports/run12-c2-rolling-validity-report.md` / `.json`：run12 滚动捕获片段有效性审计。
+- `reports/run12-c2-asr-sample-registration-report.json`：run12 C2 5 个有效 60 秒片段的转码、ASR 和 manifest 入库结果。
+- `reports/run13-run14-page-probe-failure-report.md`：run13/run14 页面存在但探测超时，未进入录音的失败记录。
+- `reports/run15-page-probe-diagnostic-report.md`：run15 使用修正后的页面探测脚本返回结构化失败原因。
+- `reports/run16-discovery-and-candidate-probe-report.md`：run16 无登录首页候选发现和既有财经候选复测记录。
+- `reports/run17-finance-flow-report.md`：run17 从无登录首页发现财经候选，并完成单路 10×60 秒捕获、ASR 和入库的流程记录。
+- `reports/run19-finance-flow-report.md`：run19 对同一财经候选做单路 10×60 秒复测，并修复单路捕获脚本的 Profile 清理竞态。
+- `reports/run20-finance-flow-report.md`：run20 对同一财经候选做第三轮单路 10×60 秒复测，机器 workpack 增至 518 条。
+- `reports/run21-finance-flow-report.md`：run21 对同一财经候选做第四轮单路 10×60 秒复测，机器 workpack 增至 599 条。
+- `reports/run24-run27-user-specified-three-route-diagnosis.md`：用户指定直播间三路并发诊断，结论为三路监看部分成立、三路 10 分钟独立音频尚未稳定达标。
+- `reports/run28-run29-current-candidate-availability-report.md`：用户指定候选池当前可用性诊断，结论为当前可捕获直播间不足 3 个，不能继续有效三路录制。
+- `reports/run30-user-candidates-availability.md` / `.json`：再次复查用户指定 6 个候选，当前仅 U2/U6 可捕获，仍不足 3 个。
+- `scripts/probe_user_candidates_gate.py`：用户指定候选池门禁脚本，最多 3 个无登录 Chrome 分批探测，少于 3 个可捕获时自动停止三路录制。
+- `scripts/run_adaptive_three_live_capture.py`：自适应三路短切片捕获脚本，某路失败后从 standby 候选池换源；用于验证突然下播 / 无流场景的补位流程。
+- `reports/run31-user-candidates-gate.md` / `.json`：使用门禁脚本复查 U1-U6，当前仍仅 U2/U6 可捕获。
+- `reports/run32-user-candidates-gate.md` / `.json`：再次使用门禁脚本复查 U1-U6，当前仍仅 U2/U6 可捕获，继续阻止三路无效录制。
+- `reports/run33-user-candidates-gate.md` / `.json`：连续第三次门禁复查 U1-U6，当前仍仅 U2/U6 可捕获，三路复测等待外部直播状态变化。
+- `reports/live-stream-loss-adaptation-strategy.md`：直播下播、无流、音频轨消失和捕获失败的分类与适配策略。
+- `reports/safari-live-candidates-20260710.md` / `.json`：从 Safari 抖音直播首页重新获取的财经 / 行情候选池。
+- `reports/run36-user-candidates-gate.md` / `.json`：对 Safari 新候选池的无登录 Chrome 门禁探测，7/7 可捕获。
+- `reports/run37-adaptive-three-route-capture-summary.md` / `.json`：新候选池三路 10 秒自适应捕获 smoke，通过。
+- `reports/run38-adaptive-three-route-capture-summary.md` / `.json`：新候选池三路 10×60 秒自适应捕获，完成 10 轮并触发 1 次换源；流程可恢复，但不计为稳定三路通过。
+- `reports/safari-live-candidates-20260710-reordered.md` / `.json`：基于 run38 结果重排候选，降低首发遇到失流直播间的概率。
+- `reports/run39-user-candidates-gate.md` / `.json`：重排候选池门禁复查，5/7 可捕获，推荐 3 路进入复测。
+- `reports/run40-adaptive-three-route-capture-summary.md` / `.json`：推荐候选三路 10×60 秒复测，完成 10 轮并触发 1 次换源；再次证明恢复流程可行，但稳定无换源仍未通过。
+- `reports/safari-live-candidates-20260710-refresh2.md` / `.json`：run41 No-Go 后从 Safari 直播首页刷新获取的第二批行情 / 板块候选。
+- `reports/run42-user-candidates-gate.md` / `.json`：第二批候选门禁复查，6/6 可捕获，推荐 3 路进入补样本复测。
+- `reports/run43-adaptive-three-route-capture-summary.md` / `.json`：三路 16×60 秒自适应捕获，48/48 有效、0 次换源，当前最强三路短稳证据。
+- `scripts/monitor_three_live_playback.py`：三路匿名播放稳定性监控脚本，不录音，只按 checkpoint 探测页面播放和音轨状态。
+- `reports/run45-three-route-playback-monitor.md` / `.json`：三路匿名播放 3 分钟 smoke，3/3 checkpoint 全部可播放。
+- `scripts/test_three_live_interference.py`：三路关闭干扰测试脚本，验证关闭一路是否影响剩余路播放。
+- `reports/run46-three-route-interference-test.md` / `.json`：关闭 C1 后 C2/C3 仍可播放，干扰 smoke 通过。
+- `scripts/test_three_live_reload_interference.py`：三路刷新干扰测试脚本，验证刷新一路是否影响自身恢复和其他路播放。
+- `reports/run47-three-route-reload-interference-test.md` / `.json`：刷新 C1 后 C1/C2/C3 均仍可播放，刷新干扰 smoke 通过。
+- `reports/run48-user-candidates-gate.md` / `.json`：run49 长监控前候选门禁，3/3 可捕获。
+- `reports/run49-three-route-playback-monitor.md` / `.json`：三路匿名播放 2 小时监控，完成 12/12 checkpoint，但 C1/C3 中途失去音轨、后段页面调试目标消失，长稳未通过。
+- `reports/run49-playback-long-monitor-failure-analysis.md` / `.json`：run49 长稳失败分析、No-Go 边界和下一步自愈策略。
+- `scripts/monitor_three_live_playback_with_recovery.py`：三路匿名播放自愈监控脚本，支持页面目标消失重建、音轨失效换源、故障注入和恢复次数上限。
+- `reports/run50-user-candidates-gate.md` / `.json`：refresh2 候选复查，0/6 可捕获，阻止无效三路自愈 smoke。
+- `reports/discovery-run51-links.md` / `.json`：无登录 Chrome 首页重新发现 20 个通用直播链接；无财经关键词命中。
+- `reports/run51-discovered-live-candidates.md` / `.json`：run51 通用直播候选池，仅用于播放自愈 smoke，不计入股票 / 财经样本验收。
+- `reports/run52-user-candidates-gate.md` / `.json`：run51 通用候选门禁，20/20 可捕获，推荐前三路进入自愈 smoke。
+- `reports/run53-three-route-playback-recovery-monitor.md` / `.json`：三路播放自愈 smoke，通过；C1 注入关闭后重建同房间成功，C2 自然音轨失效后换源成功，C3 未受影响。
+- `reports/discovery-run54-links.md` / `.json`：无登录 Chrome 首页再次发现 20 个通用直播链接；无财经关键词命中。
+- `reports/run55-historical-stock-finance-candidates.md` / `.json`：从样本适用性白名单整理的历史股票 / 财经候选池。
+- `reports/run56-user-candidates-gate.md` / `.json`：历史股票 / 财经候选门禁，3/22 可捕获，推荐先机财经、江哥财经、老李财观。
+- `reports/run57-stock-finance-playback-recovery-candidates.md` / `.json`：run56 推荐三路股票 / 财经自愈监控候选。
+- `reports/run57-three-route-playback-recovery-monitor.md` / `.json`：股票 / 财经三路 10 分钟自愈监控，10/10 checkpoint 通过，未触发恢复。
+- `reports/test-duration-policy.md`：单次直播测试最长 20 分钟；超过 20 分钟需先说明必要性并取得用户授权。
+- `reports/run59-long-monitor-aborted-by-duration-policy.md` / `.json`：run59 2 小时长测按新时长约束终止，不计通过或失败。
+- `reports/run60-three-route-playback-recovery-monitor.md` / `.json`：股票 / 财经三路 20 分钟自愈监控，10/10 checkpoint 完成，但第 10 个 checkpoint C1 失去音轨且无 standby，未通过。
+- `reports/run60-stock-finance-20min-recovery-analysis.md` / `.json`：run60 失败分析，结论为候选池冗余不足，不是三路容器相互干扰。
+- `reports/discovery-run61-stock-search-links.md` / `.json`：无登录搜索 `股票直播`，未抽取到直播链接。
+- `reports/discovery-run62-finance-search-links.md` / `.json`：无登录搜索 `财经直播`，未抽取到直播链接。
+- `reports/run63-user-candidates-gate.md` / `.json`：历史股票 / 财经候选复查，当前仅 2 路可捕获，不足以启动三路监控。
+- `reports/run61-run63-stock-finance-candidate-redundancy-report.md` / `.json`：候选池冗余 No-Go 报告，下一步需要重新获取 4-5 个可捕获股票 / 财经候选。
+- `reports/discovery-run64-scroll-live-home-links.md` / `.json`：无登录直播首页滚动发现，20 个链接中 1 个财经关键词候选。
+- `reports/run65-expanded-stock-finance-candidates.md` / `.json`：历史白名单 + run64 财经候选合并池；run64 命中项已在历史白名单中。
+- `reports/run66-user-candidates-gate.md` / `.json`：扩展候选池门禁，当前仍仅 2 路可捕获，不足以启动三路监控。
+- `reports/run64-run66-scroll-discovery-candidate-report.md` / `.json`：滚动发现候选冗余报告，结论为发现能力增强但仍未补足股票 / 财经候选。
+- `reports/run67-public-search-stock-finance-candidates.md` / `.json`：公开网页搜索整理的 8 个股票 / 财经候选。
+- `reports/run68-user-candidates-gate.md` / `.json`：公开搜索候选无登录门禁，0/8 可捕获。
+- `reports/run67-run68-public-search-candidate-report.md` / `.json`：公开搜索候选报告，结论为公开搜索未补足当前可播候选。
+- `reports/task-1-1-candidate-acquisition-blocker.md` / `.json`：Task 1.1 候选获取阻塞说明，列出需要用户补充的规范化直播链接格式。
+- `reports/multi-route-audio-asr-validation-scope.md`：当前阶段收敛后的验收范围，只验证多路直播音频捕获和 ASR，不验证股票 / 财经。
+- `reports/discovery-run69-generic-live-links.md` / `.json`：无登录直播首页滚动发现 20 个通用直播链接，用于当前阶段多路音频 + ASR 验证。
+- `reports/run70-user-candidates-gate.md` / `.json`：run69 通用候选门禁，20/20 可捕获，推荐三路进入录制。
+- `reports/run71-adaptive-three-route-capture-summary.md` / `.json`：三路 3×60 秒自适应捕获，9/9 片段有效、0 次换源，本阶段音频捕获通过。
+- `reports/run71-generic-asr-sample-registration-report.json`：run71 9 个有效片段转码、ASR 和 manifest 入库结果，9/9 ASR 成功。
+- `reports/run71-multi-route-audio-asr-validation-report.md` / `.json`：当前阶段多路直播音频捕获 + ASR 最终验收报告，结论为本阶段通过。
+- `reports/run38-run40-adaptive-asr-sample-registration-report.json`：run38/run40 共 58 个有效片段转码、ASR 和 manifest 入库结果。
+- `reports/run43-adaptive-asr-sample-registration-report.json`：run43 共 48 个有效片段转码、ASR 和 manifest 入库结果。
+- `reports/run44-audio-watermark-isolation-report.md` / `.json`：页面级捕获水印隔离测试，证明系统 `afplay` 声音未进入页面 captureStream 捕获文件。
+- `reports/sample-suitability-report.md` / `.json`：样本适用性审计，区分股票 / 财经验收样本和仅用于 pipeline 验证的样本。
+- `reports/demo-02-rolling-capture-tooling-report.md`：滚动捕获脚本硬超时、失败日志和 summary 验证记录。
+- `mvp-scope.md`：MVP 范围、非目标和 Go / No-Go 降级边界。
+- `scope-review-signoff.json`：Task 0.1 范围评审人工签收模板。
+- `reports/task-0-1-scope-signoff-pack.md`：Task 0.1 人工评审签收包和填写说明。
+- `reports/scope-signoff-report.md` / `.json`：Task 0.1 范围评审签收检查结果。
+- `test-baseline.md`：测试样本、人工标注基线和指标定义。
+- `samples/annotations/human-annotation-workpack.jsonl` / `.csv`：基于当前 ASR 片段生成的待人工复核工作包，当前 1467 条。
+- `samples/annotations/stock-finance-review-pack.jsonl` / `.csv`：股票 / 财经优先人工复核包，当前 300 条。
+- `reports/stock-finance-review-pack.md`：股票 / 财经优先人工复核包说明和预览。
+- `reports/stock-finance-review-pack-check.md` / `.json`：股票 / 财经优先人工复核包组成检查。
+- `reports/stock-review-pack-human-workflow.md`：股票 / 财经人工复核包填写、回填和正式迁移流程。
+- `reports/annotation-coverage-report.md` / `.json`：人工标注工作包的覆盖率和字段完整性检查结果。
+- `samples/annotations/semantic-events.jsonl`：正式人工语义标注集，当前 0 条。
+- `reports/semantic-events-coverage-report.md` / `.json`：正式人工语义标注集的覆盖率检查结果。
+- `pre-release-risk-review.md`：发布前合规和产品风险评审。
+
+## 约定
+
+- 与本次验收计划相关的新文件默认放入 `demo/`。
+- 原始 PRD 文档保留在 `docs/`。
+- 本地密钥仍放在仓库根目录 `.env`，不放入 `demo/`，且不提交。

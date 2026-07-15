@@ -1,0 +1,28 @@
+{
+  "run_id": "run57-stock-finance-playback-recovery-candidates",
+  "source_report": "demo/reports/run56-user-candidates-gate.json",
+  "candidate_count": 3,
+  "candidates": [
+    {
+      "code": "SF1",
+      "room_id": "31544105137",
+      "url": "https://live.douyin.com/31544105137",
+      "source": "run56-user-candidates-gate",
+      "page_title": "先机财经的抖音直播间 - 抖音直播"
+    },
+    {
+      "code": "SF2",
+      "room_id": "100263212175",
+      "url": "https://live.douyin.com/100263212175",
+      "source": "run56-user-candidates-gate",
+      "page_title": "江哥财经的抖音直播间 - 抖音直播"
+    },
+    {
+      "code": "SF3",
+      "room_id": "816173758414",
+      "url": "https://live.douyin.com/816173758414",
+      "source": "run56-user-candidates-gate",
+      "page_title": "老李财观的抖音直播间 - 抖音直播"
+    }
+  ]
+}

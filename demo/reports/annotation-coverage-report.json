@@ -1,0 +1,61 @@
+{
+  "total_rows": 1467,
+  "target_total": 500,
+  "total_gap": 0,
+  "manual_text_rows": 0,
+  "reviewed_rows": 0,
+  "review_status": {
+    "todo": 1467
+  },
+  "missing_required_fields": {},
+  "empty_required_fields": {
+    "conditions": 1454,
+    "risk_flags": 1462,
+    "is_news_relay": 1467,
+    "is_independent_view": 1467,
+    "is_same_source_relay": 1467,
+    "is_reversal": 1467,
+    "topic": 1382,
+    "direction": 1382,
+    "content_type": 1382,
+    "source_type": 1382,
+    "asr_text": 1,
+    "evidence_text": 1
+  },
+  "category_counts": {
+    "topic_or_market_entity": 21,
+    "number_expression": 649,
+    "risk_expression": 5,
+    "negative_expression": 640,
+    "condition_expression": 13
+  },
+  "coverage_targets": {
+    "topic_or_market_entity": 150,
+    "number_expression": 80,
+    "negative_expression": 50,
+    "condition_expression": 50,
+    "risk_expression": 50,
+    "news_relay": 40,
+    "independent_view": 80,
+    "same_source_relay": 30,
+    "reversal_or_correction": 20,
+    "low_value_or_ad": 60
+  },
+  "coverage_gaps": {
+    "topic_or_market_entity": 129,
+    "number_expression": 0,
+    "negative_expression": 0,
+    "condition_expression": 37,
+    "risk_expression": 45,
+    "news_relay": 40,
+    "independent_view": 80,
+    "same_source_relay": 30,
+    "reversal_or_correction": 20,
+    "low_value_or_ad": 60
+  },
+  "risk_condition_reversal_rows": 647,
+  "risk_condition_reversal_ratio": 0.44103612815269255,
+  "target_risk_condition_reversal_ratio": 0.2,
+  "risk_condition_reversal_ratio_pass": true,
+  "task_0_2_pass": false
+}

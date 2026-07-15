@@ -1,0 +1,70 @@
+{
+  "ok": true,
+  "mimeType": "audio/webm;codecs=opus",
+  "size": 160661,
+  "chunkCount": 10,
+  "nonEmptyChunkCount": 10,
+  "chunkSizes": [
+    15618,
+    16438,
+    16438,
+    16438,
+    16438,
+    16438,
+    16438,
+    16438,
+    16438,
+    13539
+  ],
+  "audioTracks": 1,
+  "startState": {
+    "video": {
+      "paused": false,
+      "muted": false,
+      "volume": 1,
+      "readyState": 4,
+      "networkState": 2,
+      "currentTime": 8.333,
+      "duration": null,
+      "srcPresent": false
+    },
+    "audioTracks": [
+      {
+        "id": "a9c591ae-667f-4261-8111-c8620d5fc328",
+        "kind": "audio",
+        "label": "MediaStreamAudioDestinationNode",
+        "enabled": true,
+        "muted": false,
+        "readyState": "live"
+      }
+    ],
+    "videoTrackCount": 1
+  },
+  "endState": {
+    "video": {
+      "paused": false,
+      "muted": false,
+      "volume": 1,
+      "readyState": 4,
+      "networkState": 2,
+      "currentTime": 18.366,
+      "duration": null,
+      "srcPresent": false
+    },
+    "audioTracks": [
+      {
+        "id": "a9c591ae-667f-4261-8111-c8620d5fc328",
+        "kind": "audio",
+        "label": "MediaStreamAudioDestinationNode",
+        "enabled": true,
+        "muted": false,
+        "readyState": "live"
+      }
+    ],
+    "recorderState": "inactive"
+  },
+  "durationMs": 10000,
+  "output": "/Users/xuke/Documents/getian/duoduo/demo/samples/audio/raw/run37_C2_305503141482_20260710T185719_r01_seg01_10s_page_capture.webm",
+  "targetTitle": "财经红姐的抖音直播间 - 抖音直播",
+  "targetUrl": "https://live.douyin.com/305503141482"
+}

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "max_allowed_test_chrome": 3,
+  "test_chrome_count": 0,
+  "capture_process_count": 0,
+  "test_chrome_processes": [],
+  "capture_processes": [],
+  "rules": [
+    "同一时间最多保留 3 个本次验收使用的 Chrome 主实例。",
+    "每个实例只打开 1 个有效直播窗口。",
+    "开始新 run 前必须先关闭旧 run 实例并复查进程列表。",
+    "存在捕获进程残留时不得启动下一轮验收。"
+  ]
+}

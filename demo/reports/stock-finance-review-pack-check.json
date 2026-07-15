@@ -1,0 +1,36 @@
+{
+  "total_rows": 300,
+  "target_rows": 120,
+  "target_gap": 0,
+  "room_counts": {
+    "16743488023": 97,
+    "746541295999": 6,
+    "31544105137": 12,
+    "414092641626": 6,
+    "583183556429": 16,
+    "305503141482": 10,
+    "848398958216": 21,
+    "142040264912": 4,
+    "782837937233": 21,
+    "816173758414": 26,
+    "5583822346": 38,
+    "632263122130": 18,
+    "56106509963": 15,
+    "88057849963": 7,
+    "857559947435": 3
+  },
+  "non_stock_rows": 0,
+  "non_stock_work_item_ids": [],
+  "selection_reason_counts": {
+    "number": 273,
+    "negative": 281,
+    "condition": 154,
+    "risk": 47,
+    "good_duration": 215,
+    "entity": 13
+  },
+  "score_min": 7,
+  "score_max": 13,
+  "review_pack_ready": true,
+  "important_note": "This readiness only covers review-pack composition. It is not manual transcription or formal annotation completion."
+}

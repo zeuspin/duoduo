@@ -1,0 +1,19 @@
+{
+  "profile_root": "demo/runtime/chrome-profiles",
+  "apply_cleanup": true,
+  "process_guard_ok": true,
+  "test_chrome_count": 0,
+  "capture_process_count": 0,
+  "candidate_count": 1,
+  "deleted_count": 1,
+  "deleted_size_bytes": 0,
+  "candidates": [
+    {
+      "path": "demo/runtime/chrome-profiles/run70-g16-gate",
+      "size_bytes": 0,
+      "deleted": true
+    }
+  ],
+  "skipped": [],
+  "ok": true
+}

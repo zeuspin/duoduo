@@ -1,0 +1,4 @@
+Error: No live.douyin.com page target with webSocketDebuggerUrl found
+    at getPageTarget (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_audio_capture.js:18:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async /Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_audio_capture.js:149:18

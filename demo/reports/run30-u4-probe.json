@@ -1,0 +1,27 @@
+{
+  "command_returncode": 2,
+  "stdout": "{\n  \"ok\": false,\n  \"pageTitle\": \"汇正首席杨Sir的抖音直播间 - 抖音直播\",\n  \"videoCount\": 1,\n  \"selected\": {\n    \"paused\": false,\n    \"muted\": false,\n    \"volume\": 1,\n    \"readyState\": 0,\n    \"networkState\": 2,\n    \"currentTime\": 0,\n    \"duration\": null,\n    \"srcPresent\": false\n  },\n  \"captureStreamAvailable\": true,\n  \"audioTrackCount\": 0,\n  \"videoTrackCount\": 1,\n  \"playAttempt\": \"play-timeout\",\n  \"reason\": \"video-not-ready-or-no-audio-track\",\n  \"targetTitle\": \"汇正首席杨Sir的抖音直播间 - 抖音直播\",\n  \"targetUrl\": \"https://live.douyin.com/400595809668\"\n}",
+  "stderr": "",
+  "probe": {
+    "ok": false,
+    "pageTitle": "汇正首席杨Sir的抖音直播间 - 抖音直播",
+    "videoCount": 1,
+    "selected": {
+      "paused": false,
+      "muted": false,
+      "volume": 1,
+      "readyState": 0,
+      "networkState": 2,
+      "currentTime": 0,
+      "duration": null,
+      "srcPresent": false
+    },
+    "captureStreamAvailable": true,
+    "audioTrackCount": 0,
+    "videoTrackCount": 1,
+    "playAttempt": "play-timeout",
+    "reason": "video-not-ready-or-no-audio-track",
+    "targetTitle": "汇正首席杨Sir的抖音直播间 - 抖音直播",
+    "targetUrl": "https://live.douyin.com/400595809668"
+  }
+}

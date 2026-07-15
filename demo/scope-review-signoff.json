@@ -1,0 +1,69 @@
+{
+  "document": "demo/mvp-scope.md",
+  "task": "Task 0.1",
+  "purpose": "MVP 范围、非目标和 Go / No-Go 降级边界评审签收",
+  "required_roles": [
+    "product",
+    "client_capture_engineering",
+    "asr_ai_engineering",
+    "backend_engineering",
+    "qa",
+    "compliance_ops"
+  ],
+  "signoffs": [
+    {
+      "role": "product",
+      "display_name": "产品负责人",
+      "status": "pending",
+      "confirmed_at": "",
+      "reviewer": "",
+      "confirmation": "MUST / SHOULD / LATER 分类符合首版目标；非目标足够明确。",
+      "notes": ""
+    },
+    {
+      "role": "client_capture_engineering",
+      "display_name": "客户端 / 采集研发",
+      "status": "pending",
+      "confirmed_at": "",
+      "reviewer": "",
+      "confirmation": "3 路匿名容器、独立音频、后台稳定性验收口径可执行。",
+      "notes": ""
+    },
+    {
+      "role": "asr_ai_engineering",
+      "display_name": "ASR / AI 研发",
+      "status": "pending",
+      "confirmed_at": "",
+      "reviewer": "",
+      "confirmation": "ASR 指标、语义完整性指标、事件字段和降级边界可执行。",
+      "notes": ""
+    },
+    {
+      "role": "backend_engineering",
+      "display_name": "服务端研发",
+      "status": "pending",
+      "confirmed_at": "",
+      "reviewer": "",
+      "confirmation": "私人数据、结构化共建、版本链和权限隔离边界可执行。",
+      "notes": ""
+    },
+    {
+      "role": "qa",
+      "display_name": "测试 / 质量",
+      "status": "pending",
+      "confirmed_at": "",
+      "reviewer": "",
+      "confirmation": "每个 MUST 项都有可复算或可观察的验收方式。",
+      "notes": ""
+    },
+    {
+      "role": "compliance_ops",
+      "display_name": "合规 / 运营",
+      "status": "pending",
+      "confirmed_at": "",
+      "reviewer": "",
+      "confirmation": "不登录、不荐股、不公开逐字稿、投诉删除入口等边界足够。",
+      "notes": ""
+    }
+  ]
+}

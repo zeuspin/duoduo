@@ -1,0 +1,32 @@
+.live-workspace { min-width:0; overflow:hidden; }
+.live-workspace-toolbar { height:48px; padding:0 12px; display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line); }
+.live-tabs { height:100%; display:flex; }
+.live-tabs button { min-width:86px; border:0; border-bottom:2px solid transparent; background:#fff; color:#697481; font-size:11px; }
+.live-tabs button.active { border-bottom-color:var(--blue); color:var(--blue); font-weight:600; }
+.live-workspace-toolbar label { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:10px; }
+.live-workspace-toolbar select { width:230px; height:32px; border:1px solid #cbd3dc; background:#fff; padding:0 8px; font-size:10px; }
+.live-workspace .asr-title { display:none; }
+.live-insight-feed { height:230px; overflow-x:hidden; overflow-y:auto; }
+.live-parser-state,.live-insight-loading,.live-insight-empty { padding:8px 14px; border-bottom:1px solid #edf0f3; color:var(--muted); font-size:10px; text-align:center; }
+.live-parser-state.enabled { color:#20875f; }
+.live-insight-empty { padding:44px 14px; }
+.live-insight-item { padding:11px 14px; border-bottom:1px solid #edf0f3; transition:background .2s; }
+.live-insight-item.focused { background:#fff8e8; outline:1px solid #e0ba63; outline-offset:-1px; }
+.live-insight-meta { display:flex; justify-content:space-between; gap:10px; color:var(--blue); font-size:10px; }
+.live-insight-meta span { color:#8b641d; }
+.live-insight-meta span.important { color:#d34854; }
+.live-insight-item h3 { margin:6px 0; font-size:12px; }
+.live-insight-item p,.live-insight-item blockquote { margin:6px 0; font-size:10px; line-height:1.6; }
+.live-insight-item blockquote { padding:7px; border-left:2px solid #aeb8c5; background:#f7f8fa; color:#5f6b78; }
+.live-insight-item small { color:var(--muted); font-size:9px; }
+.live-insight-conditions { color:#8b641d; }
+.insight-notification-rail { position:fixed; top:64px; left:250px; right:0; z-index:2; padding:8px 14px; background:#f4f6fa; border-bottom:1px solid var(--line); }
+.insight-notification-track { display:flex; gap:8px; overflow-x:auto; scrollbar-gutter:stable; }
+.insight-notification-track article { position:relative; flex:0 0 310px; min-width:0; height:62px; border:1px solid #d5dbe3; border-left:3px solid #d6a642; background:#fff; }
+.insight-notification-track article.important { border-left-color:#d34854; }
+.insight-notification-open { width:100%; height:100%; padding:8px 34px 8px 10px; border:0; background:transparent; text-align:left; }
+.insight-notification-open small { display:block; margin-bottom:5px; color:var(--muted); font-size:9px; }
+.insight-notification-open b { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
+.insight-notification-close { position:absolute; top:5px; right:5px; width:24px; height:24px; border:0; background:transparent; color:#7b8591; display:grid; place-items:center; }
+.shell.has-insight-notifications { padding-top:142px; }
+.shell.has-insight-notifications main { scroll-margin-top:142px; }

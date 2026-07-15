@@ -1,0 +1,154 @@
+{
+  "run_id": "run71",
+  "created_at": "2026-07-11T09:42:03+08:00",
+  "stage_scope": "multi-route live audio capture and ASR validation only",
+  "stage_acceptance_pass": true,
+  "out_of_scope": [
+    "stock or finance room classification",
+    "two-hour stability testing",
+    "manual transcription",
+    "manual semantic annotation",
+    "real-time aggregation"
+  ],
+  "duration_policy": {
+    "max_single_test_minutes": 20,
+    "actual_capture_minutes_per_route": 3,
+    "actual_total_audio_minutes": 9
+  },
+  "candidate_gate": {
+    "source": "demo/reports/run69-generic-live-candidates.json",
+    "report": "demo/reports/run70-user-candidates-gate.json",
+    "probe_ok_count": 20,
+    "can_run_three_route_capture": true,
+    "recommended_room_ids": [
+      "478068897604",
+      "575973340980",
+      "744549703134"
+    ]
+  },
+  "capture": {
+    "summary": "demo/reports/run71-adaptive-three-route-capture-summary.json",
+    "initial_active_count": 3,
+    "requested_rounds": 3,
+    "completed_rounds": 3,
+    "segment_seconds": 60,
+    "valid_segments": 9,
+    "replacement_events": 0,
+    "all_rounds_three_valid": true,
+    "conclusion": "Pass",
+    "routes": [
+      {
+        "route": "C1",
+        "room_id": "478068897604",
+        "url": "https://live.douyin.com/478068897604",
+        "page_title": "大声的抖音直播间 - 抖音直播",
+        "audio_track_count": 1,
+        "valid_segments": 3
+      },
+      {
+        "route": "C2",
+        "room_id": "575973340980",
+        "url": "https://live.douyin.com/575973340980",
+        "page_title": "王者荣耀猪八（国服阿骨朵）的抖音直播间 - 抖音直播",
+        "audio_track_count": 1,
+        "valid_segments": 3
+      },
+      {
+        "route": "C3",
+        "room_id": "744549703134",
+        "url": "https://live.douyin.com/744549703134",
+        "page_title": "小白龙🐲¹¹¹的抖音直播间 - 抖音直播",
+        "audio_track_count": 1,
+        "valid_segments": 3
+      }
+    ]
+  },
+  "audio_isolation_evidence": {
+    "capture_method": "page-level video.captureStream() + MediaRecorder in separate anonymous Chrome user-data-dir profiles",
+    "separate_cdp_ports": [
+      10361,
+      10362,
+      10363
+    ],
+    "distinct_room_ids": [
+      "478068897604",
+      "575973340980",
+      "744549703134"
+    ],
+    "system_audio_watermark_prior_evidence": "demo/reports/run44-audio-watermark-isolation-report.json",
+    "automated_isolation_evidence_pass": true,
+    "manual_listening_performed": false,
+    "manual_listening_note": "本阶段以页面级捕获、独立 profile、独立 CDP 端口、不同房间 ID 和不同 ASR 文本作为自动化隔离证据；未执行人耳听检。"
+  },
+  "asr": {
+    "report": "demo/reports/run71-generic-asr-sample-registration-report.json",
+    "valid_items": 9,
+    "transcoded_ok": 9,
+    "asr_ok": 9,
+    "manifest_appended": 9,
+    "model": "paraformer-realtime-v2",
+    "sentence_counts": {
+      "RUN71-C1-R01": 1,
+      "RUN71-C2-R01": 10,
+      "RUN71-C3-R01": 11,
+      "RUN71-C1-R02": 2,
+      "RUN71-C2-R02": 8,
+      "RUN71-C3-R02": 12,
+      "RUN71-C1-R03": 2,
+      "RUN71-C2-R03": 15,
+      "RUN71-C3-R03": 10
+    },
+    "sample_text_snippets": {
+      "RUN71-C1-R01": "墙围墙台风级。早晨五点钟，其中心位于这闽交界东偏南方向约560公里的西北太平洋洋面上...",
+      "RUN71-C2-R01": "他没大了。",
+      "RUN71-C3-R01": "开区。",
+      "RUN71-C1-R03": "超1400人进入这ba比赛场馆躲避台风...",
+      "RUN71-C2-R03": "断下，打通棍子，什么都是。断下。",
+      "RUN71-C3-R03": "临海啊啊对啊稍等啊，台州临海。"
+    }
+  },
+  "environment_cleanup": {
+    "process_guard_report": "demo/reports/test-process-guard-report.json",
+    "profile_cleanup_report": "demo/reports/test-chrome-profile-cleanup-report.json",
+    "test_chrome_count": 0,
+    "capture_process_count": 0,
+    "chrome_profile_dir_count_after_cleanup": 0
+  },
+  "acceptance_checklist": [
+    {
+      "item": "Use only demo directory for validation artifacts",
+      "status": "pass"
+    },
+    {
+      "item": "Find at least three currently playable live rooms",
+      "status": "pass",
+      "evidence": "run70 probe_ok_count=20 and can_run_three_route_capture=true"
+    },
+    {
+      "item": "Run three live rooms in parallel without Safari playback",
+      "status": "pass",
+      "evidence": "run71 uses three anonymous Chrome profiles and separate CDP ports"
+    },
+    {
+      "item": "Capture per-route audio without zero-byte or missing-audio segments",
+      "status": "pass",
+      "evidence": "run71 completed 3/3 rounds, 9/9 segments valid"
+    },
+    {
+      "item": "Route audio is automatically isolated from other routes and system audio",
+      "status": "pass_with_caveat",
+      "evidence": "page-level captureStream per route, distinct ASR text per route, and prior run44 system-audio watermark isolation",
+      "caveat": "manual listening was not performed"
+    },
+    {
+      "item": "ASR returns text for each captured sample",
+      "status": "pass",
+      "evidence": "run71 ASR 9/9 ok"
+    },
+    {
+      "item": "Clean up test Chrome windows, capture processes, and anonymous profiles",
+      "status": "pass",
+      "evidence": "process guard count=0 and profile dir count=0"
+    }
+  ]
+}

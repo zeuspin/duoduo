@@ -1,0 +1,11 @@
+{
+  "run_id": "run59",
+  "decision": "aborted",
+  "reason": "User constrained live tests to at most 20 minutes unless longer testing is explicitly justified and approved.",
+  "planned_duration_seconds": 7200,
+  "planned_interval_seconds": 600,
+  "exit_code": 130,
+  "counts_as_pass": false,
+  "counts_as_failure": false,
+  "replacement_plan": "Run a stock/finance three-route recovery monitor with duration_seconds <= 1200."
+}

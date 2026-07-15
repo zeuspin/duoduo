@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "reason": "probe timed out after 8000 ms on two attempts",
+  "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+  "targetUrl": "https://live.douyin.com/816173758414",
+  "action": "recorded as failed; rolling capture was not started"
+}

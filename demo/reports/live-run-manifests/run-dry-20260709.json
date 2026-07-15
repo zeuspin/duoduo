@@ -1,0 +1,46 @@
+{
+  "run_id": "run-dry-20260709",
+  "created_at": "2026-07-09T03:54:02+08:00",
+  "dry_run": true,
+  "guard": {
+    "returncode": 0,
+    "stdout": "{\"output_json\": \"demo/reports/test-process-guard-report.json\", \"output_md\": \"demo/reports/test-process-guard-report.md\", \"ok\": true, \"test_chrome_count\": 0, \"capture_process_count\": 0}",
+    "stderr": "",
+    "ok": true
+  },
+  "actions": [
+    {
+      "index": 1,
+      "room_id": "782837937233",
+      "url": "https://live.douyin.com/782837937233",
+      "profile_dir": "demo/runtime/chrome-profiles/run-dry-20260709-a",
+      "debug_port": 9241,
+      "launched": false,
+      "returncode": null
+    },
+    {
+      "index": 2,
+      "room_id": "31544105137",
+      "url": "https://live.douyin.com/31544105137",
+      "profile_dir": "demo/runtime/chrome-profiles/run-dry-20260709-b",
+      "debug_port": 9242,
+      "launched": false,
+      "returncode": null
+    },
+    {
+      "index": 3,
+      "room_id": "414092641626",
+      "url": "https://live.douyin.com/414092641626",
+      "profile_dir": "demo/runtime/chrome-profiles/run-dry-20260709-c",
+      "debug_port": 9243,
+      "launched": false,
+      "returncode": null
+    }
+  ],
+  "rules": [
+    "Safari 只用于搜索和获取链接，不用于播放或录制。",
+    "所有 URL 规范化为 https://live.douyin.com/{room_id}。",
+    "启动前必须通过进程守卫。",
+    "每轮只启动 3 个独立 Chrome user-data-dir。"
+  ]
+}

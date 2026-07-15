@@ -1,0 +1,8 @@
+{
+  "ok": false,
+  "reason": "no-audio-tracks",
+  "videos": 1,
+  "paused": true,
+  "readyState": 0,
+  "hasVideoTracks": 0
+}

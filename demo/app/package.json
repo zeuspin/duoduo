@@ -1,0 +1,53 @@
+{
+  "name": "duoduo-live",
+  "version": "0.5.1",
+  "private": true,
+  "description": "Cross-platform live room monitoring and realtime ASR client",
+  "author": "Duoduo Live",
+  "main": ".vite/build/main.js",
+  "scripts": {
+    "dev": "electron-forge start",
+    "build": "electron-forge package",
+    "make": "electron-forge make",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:electron-audio": "ELECTRON_DISABLE_SECURITY_WARNINGS=1 electron tests/electron/audio-isolation.cjs",
+    "test:electron-crash": "ELECTRON_DISABLE_SECURITY_WARNINGS=1 electron tests/electron/renderer-crash.cjs",
+    "test:e2e-fixture": "npm run build --silent && node tests/electron/app-fixture-e2e.cjs",
+    "test:e2e-packaged-mac": "DUODUO_PACKAGED_E2E=1 node tests/electron/app-fixture-e2e.cjs",
+    "test:e2e-player": "npm run build --silent && node tests/electron/player-e2e.cjs",
+    "test:e2e-insights": "npm run build --silent && node tests/electron/insight-parser-e2e.cjs",
+    "test:real-insights": "npm run build --silent && node tests/electron/real-insight-smoke.cjs",
+    "evaluate:parser": "node scripts/evaluate-parser.mjs",
+    "test:resource-soak": "node tests/electron/resource-soak.cjs",
+    "scan:secrets": "node scripts/scan-secrets.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.9.2",
+    "ws": "^8.18.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/maker-dmg": "^7.10.2",
+    "@electron-forge/maker-squirrel": "^7.10.2",
+    "@electron-forge/maker-zip": "^7.10.2",
+    "@electron-forge/plugin-vite": "^7.10.2",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "electron": "^39.2.7",
+    "jsdom": "^27.2.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.6",
+    "vitest": "^4.0.15"
+  }
+}

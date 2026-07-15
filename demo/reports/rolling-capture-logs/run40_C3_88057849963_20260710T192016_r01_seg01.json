@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "mimeType": "audio/webm;codecs=opus",
+  "size": 39799,
+  "chunkCount": 4,
+  "nonEmptyChunkCount": 4,
+  "chunkSizes": [
+    2094,
+    16438,
+    16438,
+    4829
+  ],
+  "audioTracks": 1,
+  "startState": {
+    "video": {
+      "paused": false,
+      "muted": false,
+      "volume": 1,
+      "readyState": 4,
+      "networkState": 2,
+      "currentTime": 20.392312,
+      "duration": null,
+      "srcPresent": true
+    },
+    "audioTracks": [
+      {
+        "id": "e35017c2-39fe-45de-9f08-7d5b7188f898",
+        "kind": "audio",
+        "label": "7861f5a3-adb7-4ec1-822b-8b9919bda11b",
+        "enabled": true,
+        "muted": false,
+        "readyState": "live"
+      }
+    ],
+    "videoTrackCount": 1
+  },
+  "endState": {
+    "video": {
+      "paused": false,
+      "muted": false,
+      "volume": 1,
+      "readyState": 4,
+      "networkState": 2,
+      "currentTime": 56.347193,
+      "duration": null,
+      "srcPresent": true
+    },
+    "audioTracks": [
+      {
+        "id": "e35017c2-39fe-45de-9f08-7d5b7188f898",
+        "kind": "audio",
+        "label": "7861f5a3-adb7-4ec1-822b-8b9919bda11b",
+        "enabled": true,
+        "muted": false,
+        "readyState": "live"
+      }
+    ],
+    "recorderState": "inactive"
+  },
+  "durationMs": 60000,
+  "output": "/Users/xuke/Documents/getian/duoduo/demo/samples/audio/raw/run40_C3_88057849963_20260710T192016_r01_seg01_60s_page_capture.webm",
+  "targetTitle": "广发证券修多多的抖音直播间 - 抖音直播",
+  "targetUrl": "https://live.douyin.com/88057849963"
+}

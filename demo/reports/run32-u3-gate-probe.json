@@ -1,0 +1,22 @@
+{
+  "ok": false,
+  "pageTitle": "海派-和众汇富的抖音直播间 - 抖音直播",
+  "videoCount": 1,
+  "selected": {
+    "paused": false,
+    "muted": false,
+    "volume": 1,
+    "readyState": 0,
+    "networkState": 2,
+    "currentTime": 0,
+    "duration": null,
+    "srcPresent": false
+  },
+  "captureStreamAvailable": true,
+  "audioTrackCount": 0,
+  "videoTrackCount": 1,
+  "playAttempt": "play-timeout",
+  "reason": "video-not-ready-or-no-audio-track",
+  "targetTitle": "海派-和众汇富的抖音直播间 - 抖音直播",
+  "targetUrl": "https://live.douyin.com/812755146455"
+}

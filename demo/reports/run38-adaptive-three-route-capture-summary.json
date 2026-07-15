@@ -1,0 +1,601 @@
+{
+  "run_id": "run38",
+  "created_at": "2026-07-10T19:10:08+08:00",
+  "dry_run": false,
+  "candidate_count": 7,
+  "requested_rounds": 10,
+  "completed_rounds": 10,
+  "initial_active_count": 3,
+  "replacement_events": 1,
+  "all_rounds_three_valid": false,
+  "conclusion": "Completed with replacements or invalid segments; not a stable three-route pass",
+  "routes": [
+    {
+      "slot": 1,
+      "route": "C1",
+      "candidate": {
+        "code": "S4",
+        "room_id": "857559947435",
+        "url": "https://live.douyin.com/857559947435",
+        "title": "黄金的机会与风险？"
+      },
+      "room_id": "857559947435",
+      "url": "https://live.douyin.com/857559947435",
+      "port": 9521,
+      "profile_dir": "demo/runtime/chrome-profiles/run38-adaptive-c1",
+      "failure_streak": 0,
+      "replacement_count": 1,
+      "active": true,
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run38-C1-s4-adaptive-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "老李财经的抖音直播间 - 抖音直播",
+      "audio_track_count": 1
+    },
+    {
+      "slot": 2,
+      "route": "C2",
+      "candidate": {
+        "code": "S2",
+        "room_id": "305503141482",
+        "url": "https://live.douyin.com/305503141482",
+        "title": "大盘跌破4000点，科技股大跌，行情就此熄火了？"
+      },
+      "room_id": "305503141482",
+      "url": "https://live.douyin.com/305503141482",
+      "port": 9522,
+      "profile_dir": "demo/runtime/chrome-profiles/run38-adaptive-c2",
+      "failure_streak": 0,
+      "replacement_count": 0,
+      "active": true,
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run38-C2-s2-adaptive-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "财经红姐的抖音直播间 - 抖音直播",
+      "audio_track_count": 1
+    },
+    {
+      "slot": 3,
+      "route": "C3",
+      "candidate": {
+        "code": "S3",
+        "room_id": "848398958216",
+        "url": "https://live.douyin.com/848398958216",
+        "title": "接下来的核心主线是什么？"
+      },
+      "room_id": "848398958216",
+      "url": "https://live.douyin.com/848398958216",
+      "port": 9523,
+      "profile_dir": "demo/runtime/chrome-profiles/run38-adaptive-c3",
+      "failure_streak": 0,
+      "replacement_count": 0,
+      "active": true,
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run38-C3-s3-adaptive-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "小溪财经的抖音直播间 - 抖音直播",
+      "audio_track_count": 1
+    }
+  ],
+  "events": [
+    {
+      "type": "initial_probe",
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "message": "海能-叨哥财经的抖音直播间 - 抖音直播"
+    },
+    {
+      "type": "initial_probe",
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "message": "财经红姐的抖音直播间 - 抖音直播"
+    },
+    {
+      "type": "initial_probe",
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "message": "小溪财经的抖音直播间 - 抖音直播"
+    },
+    {
+      "type": "segment",
+      "round": 1,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T185957_r01_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T18:59:57+08:00\",\"ended_at\":\"2026-07-10T19:00:58+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_583183556429_20260710T185957_r01_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T185957_r01_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T185957_r01_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 1,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T185957_r01_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T18:59:57+08:00\",\"ended_at\":\"2026-07-10T19:00:58+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T185957_r01_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T185957_r01_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T185957_r01_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 1,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T185957_r01_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T18:59:57+08:00\",\"ended_at\":\"2026-07-10T19:00:58+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T185957_r01_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T185957_r01_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T185957_r01_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 2,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190058_r02_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T19:00:58+08:00\",\"ended_at\":\"2026-07-10T19:01:59+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_583183556429_20260710T190058_r02_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190058_r02_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190058_r02_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 2,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190058_r02_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T19:00:58+08:00\",\"ended_at\":\"2026-07-10T19:01:59+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T190058_r02_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190058_r02_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190058_r02_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 2,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190058_r02_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T19:00:58+08:00\",\"ended_at\":\"2026-07-10T19:01:59+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T190058_r02_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190058_r02_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190058_r02_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 3,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190159_r03_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T19:01:59+08:00\",\"ended_at\":\"2026-07-10T19:02:59+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_583183556429_20260710T190159_r03_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190159_r03_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190159_r03_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 3,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190159_r03_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T19:01:59+08:00\",\"ended_at\":\"2026-07-10T19:02:59+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T190159_r03_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190159_r03_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190159_r03_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 3,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190159_r03_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T19:01:59+08:00\",\"ended_at\":\"2026-07-10T19:02:59+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T190159_r03_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190159_r03_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190159_r03_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 4,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190300_r04_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T19:03:00+08:00\",\"ended_at\":\"2026-07-10T19:04:00+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_583183556429_20260710T190300_r04_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190300_r04_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190300_r04_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 4,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190300_r04_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T19:03:00+08:00\",\"ended_at\":\"2026-07-10T19:04:00+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T190300_r04_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190300_r04_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190300_r04_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 4,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190300_r04_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T19:03:00+08:00\",\"ended_at\":\"2026-07-10T19:04:00+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T190300_r04_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190300_r04_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190300_r04_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 5,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190400_r05_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T19:04:00+08:00\",\"ended_at\":\"2026-07-10T19:05:01+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_583183556429_20260710T190400_r05_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190400_r05_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190400_r05_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 5,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190400_r05_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T19:04:00+08:00\",\"ended_at\":\"2026-07-10T19:05:01+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T190400_r05_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190400_r05_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190400_r05_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 5,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190400_r05_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T19:04:00+08:00\",\"ended_at\":\"2026-07-10T19:05:01+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T190400_r05_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190400_r05_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190400_r05_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 6,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190501_r06_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T19:05:01+08:00\",\"ended_at\":\"2026-07-10T19:06:02+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_583183556429_20260710T190501_r06_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190501_r06_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190501_r06_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 6,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190501_r06_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T19:05:01+08:00\",\"ended_at\":\"2026-07-10T19:06:02+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T190501_r06_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190501_r06_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190501_r06_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 6,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190501_r06_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T19:05:01+08:00\",\"ended_at\":\"2026-07-10T19:06:02+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T190501_r06_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190501_r06_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190501_r06_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 7,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190602_r07_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T19:06:02+08:00\",\"ended_at\":\"2026-07-10T19:07:02+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_583183556429_20260710T190602_r07_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190602_r07_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190602_r07_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 7,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190602_r07_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T19:06:02+08:00\",\"ended_at\":\"2026-07-10T19:07:02+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T190602_r07_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190602_r07_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190602_r07_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 7,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190602_r07_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T19:06:02+08:00\",\"ended_at\":\"2026-07-10T19:07:02+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T190602_r07_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190602_r07_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190602_r07_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 8,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "reason": "",
+      "bytes": 840568,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190703_r08_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T19:07:03+08:00\",\"ended_at\":\"2026-07-10T19:08:03+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_583183556429_20260710T190703_r08_seg01_60s_page_capture.webm\",\"bytes\":840568,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190703_r08_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190703_r08_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 8,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190703_r08_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T19:07:03+08:00\",\"ended_at\":\"2026-07-10T19:08:03+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T190703_r08_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190703_r08_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190703_r08_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 8,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 966123,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190703_r08_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T19:07:03+08:00\",\"ended_at\":\"2026-07-10T19:08:03+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T190703_r08_seg01_60s_page_capture.webm\",\"bytes\":966123,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190703_r08_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190703_r08_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 9,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": false,
+      "reason": "capture-command-failed",
+      "bytes": 0,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190803_r09_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":false,\"reason\":\"capture-command-failed\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T19:08:03+08:00\",\"ended_at\":\"2026-07-10T19:08:03+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_583183556429_20260710T190803_r09_seg01_60s_page_capture.webm\",\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190803_r09_seg01.json\",\"post_failure_probe_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190803_r09_seg01_post_failure_probe.json\"}",
+        "{\"ok\":false,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":0,\"failed_segments\":1,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_583183556429_20260710T190803_r09_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "replace"
+    },
+    {
+      "type": "replacement",
+      "round": 9,
+      "route": "C1",
+      "old_room_id": "583183556429",
+      "room_id": "857559947435",
+      "ok": true,
+      "message": "老李财经的抖音直播间 - 抖音直播"
+    },
+    {
+      "type": "segment",
+      "round": 9,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190803_r09_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T19:08:03+08:00\",\"ended_at\":\"2026-07-10T19:09:04+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T190803_r09_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190803_r09_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190803_r09_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 9,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190803_r09_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T19:08:03+08:00\",\"ended_at\":\"2026-07-10T19:09:04+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T190803_r09_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190803_r09_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190803_r09_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 10,
+      "route": "C1",
+      "room_id": "857559947435",
+      "ok": true,
+      "reason": "",
+      "bytes": 966775,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C1_857559947435_20260710T190904_r10_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C1\",\"room_id\":\"857559947435\",\"segment\":1,\"started_at\":\"2026-07-10T19:09:04+08:00\",\"ended_at\":\"2026-07-10T19:10:04+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C1_857559947435_20260710T190904_r10_seg01_60s_page_capture.webm\",\"bytes\":966775,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C1_857559947435_20260710T190904_r10_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C1\",\"room_id\":\"857559947435\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C1_857559947435_20260710T190904_r10_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 10,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190904_r10_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T19:09:04+08:00\",\"ended_at\":\"2026-07-10T19:10:04+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C2_305503141482_20260710T190904_r10_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190904_r10_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C2_305503141482_20260710T190904_r10_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 10,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 967089,
+      "summary_file": "demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190904_r10_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T19:09:04+08:00\",\"ended_at\":\"2026-07-10T19:10:04+08:00\",\"audio_file\":\"demo/samples/audio/raw/run38_C3_848398958216_20260710T190904_r10_seg01_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190904_r10_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run38_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run38_C3_848398958216_20260710T190904_r10_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    }
+  ]
+}

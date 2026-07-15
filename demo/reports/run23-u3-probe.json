@@ -1,0 +1,27 @@
+{
+  "command_returncode": 0,
+  "stdout": "{\n  \"ok\": true,\n  \"pageTitle\": \"海派-和众汇富的抖音直播间 - 抖音直播\",\n  \"videoCount\": 1,\n  \"selected\": {\n    \"paused\": false,\n    \"muted\": false,\n    \"volume\": 1,\n    \"readyState\": 4,\n    \"networkState\": 2,\n    \"currentTime\": 10.818,\n    \"duration\": null,\n    \"srcPresent\": false\n  },\n  \"captureStreamAvailable\": true,\n  \"audioTrackCount\": 1,\n  \"videoTrackCount\": 1,\n  \"playAttempt\": \"ok\",\n  \"reason\": \"\",\n  \"targetTitle\": \"海派-和众汇富的抖音直播间 - 抖音直播\",\n  \"targetUrl\": \"https://live.douyin.com/812755146455\"\n}",
+  "stderr": "",
+  "probe": {
+    "ok": true,
+    "pageTitle": "海派-和众汇富的抖音直播间 - 抖音直播",
+    "videoCount": 1,
+    "selected": {
+      "paused": false,
+      "muted": false,
+      "volume": 1,
+      "readyState": 4,
+      "networkState": 2,
+      "currentTime": 10.818,
+      "duration": null,
+      "srcPresent": false
+    },
+    "captureStreamAvailable": true,
+    "audioTrackCount": 1,
+    "videoTrackCount": 1,
+    "playAttempt": "ok",
+    "reason": "",
+    "targetTitle": "海派-和众汇富的抖音直播间 - 抖音直播",
+    "targetUrl": "https://live.douyin.com/812755146455"
+  }
+}

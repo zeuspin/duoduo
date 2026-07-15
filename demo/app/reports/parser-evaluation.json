@@ -1,0 +1,13 @@
+{
+  "fixtureSegments": 20,
+  "goldRelevant": 13,
+  "predicted": 13,
+  "precision": 1,
+  "recall": 1,
+  "natureAccuracy": 1,
+  "evidenceConsistency": 1,
+  "schemaValidity": 1,
+  "falsePositives": [],
+  "falseNegatives": [],
+  "note": "Deterministic contract fixture; real-model quality is reported separately by live smoke and replay evidence."
+}

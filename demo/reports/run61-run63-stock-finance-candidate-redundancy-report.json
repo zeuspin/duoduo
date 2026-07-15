@@ -1,0 +1,28 @@
+{
+  "decision": "no-go",
+  "reason": "Current stock/finance candidate pool has fewer than three capturable rooms and cannot support three-route recovery monitoring.",
+  "search_runs": [
+    {
+      "run_id": "discovery-run61-stock-search",
+      "query": "股票直播",
+      "link_count": 0,
+      "finance_candidate_count": 0
+    },
+    {
+      "run_id": "discovery-run62-finance-search",
+      "query": "财经直播",
+      "link_count": 0,
+      "finance_candidate_count": 0
+    }
+  ],
+  "gate_run": {
+    "run_id": "run63",
+    "candidate_source": "run55 historical stock/finance candidates",
+    "probe_ok_count": 2,
+    "can_run_three_route_capture": false,
+    "recommended_room_ids": ["782837937233", "816173758414"]
+  },
+  "minimum_required_for_three_route": 3,
+  "recommended_required_with_standby": 5,
+  "counts_as_container_failure": false
+}

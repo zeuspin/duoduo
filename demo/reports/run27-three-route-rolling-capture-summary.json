@@ -1,0 +1,64 @@
+{
+  "run_id": "run27",
+  "stamp": "20260709T0929",
+  "room_ids": [
+    "334489081726",
+    "773107011629",
+    "812755146455"
+  ],
+  "all_probe_ok": false,
+  "all_capture_ok": false,
+  "routes": [
+    {
+      "route": "C1",
+      "room_id": "334489081726",
+      "port": 9411,
+      "profile_dir": "demo/runtime/chrome-profiles/run27-C1-capture",
+      "stream_code": "run27_C1",
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run27-C1-page-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "文鼎（文说股市）的抖音直播间 - 抖音直播",
+      "audio_track_count": 1,
+      "capture_returncode": null,
+      "rolling_summary_file": ""
+    },
+    {
+      "route": "C2",
+      "room_id": "773107011629",
+      "port": 9412,
+      "profile_dir": "demo/runtime/chrome-profiles/run27-C2-capture",
+      "stream_code": "run27_C2",
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run27-C2-page-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "低吸一哥奇点的抖音直播间 - 抖音直播",
+      "audio_track_count": 1,
+      "capture_returncode": null,
+      "rolling_summary_file": ""
+    },
+    {
+      "route": "C3",
+      "room_id": "812755146455",
+      "port": 9413,
+      "profile_dir": "demo/runtime/chrome-profiles/run27-C3-capture",
+      "stream_code": "run27_C3",
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run27-C3-page-probe.json",
+      "probe_returncode": 2,
+      "probe_ok": false,
+      "probe_reason": "video-not-ready-or-no-audio-track",
+      "page_title": "海派-和众汇富的抖音直播间 - 抖音直播",
+      "audio_track_count": 0,
+      "capture_returncode": null,
+      "rolling_summary_file": ""
+    }
+  ]
+}

@@ -1,0 +1,984 @@
+{
+  "run_id": "run49",
+  "created_at": "2026-07-10T23:07:29+08:00",
+  "duration_seconds": 7200,
+  "interval_seconds": 600,
+  "requested_checkpoints": 12,
+  "completed_checkpoints": 12,
+  "initial_active_count": 3,
+  "all_checkpoints_three_ok": false,
+  "conclusion": "Completed with one or more failed playback checkpoints",
+  "routes": [
+    {
+      "route": "C1",
+      "room_id": "5583822346",
+      "url": "https://live.douyin.com/5583822346",
+      "port": 9721,
+      "profile_dir": "demo/runtime/chrome-profiles/run49-playback-c1",
+      "launch_returncode": 0,
+      "initial_probe": {
+        "ok": true,
+        "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 29.85,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/5583822346",
+        "probe_returncode": 0
+      }
+    },
+    {
+      "route": "C2",
+      "room_id": "632263122130",
+      "url": "https://live.douyin.com/632263122130",
+      "port": 9722,
+      "profile_dir": "demo/runtime/chrome-profiles/run49-playback-c2",
+      "launch_returncode": 0,
+      "initial_probe": {
+        "ok": true,
+        "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 27.819,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/632263122130",
+        "probe_returncode": 0
+      }
+    },
+    {
+      "route": "C3",
+      "room_id": "746541295999",
+      "url": "https://live.douyin.com/746541295999",
+      "port": 9723,
+      "profile_dir": "demo/runtime/chrome-profiles/run49-playback-c3",
+      "launch_returncode": 0,
+      "initial_probe": {
+        "ok": true,
+        "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 24.532,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/746541295999",
+        "probe_returncode": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "elapsed_seconds": 600.36,
+      "routes": [
+        {
+          "ok": true,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 649.7,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 0,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 616.611,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": true,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 577.633,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 0,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": true
+    },
+    {
+      "checkpoint": 2,
+      "elapsed_seconds": 1200.45,
+      "routes": [
+        {
+          "ok": false,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": true,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 3,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "ok",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 2,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1216.076,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": true,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1177.7,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 0,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 3,
+      "elapsed_seconds": 1802.31,
+      "routes": [
+        {
+          "ok": false,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 2,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1817.961,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": true,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1779.6,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 0,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 4,
+      "elapsed_seconds": 2402.35,
+      "routes": [
+        {
+          "ok": false,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 2,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1890.145,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": false,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": true,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 3,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "ok",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 2,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 5,
+      "elapsed_seconds": 3004.27,
+      "routes": [
+        {
+          "ok": false,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 2,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1890.145,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": false,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 2,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 6,
+      "elapsed_seconds": 3604.26,
+      "routes": [
+        {
+          "ok": false,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 2,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1890.145,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": false,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 2,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 7,
+      "elapsed_seconds": 4204.29,
+      "routes": [
+        {
+          "ok": false,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 2,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1890.145,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": false,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 2,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 8,
+      "elapsed_seconds": 4804.27,
+      "routes": [
+        {
+          "ok": false,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 2,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1890.145,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": false,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 2,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 9,
+      "elapsed_seconds": 5404.28,
+      "routes": [
+        {
+          "ok": false,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 2,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1890.145,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": false,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 2,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 10,
+      "elapsed_seconds": 6004.26,
+      "routes": [
+        {
+          "ok": false,
+          "pageTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "九方钱老虎的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/5583822346",
+          "probe_returncode": 2,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": true,
+          "pageTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 4,
+            "networkState": 2,
+            "currentTime": 1890.145,
+            "duration": null,
+            "srcPresent": false
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 1,
+          "videoTrackCount": 1,
+          "playAttempt": "ok",
+          "reason": "",
+          "targetTitle": "A股小王子的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/632263122130",
+          "probe_returncode": 0,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": false,
+          "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "videoCount": 1,
+          "selected": {
+            "paused": false,
+            "muted": false,
+            "volume": 1,
+            "readyState": 0,
+            "networkState": 2,
+            "currentTime": 0,
+            "duration": null,
+            "srcPresent": true
+          },
+          "captureStreamAvailable": true,
+          "audioTrackCount": 0,
+          "videoTrackCount": 0,
+          "playAttempt": "play-timeout",
+          "reason": "video-not-ready-or-no-audio-track",
+          "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+          "targetUrl": "https://live.douyin.com/746541295999",
+          "probe_returncode": 2,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 11,
+      "elapsed_seconds": 6600.2,
+      "routes": [
+        {
+          "ok": false,
+          "reason": "Error: No live.douyin.com page target with webSocketDebuggerUrl found\n    at getPageTarget (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:13:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:134:18",
+          "probe_returncode": 1,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": false,
+          "reason": "Error: No live.douyin.com page target with webSocketDebuggerUrl found\n    at getPageTarget (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:13:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:134:18",
+          "probe_returncode": 1,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": false,
+          "reason": "Error: No live.douyin.com page target with webSocketDebuggerUrl found\n    at getPageTarget (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:13:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:134:18",
+          "probe_returncode": 1,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    },
+    {
+      "checkpoint": 12,
+      "elapsed_seconds": 7200.2,
+      "routes": [
+        {
+          "ok": false,
+          "reason": "Error: No live.douyin.com page target with webSocketDebuggerUrl found\n    at getPageTarget (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:13:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:134:18",
+          "probe_returncode": 1,
+          "route": "C1",
+          "room_id": "5583822346"
+        },
+        {
+          "ok": false,
+          "reason": "Error: No live.douyin.com page target with webSocketDebuggerUrl found\n    at getPageTarget (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:13:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:134:18",
+          "probe_returncode": 1,
+          "route": "C2",
+          "room_id": "632263122130"
+        },
+        {
+          "ok": false,
+          "reason": "Error: No live.douyin.com page target with webSocketDebuggerUrl found\n    at getPageTarget (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:13:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:134:18",
+          "probe_returncode": 1,
+          "route": "C3",
+          "room_id": "746541295999"
+        }
+      ],
+      "three_ok": false
+    }
+  ]
+}

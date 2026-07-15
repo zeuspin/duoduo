@@ -1,0 +1,16 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+.superpowers/
+node_modules/
+out/
+dist/
+coverage/
+.npm-cache/
+demo/samples/
+.vite/
+__pycache__/
+*.py[cod]
+*.log
+demo/runtime/

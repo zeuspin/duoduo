@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "reason": "probe timed out after 8000 ms on two attempts",
+  "targetTitle": "财经小板总的抖音直播间 - 抖音直播",
+  "targetUrl": "https://live.douyin.com/782837937233",
+  "action": "recorded as failed; rolling capture was not started"
+}

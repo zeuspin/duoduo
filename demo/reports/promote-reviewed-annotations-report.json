@@ -1,0 +1,16 @@
+{
+  "input": "demo/samples/annotations/human-annotation-workpack.jsonl",
+  "output": "demo/samples/annotations/semantic-events.jsonl",
+  "total_rows": 599,
+  "promoted_rows": 0,
+  "skipped_rows": 599,
+  "approved_statuses": [
+    "accepted",
+    "done",
+    "reviewed"
+  ],
+  "status_counts": {
+    "todo": 599
+  },
+  "ready_for_task_0_2_count_gate": false
+}

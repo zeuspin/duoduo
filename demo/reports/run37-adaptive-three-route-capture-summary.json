@@ -1,0 +1,160 @@
+{
+  "run_id": "run37",
+  "created_at": "2026-07-10T18:57:33+08:00",
+  "dry_run": false,
+  "candidate_count": 7,
+  "requested_rounds": 1,
+  "completed_rounds": 1,
+  "initial_active_count": 3,
+  "replacement_events": 0,
+  "all_rounds_three_valid": true,
+  "conclusion": "Pass",
+  "routes": [
+    {
+      "slot": 1,
+      "route": "C1",
+      "candidate": {
+        "code": "S1",
+        "room_id": "583183556429",
+        "url": "https://live.douyin.com/583183556429",
+        "title": "海能-叨哥财经：7月行情复杂，主线到底怎么看？"
+      },
+      "room_id": "583183556429",
+      "url": "https://live.douyin.com/583183556429",
+      "port": 9521,
+      "profile_dir": "demo/runtime/chrome-profiles/run37-adaptive-c1",
+      "failure_streak": 0,
+      "replacement_count": 0,
+      "active": true,
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run37-C1-s1-adaptive-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "海能-叨哥财经的抖音直播间 - 抖音直播",
+      "audio_track_count": 1
+    },
+    {
+      "slot": 2,
+      "route": "C2",
+      "candidate": {
+        "code": "S2",
+        "room_id": "305503141482",
+        "url": "https://live.douyin.com/305503141482",
+        "title": "大盘跌破4000点，科技股大跌，行情就此熄火了？"
+      },
+      "room_id": "305503141482",
+      "url": "https://live.douyin.com/305503141482",
+      "port": 9522,
+      "profile_dir": "demo/runtime/chrome-profiles/run37-adaptive-c2",
+      "failure_streak": 0,
+      "replacement_count": 0,
+      "active": true,
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run37-C2-s2-adaptive-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "财经红姐的抖音直播间 - 抖音直播",
+      "audio_track_count": 1
+    },
+    {
+      "slot": 3,
+      "route": "C3",
+      "candidate": {
+        "code": "S3",
+        "room_id": "848398958216",
+        "url": "https://live.douyin.com/848398958216",
+        "title": "接下来的核心主线是什么？"
+      },
+      "room_id": "848398958216",
+      "url": "https://live.douyin.com/848398958216",
+      "port": 9523,
+      "profile_dir": "demo/runtime/chrome-profiles/run37-adaptive-c3",
+      "failure_streak": 0,
+      "replacement_count": 0,
+      "active": true,
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run37-C3-s3-adaptive-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "小溪财经的抖音直播间 - 抖音直播",
+      "audio_track_count": 1
+    }
+  ],
+  "events": [
+    {
+      "type": "initial_probe",
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "message": "海能-叨哥财经的抖音直播间 - 抖音直播"
+    },
+    {
+      "type": "initial_probe",
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "message": "财经红姐的抖音直播间 - 抖音直播"
+    },
+    {
+      "type": "initial_probe",
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "message": "小溪财经的抖音直播间 - 抖音直播"
+    },
+    {
+      "type": "segment",
+      "round": 1,
+      "route": "C1",
+      "room_id": "583183556429",
+      "ok": true,
+      "reason": "",
+      "bytes": 160661,
+      "summary_file": "demo/reports/rolling-capture-logs/run37_C1_583183556429_20260710T185719_r01_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run37_C1\",\"room_id\":\"583183556429\",\"segment\":1,\"started_at\":\"2026-07-10T18:57:19+08:00\",\"ended_at\":\"2026-07-10T18:57:29+08:00\",\"audio_file\":\"demo/samples/audio/raw/run37_C1_583183556429_20260710T185719_r01_seg01_10s_page_capture.webm\",\"bytes\":160661,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run37_C1_583183556429_20260710T185719_r01_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run37_C1\",\"room_id\":\"583183556429\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":10,\"summary_file\":\"demo/reports/rolling-capture-logs/run37_C1_583183556429_20260710T185719_r01_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 1,
+      "route": "C2",
+      "room_id": "305503141482",
+      "ok": true,
+      "reason": "",
+      "bytes": 160661,
+      "summary_file": "demo/reports/rolling-capture-logs/run37_C2_305503141482_20260710T185719_r01_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run37_C2\",\"room_id\":\"305503141482\",\"segment\":1,\"started_at\":\"2026-07-10T18:57:19+08:00\",\"ended_at\":\"2026-07-10T18:57:29+08:00\",\"audio_file\":\"demo/samples/audio/raw/run37_C2_305503141482_20260710T185719_r01_seg01_10s_page_capture.webm\",\"bytes\":160661,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run37_C2_305503141482_20260710T185719_r01_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run37_C2\",\"room_id\":\"305503141482\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":10,\"summary_file\":\"demo/reports/rolling-capture-logs/run37_C2_305503141482_20260710T185719_r01_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    },
+    {
+      "type": "segment",
+      "round": 1,
+      "route": "C3",
+      "room_id": "848398958216",
+      "ok": true,
+      "reason": "",
+      "bytes": 160661,
+      "summary_file": "demo/reports/rolling-capture-logs/run37_C3_848398958216_20260710T185719_r01_summary.jsonl",
+      "stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run37_C3\",\"room_id\":\"848398958216\",\"segment\":1,\"started_at\":\"2026-07-10T18:57:19+08:00\",\"ended_at\":\"2026-07-10T18:57:29+08:00\",\"audio_file\":\"demo/samples/audio/raw/run37_C3_848398958216_20260710T185719_r01_seg01_10s_page_capture.webm\",\"bytes\":160661,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run37_C3_848398958216_20260710T185719_r01_seg01.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run37_C3\",\"room_id\":\"848398958216\",\"requested_segments\":1,\"ok_segments\":1,\"failed_segments\":0,\"segment_seconds\":10,\"summary_file\":\"demo/reports/rolling-capture-logs/run37_C3_848398958216_20260710T185719_r01_summary.jsonl\"}"
+      ],
+      "stderr_tail": [],
+      "action": "keep"
+    }
+  ]
+}

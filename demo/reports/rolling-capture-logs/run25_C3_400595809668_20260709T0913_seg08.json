@@ -1,0 +1,4 @@
+Error: capture timed out after 90000 ms
+    at Timeout.<anonymous> (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_audio_capture.js:59:41)
+    at listOnTimeout (node:internal/timers:608:17)
+    at process.processTimers (node:internal/timers:543:7)

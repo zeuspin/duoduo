@@ -1,0 +1,13 @@
+{
+  "master_rows": 1467,
+  "review_rows": 300,
+  "matched_rows": 300,
+  "changed_rows": 0,
+  "approved_rows_after_merge": 0,
+  "skipped_unreviewed_rows": 300,
+  "missing_master_ids": [],
+  "dry_run": true,
+  "input_master": "demo/samples/annotations/human-annotation-workpack.jsonl",
+  "input_review_pack": "demo/samples/annotations/stock-finance-review-pack.jsonl",
+  "output": "demo/samples/annotations/human-annotation-workpack.jsonl"
+}

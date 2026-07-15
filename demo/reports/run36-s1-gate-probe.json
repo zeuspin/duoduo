@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "pageTitle": "海能-叨哥财经的抖音直播间 - 抖音直播",
+  "videoCount": 1,
+  "selected": {
+    "paused": false,
+    "muted": false,
+    "volume": 1,
+    "readyState": 4,
+    "networkState": 2,
+    "currentTime": 25.046928,
+    "duration": null,
+    "srcPresent": true
+  },
+  "captureStreamAvailable": true,
+  "audioTrackCount": 1,
+  "videoTrackCount": 1,
+  "playAttempt": "ok",
+  "reason": "",
+  "targetTitle": "海能-叨哥财经的抖音直播间 - 抖音直播",
+  "targetUrl": "https://live.douyin.com/583183556429"
+}

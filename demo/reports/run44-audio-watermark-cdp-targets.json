@@ -1,0 +1,38 @@
+[
+  {
+    "description": "",
+    "devtoolsFrontendUrl": "https://chrome-devtools-frontend.appspot.com/serve_rev/@6a7b3dbec3b2ca25877c2553b5473b2f277ef644/inspector.html?ws=127.0.0.1:9631/devtools/page/89C6CEF9131A531ADE355C40E398F60E",
+    "id": "89C6CEF9131A531ADE355C40E398F60E",
+    "title": "Chrome 网上应用店付款系统",
+    "type": "background_page",
+    "url": "chrome-extension://nmmhkkegccagdldgiimedpiccmgmieda/_generated_background_page.html",
+    "webSocketDebuggerUrl": "ws://127.0.0.1:9631/devtools/page/89C6CEF9131A531ADE355C40E398F60E"
+  },
+  {
+    "description": "",
+    "devtoolsFrontendUrl": "https://chrome-devtools-frontend.appspot.com/serve_rev/@6a7b3dbec3b2ca25877c2553b5473b2f277ef644/inspector.html?ws=127.0.0.1:9631/devtools/page/9EA8CBDB0B7D209F216CA022FCCBB634",
+    "id": "9EA8CBDB0B7D209F216CA022FCCBB634",
+    "title": "Google Hangouts",
+    "type": "background_page",
+    "url": "chrome-extension://nkeimhogjdpnpccoofpliimaahmaaome/background.html",
+    "webSocketDebuggerUrl": "ws://127.0.0.1:9631/devtools/page/9EA8CBDB0B7D209F216CA022FCCBB634"
+  },
+  {
+    "description": "",
+    "devtoolsFrontendUrl": "https://chrome-devtools-frontend.appspot.com/serve_rev/@6a7b3dbec3b2ca25877c2553b5473b2f277ef644/inspector.html?ws=127.0.0.1:9631/devtools/page/6886580EDC64322694A450A0C1714935",
+    "id": "6886580EDC64322694A450A0C1714935",
+    "title": "audio-isolation-test",
+    "type": "page",
+    "url": "http://127.0.0.1:9632/run44.html",
+    "webSocketDebuggerUrl": "ws://127.0.0.1:9631/devtools/page/6886580EDC64322694A450A0C1714935"
+  },
+  {
+    "description": "",
+    "devtoolsFrontendUrl": "https://chrome-devtools-frontend.appspot.com/serve_rev/@6a7b3dbec3b2ca25877c2553b5473b2f277ef644/worker_app.html?ws=127.0.0.1:9631/devtools/page/7D0867C2757B359F76BF2D2C097496FA",
+    "id": "7D0867C2757B359F76BF2D2C097496FA",
+    "title": "Service Worker chrome-extension://fignfifoniblkonapihmkfakmlgkbkcf/service_worker.js",
+    "type": "service_worker",
+    "url": "chrome-extension://fignfifoniblkonapihmkfakmlgkbkcf/service_worker.js",
+    "webSocketDebuggerUrl": "ws://127.0.0.1:9631/devtools/page/7D0867C2757B359F76BF2D2C097496FA"
+  }
+]

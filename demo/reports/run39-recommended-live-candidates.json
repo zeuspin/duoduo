@@ -1,0 +1,39 @@
+{
+  "created_at": "2026-07-10",
+  "source": "run39-user-candidates-gate recommended_room_ids",
+  "safari_usage": "Safari only used for initial discovery; playback and capture must use anonymous Chrome profiles.",
+  "selection_reason": "run39 gate found R1 and R7 unavailable; R2/R3/R4 were the first three capturable rooms.",
+  "only_use_these_candidates": false,
+  "candidates": [
+    {
+      "code": "G1",
+      "room_id": "848398958216",
+      "url": "https://live.douyin.com/848398958216",
+      "title": "小溪财经"
+    },
+    {
+      "code": "G2",
+      "room_id": "857559947435",
+      "url": "https://live.douyin.com/857559947435",
+      "title": "老李财经"
+    },
+    {
+      "code": "G3",
+      "room_id": "56106509963",
+      "url": "https://live.douyin.com/56106509963",
+      "title": "国海小飞鱼"
+    },
+    {
+      "code": "G4",
+      "room_id": "88057849963",
+      "url": "https://live.douyin.com/88057849963",
+      "title": "广发证券修多多"
+    },
+    {
+      "code": "G5",
+      "room_id": "142040264912",
+      "url": "https://live.douyin.com/142040264912",
+      "title": "来来财经"
+    }
+  ]
+}

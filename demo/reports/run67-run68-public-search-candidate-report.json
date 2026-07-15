@@ -1,0 +1,16 @@
+{
+  "decision": "no-go",
+  "reason": "Public web search produced historical or currently unavailable stock/finance room links; no candidate passed anonymous Chrome gate.",
+  "candidate_run": {
+    "run_id": "run67",
+    "candidate_count": 8
+  },
+  "gate_run": {
+    "run_id": "run68",
+    "probe_ok_count": 0,
+    "can_run_three_route_capture": false,
+    "recommended_room_ids": []
+  },
+  "counts_as_container_failure": false,
+  "next_step": "Use Safari logged-in live homepage for link discovery only, then gate normalized links with anonymous Chrome."
+}

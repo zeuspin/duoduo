@@ -1,0 +1,76 @@
+{
+  "run_id": "run41",
+  "created_at": "2026-07-10T19:52:57+08:00",
+  "dry_run": false,
+  "candidate_count": 5,
+  "requested_rounds": 16,
+  "completed_rounds": 0,
+  "initial_active_count": 1,
+  "replacement_events": 0,
+  "all_rounds_three_valid": false,
+  "conclusion": "No-Go: initial capturable rooms fewer than 3; adaptive capture not started",
+  "routes": [
+    {
+      "slot": 1,
+      "route": "C1",
+      "candidate": {
+        "code": "G4",
+        "room_id": "88057849963",
+        "url": "https://live.douyin.com/88057849963",
+        "title": "广发证券修多多"
+      },
+      "room_id": "88057849963",
+      "url": "https://live.douyin.com/88057849963",
+      "port": 9521,
+      "profile_dir": "demo/runtime/chrome-profiles/run41-adaptive-c1",
+      "failure_streak": 0,
+      "replacement_count": 0,
+      "active": true,
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run41-C1-g4-adaptive-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "广发证券修多多的抖音直播间 - 抖音直播",
+      "audio_track_count": 1
+    }
+  ],
+  "events": [
+    {
+      "type": "initial_probe",
+      "route": "C1",
+      "room_id": "848398958216",
+      "ok": false,
+      "message": "video-not-ready-or-no-audio-track"
+    },
+    {
+      "type": "initial_probe",
+      "route": "C1",
+      "room_id": "857559947435",
+      "ok": false,
+      "message": "video-not-ready-or-no-audio-track"
+    },
+    {
+      "type": "initial_probe",
+      "route": "C1",
+      "room_id": "56106509963",
+      "ok": false,
+      "message": "video-not-ready-or-no-audio-track"
+    },
+    {
+      "type": "initial_probe",
+      "route": "C1",
+      "room_id": "88057849963",
+      "ok": true,
+      "message": "广发证券修多多的抖音直播间 - 抖音直播"
+    },
+    {
+      "type": "initial_probe",
+      "route": "C2",
+      "room_id": "142040264912",
+      "ok": false,
+      "message": "video-not-ready-or-no-audio-track"
+    }
+  ]
+}

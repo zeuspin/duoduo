@@ -1,0 +1,204 @@
+{
+  "run_id": "run55-historical-stock-finance-candidates",
+  "candidate_count": 22,
+  "candidates": [
+    {
+      "code": "H1",
+      "room_id": "782837937233",
+      "url": "https://live.douyin.com/782837937233",
+      "label": "财经小板总",
+      "suitability": "stock_finance",
+      "reason": "财经 / 板块 / 个股讨论",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H2",
+      "room_id": "31544105137",
+      "url": "https://live.douyin.com/31544105137",
+      "label": "先机财经",
+      "suitability": "stock_finance",
+      "reason": "板块热点分析和主线挖掘",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H3",
+      "room_id": "100263212175",
+      "url": "https://live.douyin.com/100263212175",
+      "label": "江哥财经",
+      "suitability": "stock_finance",
+      "reason": "A 股行情分析和热点聚焦",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H4",
+      "room_id": "414092641626",
+      "url": "https://live.douyin.com/414092641626",
+      "label": "谷市一代枭雄",
+      "suitability": "stock_finance",
+      "reason": "政策 / 市场影响 / 解盘",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H5",
+      "room_id": "893703096387",
+      "url": "https://live.douyin.com/893703096387",
+      "label": "谢说财经",
+      "suitability": "stock_finance_candidate",
+      "reason": "财经候选；未完成稳定捕获",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H6",
+      "room_id": "816173758414",
+      "url": "https://live.douyin.com/816173758414",
+      "label": "老李财观",
+      "suitability": "stock_finance",
+      "reason": "K 线主题 / 财经口播",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H7",
+      "room_id": "16743488023",
+      "url": "https://live.douyin.com/16743488023",
+      "label": "大A付老大-九点",
+      "suitability": "stock_finance",
+      "reason": "利好信号 / 市场主线 / A 股主题",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H8",
+      "room_id": "873902239044",
+      "url": "https://live.douyin.com/873902239044",
+      "label": "股市林教头",
+      "suitability": "stock_finance",
+      "reason": "用户指定候选；股市直播间",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H9",
+      "room_id": "334489081726",
+      "url": "https://live.douyin.com/334489081726",
+      "label": "文鼎（文说股市）",
+      "suitability": "stock_finance",
+      "reason": "用户指定候选；股市直播间",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H10",
+      "room_id": "812755146455",
+      "url": "https://live.douyin.com/812755146455",
+      "label": "海派-和众汇富",
+      "suitability": "stock_finance",
+      "reason": "用户指定候选；股票 / 投顾直播间",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H11",
+      "room_id": "400595809668",
+      "url": "https://live.douyin.com/400595809668",
+      "label": "汇正首席杨Sir",
+      "suitability": "stock_finance",
+      "reason": "用户指定候选；股票 / 投顾直播间",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H12",
+      "room_id": "773107011629",
+      "url": "https://live.douyin.com/773107011629",
+      "label": "用户指定 U6",
+      "suitability": "stock_finance",
+      "reason": "用户新增指定候选；待标题确认",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H13",
+      "room_id": "305503141482",
+      "url": "https://live.douyin.com/305503141482",
+      "label": "财经红姐",
+      "suitability": "stock_finance",
+      "reason": "Safari 直播首页财经候选；run38 有效捕获",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H14",
+      "room_id": "583183556429",
+      "url": "https://live.douyin.com/583183556429",
+      "label": "海能-叨哥财经",
+      "suitability": "stock_finance",
+      "reason": "Safari 直播首页财经候选；run38 前 8 轮有效，后续中途失流",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H15",
+      "room_id": "848398958216",
+      "url": "https://live.douyin.com/848398958216",
+      "label": "小溪财经",
+      "suitability": "stock_finance",
+      "reason": "Safari 直播首页财经候选；run38/run40 有效捕获，曾中途失流",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H16",
+      "room_id": "857559947435",
+      "url": "https://live.douyin.com/857559947435",
+      "label": "老李财经",
+      "suitability": "stock_finance",
+      "reason": "Safari 直播首页财经候选；run38 换源后有效",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H17",
+      "room_id": "56106509963",
+      "url": "https://live.douyin.com/56106509963",
+      "label": "国海小飞鱼",
+      "suitability": "stock_finance",
+      "reason": "Safari 直播首页财经候选；run40 有效捕获",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H18",
+      "room_id": "88057849963",
+      "url": "https://live.douyin.com/88057849963",
+      "label": "广发证券修多多",
+      "suitability": "stock_finance",
+      "reason": "Safari 直播首页证券候选；run40 有效捕获",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H19",
+      "room_id": "142040264912",
+      "url": "https://live.douyin.com/142040264912",
+      "label": "来来财经",
+      "suitability": "stock_finance",
+      "reason": "Safari 直播首页财经候选；run40 换源后有效",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H20",
+      "room_id": "5583822346",
+      "url": "https://live.douyin.com/5583822346",
+      "label": "九方钱老虎",
+      "suitability": "stock_finance",
+      "reason": "Safari refresh2 行情候选；run43 16/16 有效捕获",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H21",
+      "room_id": "632263122130",
+      "url": "https://live.douyin.com/632263122130",
+      "label": "A股小王子",
+      "suitability": "stock_finance",
+      "reason": "Safari refresh2 行业板块候选；run43 16/16 有效捕获",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    },
+    {
+      "code": "H22",
+      "room_id": "746541295999",
+      "url": "https://live.douyin.com/746541295999",
+      "label": "峰哥说财经",
+      "suitability": "stock_finance",
+      "reason": "Safari refresh2 行情修复候选；run43 16/16 有效捕获",
+      "source": "audit_sample_suitability.ROOM_CLASSIFICATION"
+    }
+  ]
+}

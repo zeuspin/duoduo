@@ -1,0 +1,11 @@
+.asr { min-width: 0; overflow: hidden; }
+.asr-title { height: 47px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; padding: 0 14px; }
+.asr-feed { height: 230px; min-width: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.asr-row { min-width: 0; padding: 11px 14px; border-bottom: 1px solid #edf0f3; display: grid; grid-template-columns: 64px minmax(0, 1fr) 48px; align-items: start; gap: 12px; font-size: 12px; line-height: 1.65; }
+.asr-row.partial { background: #fffaf1; }
+.asr-row time { color: var(--blue); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.asr-row span { min-width: 0; color: #354050; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+.asr-row small { color: #929aa5; text-align: right; white-space: nowrap; }
+.history-loading, .asr-empty { padding: 12px 14px; color: #87919e; font-size: 11px; text-align: center; }
+.asr-history-button { display: block; margin: 8px auto 0; border: 0; background: transparent; color: var(--blue); font-size: 11px; cursor: pointer; }
+.asr-history-label { padding: 6px 14px; border-bottom: 1px solid #edf0f3; color: #87919e; font-size: 10px; text-align: center; }

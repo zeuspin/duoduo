@@ -1,0 +1,490 @@
+{
+  "insights": [
+    {
+      "nature": "conditional",
+      "subjectKind": "indicator",
+      "subjectOriginal": "大盘点位",
+      "subjectNormalized": "大盘点位",
+      "direction": "neutral",
+      "summary": "主播提出加仓需等待大盘回落至3938点下方，该点位为加仓触发条件。",
+      "rationale": "主播明确设定‘3938’为关键阈值，并强调‘大概率的啊我们是在3938的下方去做的啊，去做加法’，观点完全依赖该价格条件成立，属典型条件观点。",
+      "conditions": [
+        "大盘回落至3938点下方"
+      ],
+      "evidence": [
+        "听好了啊，39383938啊，3938在这个位置啊，大概率的啊我们是在3938的下方去做的啊，去做加法。"
+      ],
+      "confidence": 0.95,
+      "alertLevel": "normal",
+      "id": 18,
+      "roomId": "59479663913",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        82
+      ],
+      "startedAt": "2026-07-13T02:34:16.130Z",
+      "endedAt": "2026-07-13T02:34:16.130Z",
+      "createdAt": "2026-07-13T03:00:34.405Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "sector",
+      "subjectOriginal": "算力",
+      "subjectNormalized": "算力",
+      "direction": "risk",
+      "summary": "主播明确警示算力方向已破位，主力持续出货、无资金承接，要求‘一股也不要留了’。",
+      "rationale": "主播使用‘已经完全坏掉了’‘已经跌破位了’‘主力都还在跑路’‘注定赶紧走’‘一股也不要留了’等绝对化风险表述，无任何条件修饰，属明确风险提示。",
+      "conditions": [],
+      "evidence": [
+        "这个方向的趋势你看一下，已经完全坏掉了，已经跌破位了呀。啊，已经破位的方向，主力都不的方向，现在主力在干嘛？源源不断的突货，换手率只有1.38，没有主力资金都承接，主力都还在跑路，你还在里面站岗的嘛，所以说算力注定赶紧走，一股也不要留了。走的越早亏的越少。"
+      ],
+      "confidence": 0.99,
+      "alertLevel": "important",
+      "id": 17,
+      "roomId": "59479663913",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        91,
+        106
+      ],
+      "startedAt": "2026-07-13T02:34:28.745Z",
+      "endedAt": "2026-07-13T02:34:47.555Z",
+      "createdAt": "2026-07-13T03:00:34.405Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "sector",
+      "subjectOriginal": "消费电子",
+      "subjectNormalized": "消费电子",
+      "direction": "positive",
+      "summary": "主播明确看多消费电子，认为当前创新低是主力洗盘吸筹，后续将开启拉升，要求听众‘拿好’。",
+      "rationale": "主播连续使用‘说明什么？’‘主力在低位要拿到足够多的筹码’‘马上就会开启新一波拉升’‘你们现在有消费电子的给我拿好’等强导向性、无条件限定的表述，构成明确看多观点。",
+      "conditions": [],
+      "evidence": [
+        "这也是主力在做一个洗盘啊，今天洗的幅度比较大，对不对啊？今天是不是创新啊？今天我们看一下是不是创新低了，哎，创新低了创新低了说明什么？兄弟们，那么在消费电子这个方向，大部分散户都要割肉了。既然大部分散户都要割肉了，说明主力在低位要拿到足够多的筹罚。主力在低位拿到足够多的筹码之后，马上就会开启新一波拉升。所以说你们现在有消费电子的给我拿好啊，拿好了。因为这个方向接下来主力往下洗的幅度已经不会很大了。"
+      ],
+      "confidence": 0.97,
+      "alertLevel": "normal",
+      "id": 16,
+      "roomId": "59479663913",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        67,
+        73
+      ],
+      "startedAt": "2026-07-13T02:33:42.645Z",
+      "endedAt": "2026-07-13T02:33:53.075Z",
+      "createdAt": "2026-07-13T03:00:34.405Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "sector",
+      "subjectOriginal": "存储芯片",
+      "subjectNormalized": "存储芯片",
+      "direction": "cautious",
+      "summary": "主播明确提示存储芯片板块将延续下跌洗盘，可能创新低，中长线可持有但短线需减仓一半。",
+      "rationale": "主播使用‘接下来跌下来还会继续往下洗’‘会创新低’‘洗盘结束之后才有新一波拉伸’等确定性措辞，并给出差异化操作建议（中长线扛得住可拿住，短线重仓者‘减一半’），属明确观点。",
+      "conditions": [],
+      "evidence": [
+        "这个方向卸下来下来，接下来跌下来还会继续往下洗啊。如果说你三周五期内我的高位走掉的很舒服，但是你现在没有走，我告诉你这个板块的话接下来怎么走，是走是牛，你自己做决定。现在主力还会继续往下洗，会它会创新低啊。创完新低之后基本上洗盘就会结束啊，继续往下洗洗完之后就会有新的一波拉伸。那么存储芯片这个方向的话，你说做中长线的你扛得住，这一波下跌的你就继续拿住，现在你就继续拿住。如果说做存储芯片这个方向的话，你做短线的仓位重的，我建议你仍然要减一半，好不好？"
+      ],
+      "confidence": 0.98,
+      "alertLevel": "important",
+      "id": 15,
+      "roomId": "59479663913",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        48
+      ],
+      "startedAt": "2026-07-13T02:33:10.210Z",
+      "endedAt": "2026-07-13T02:33:10.210Z",
+      "createdAt": "2026-07-13T03:00:34.405Z"
+    },
+    {
+      "nature": "fact",
+      "subjectKind": "indicator",
+      "subjectOriginal": "中证机床ETF",
+      "subjectNormalized": "中证机床ETF",
+      "direction": "neutral",
+      "summary": "主播指出中证机床ETF关联母机板块",
+      "rationale": "纯事实性陈述，无方向性判断或解读，仅建立ETF与板块的映射关系",
+      "conditions": [],
+      "evidence": [
+        "中证机床E天赋啊，关联母机板块，你看吧，大概齐吧，就是你也你也照着我这个线去画一画，它大概的支撑呃在哪儿？"
+      ],
+      "confidence": 1,
+      "alertLevel": "none",
+      "id": 14,
+      "roomId": "60872859839",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        114
+      ],
+      "startedAt": "2026-07-13T02:35:08.001Z",
+      "endedAt": "2026-07-13T02:35:08.001Z",
+      "createdAt": "2026-07-13T03:00:26.694Z"
+    },
+    {
+      "nature": "conditional",
+      "subjectKind": "indicator",
+      "subjectOriginal": "支撑位",
+      "subjectNormalized": "支撑位",
+      "direction": "cautious",
+      "summary": "主播提出当前价格接近前期支撑，若在此处企稳则可能反弹，但需观察确认",
+      "rationale": "主播反复强调‘如果在这儿它直接撑住的话’‘是不是有可能他他咔咔咔再往上走’，并多次使用‘观察’‘观观察一下’等措辞，表明该判断完全依赖价格是否实际企稳于该位置",
+      "conditions": [
+        "价格在当前支撑位止跌企稳"
+      ],
+      "evidence": [
+        "那上一次它跌破破到了这个位置，对吧？那它这次跌破，如果按照这个规律来讲，它是不是应该破？就在这儿，就今天这个位置可能最多往下再破一点，它撑住啊。如果在这儿它直接撑住的话。是不是有可能他他咔咔咔再往上走，又又要过他再往上打，对不对？那么这个地方你需要观察一点，观观察一下。"
+      ],
+      "confidence": 0.95,
+      "alertLevel": "normal",
+      "id": 13,
+      "roomId": "60872859839",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        56,
+        62
+      ],
+      "startedAt": "2026-07-13T02:33:24.561Z",
+      "endedAt": "2026-07-13T02:33:32.266Z",
+      "createdAt": "2026-07-13T03:00:26.694Z"
+    },
+    {
+      "nature": "fact",
+      "subjectKind": "market",
+      "subjectOriginal": "涨跌家数",
+      "direction": "neutral",
+      "summary": "当前涨停家数少于跌停家数",
+      "rationale": "主播陈述‘涨停的加速还跌于低于呃低于这个跌停的家速’，属可验证的事实描述（尽管表述口语化），未附加方向判断",
+      "conditions": [],
+      "evidence": [
+        "因为今天的话呢跌幅相对来说会比较明显一点啊，甚至现在的这个呃涨停的加速还跌于低于呃低于这个跌停的家速。"
+      ],
+      "confidence": 0.85,
+      "alertLevel": "none",
+      "id": 12,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        135
+      ],
+      "startedAt": "2026-07-13T02:35:45.305Z",
+      "endedAt": "2026-07-13T02:35:45.305Z",
+      "createdAt": "2026-07-13T03:00:26.679Z"
+    },
+    {
+      "nature": "conditional",
+      "subjectKind": "market",
+      "subjectOriginal": "大盘",
+      "direction": "risk",
+      "summary": "周二至周三上午存在探底确认风险",
+      "rationale": "主播以‘周一就开始谨慎’为前提，推导出‘周二或者周三或者周二周三的上午…还有可能再去做确认，去探底’，判断依赖明确时间条件",
+      "conditions": [
+        "周一已开始谨慎",
+        "时间范围：周二至周三上午"
+      ],
+      "evidence": [
+        "啊，周一就开始谨慎的时候，就意味着接下来在我们的周中、周二或者周三或者周二周三的上午。啊，周二3，特别是周三的上午，还有可能好吧，还有可能在我们的这一周过程当中再去做确认，去探底的这个过程。"
+      ],
+      "confidence": 0.89,
+      "alertLevel": "important",
+      "id": 11,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        81,
+        90
+      ],
+      "startedAt": "2026-07-13T02:34:15.138Z",
+      "endedAt": "2026-07-13T02:34:27.168Z",
+      "createdAt": "2026-07-13T03:00:26.679Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "market",
+      "subjectOriginal": "大盘",
+      "direction": "cautious",
+      "summary": "大盘当前处于3950–4000点区间震荡",
+      "rationale": "主播直接给出明确区间‘3950到4000点’，并强调‘讲的都是一个区间范围’，属明确观点",
+      "conditions": [],
+      "evidence": [
+        "下方有支撑3950点附近，上方有压力4000点附近。那么到目前为止的话就3950，你记一个大的数吧，好吧，3950到4000点吧，好吧，因为在我的直播间的话讲的都是一个呃区间范围嘛。"
+      ],
+      "confidence": 0.98,
+      "alertLevel": "normal",
+      "id": 10,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        126
+      ],
+      "startedAt": "2026-07-13T02:35:30.728Z",
+      "endedAt": "2026-07-13T02:35:30.728Z",
+      "createdAt": "2026-07-13T03:00:26.679Z"
+    },
+    {
+      "nature": "conditional",
+      "subjectKind": "indicator",
+      "subjectOriginal": "量能水平",
+      "direction": "cautious",
+      "summary": "缩量（已缩至3000亿）导致市场节奏变慢，不利于阳线形成",
+      "rationale": "主播将‘缩量’作为前提，推断‘更好的节奏是不是就这么…如果没有量的情况下，是不是就这么就收盘’，构成典型条件判断",
+      "conditions": [
+        "量能已缩至3000亿"
+      ],
+      "evidence": [
+        "量能水平现在走到的是缩量之后，就虽然已经缩量3000个Y的情况下，请问一下它更好的节奏是不是就这么。就就这么就对吧？对对对，他如果没有量的情况下，是不是就这么就收盘，对你的总接的操作会更加有帮助。"
+      ],
+      "confidence": 0.92,
+      "alertLevel": "normal",
+      "id": 9,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        112,
+        115
+      ],
+      "startedAt": "2026-07-13T02:34:59.294Z",
+      "endedAt": "2026-07-13T02:35:08.369Z",
+      "createdAt": "2026-07-13T03:00:26.679Z"
+    },
+    {
+      "nature": "conditional",
+      "subjectKind": "market",
+      "subjectOriginal": "指数",
+      "direction": "cautious",
+      "summary": "指数低开后两次冲击前期高点或跳空缺口均失败，十点后走势趋缓",
+      "rationale": "主播明确指出‘试图去冲击前期的高点，或者是回补目前的这个跳空缺口位。呃，但是两次都失败了’，并据此推导出后续走势缓慢，属条件性判断（失败→趋缓）",
+      "conditions": [
+        "冲击前期高点或跳空缺口失败"
+      ],
+      "evidence": [
+        "总结第一个指数，指数今天低开之后的话呢，试图去冲击前期的高点，或者是回补目前的这个跳空缺口位。呃，但是两次都失败了，这个情况之下的话呢，十点钟之后的走势开始的非常的缓慢了。"
+      ],
+      "confidence": 0.95,
+      "alertLevel": "normal",
+      "id": 8,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        71
+      ],
+      "startedAt": "2026-07-13T02:33:49.793Z",
+      "endedAt": "2026-07-13T02:33:49.793Z",
+      "createdAt": "2026-07-13T03:00:26.679Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "market",
+      "subjectOriginal": "大盘",
+      "direction": "cautious",
+      "summary": "当前不建议抄底，因处于弱势横盘后的下行确认阶段",
+      "rationale": "主播直接否定‘现在可不可以补’的提问，给出‘现在不能’的明确结论，并以‘十点半反扑失败+横盘久’为依据，属明确观点",
+      "conditions": [],
+      "evidence": [
+        "这里现在可不可以补？现在不能，为什么？还是那个观点。因为这里我刚才讲了，十点半向上的拉伸，他只要这个节点多投币，横盘了这么久的一个弱势横盘。他必然就要干嘛。"
+      ],
+      "confidence": 0.96,
+      "alertLevel": "normal",
+      "id": 7,
+      "roomId": "723327304015",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        147,
+        150,
+        151
+      ],
+      "startedAt": "2026-07-13T02:36:10.018Z",
+      "endedAt": "2026-07-13T02:36:24.487Z",
+      "createdAt": "2026-07-13T03:00:25.027Z"
+    },
+    {
+      "nature": "fact",
+      "subjectKind": "indicator",
+      "subjectOriginal": "成交量",
+      "direction": "neutral",
+      "summary": "当前市场量能处于低位，预计全天缩量至4000亿，今日实际成交3万亿",
+      "rationale": "主播陈述‘量能曲线趴地板’‘预计缩量4000亿’‘今天3万亿’均为可验证的客观数据描述，未附加方向性判断（如‘缩量意味着弱势’未明说）",
+      "conditions": [],
+      "evidence": [
+        "就到目到目前为止，现在市场的量，这是这场市场的量能的曲线图啊。亮能的曲线图，目前在他地板上的，你看到没有？是趴地板上的，是不动的。而整个市场到目前为止。预计的成交量全天应该是缩量4000亿。今天3万亿。"
+      ],
+      "confidence": 0.99,
+      "alertLevel": "none",
+      "id": 6,
+      "roomId": "723327304015",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        16,
+        20,
+        24,
+        26
+      ],
+      "startedAt": "2026-07-13T02:32:35.083Z",
+      "endedAt": "2026-07-13T02:32:48.247Z",
+      "createdAt": "2026-07-13T03:00:25.027Z"
+    },
+    {
+      "nature": "conditional",
+      "subjectKind": "indicator",
+      "subjectOriginal": "大盘点位",
+      "subjectNormalized": "大盘点位",
+      "direction": "neutral",
+      "summary": "主播设定3938点为加仓条件阈值，仅在该点位下方才考虑加仓。",
+      "rationale": "明确限定加仓动作的发生前提（‘大概率的啊我们是在3938的下方去做的啊’），属典型条件观点。",
+      "conditions": [
+        "大盘点位低于3938"
+      ],
+      "evidence": [
+        "听好了啊，39383938啊，3938在这个位置啊，大概率的啊我们是在3938的下方去做的啊，去做加法。"
+      ],
+      "confidence": 1,
+      "alertLevel": "normal",
+      "id": 5,
+      "roomId": "59479663913",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        82
+      ],
+      "startedAt": "2026-07-13T02:34:16.130Z",
+      "endedAt": "2026-07-13T02:34:16.130Z",
+      "createdAt": "2026-07-13T02:55:19.378Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "sector",
+      "subjectOriginal": "半导体",
+      "subjectNormalized": "半导体",
+      "direction": "cautious",
+      "summary": "主播明确判断当前半导体反弹是高位换装，后续将向下洗盘，不建议加仓。",
+      "rationale": "主播两次强调‘这是发生在高位的一个换装’，并指出‘换完装之后，主力它就会往下洗盘’，属明确看空短期走势。",
+      "conditions": [],
+      "evidence": [
+        "这是不是这是发生在高位的一个换装了，你们的半导体啊，它并没有怎么跌啊，并没有完全跌下呀。高位的饭庄代表着什么？换完装之后，主力它就会往下洗盘的呀。"
+      ],
+      "confidence": 1,
+      "alertLevel": "normal",
+      "id": 4,
+      "roomId": "59479663913",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        161
+      ],
+      "startedAt": "2026-07-13T02:36:46.508Z",
+      "endedAt": "2026-07-13T02:36:46.508Z",
+      "createdAt": "2026-07-13T02:55:19.378Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "sector",
+      "subjectOriginal": "算力",
+      "subjectNormalized": "算力",
+      "direction": "risk",
+      "summary": "主播明确要求清仓算力，称其趋势已破位、主力持续出货、无资金承接。",
+      "rationale": "使用强烈否定措辞（‘一股也不要留了’‘注定赶紧走’‘走的越早亏的越少’），并给出三项事实依据（破位、主力突货、换手率低），属明确风险警示。",
+      "conditions": [],
+      "evidence": [
+        "所以说算力注定赶紧走，一股也不要留了。走的越早亏的越少。"
+      ],
+      "confidence": 1,
+      "alertLevel": "important",
+      "id": 3,
+      "roomId": "59479663913",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        106
+      ],
+      "startedAt": "2026-07-13T02:34:47.555Z",
+      "endedAt": "2026-07-13T02:34:47.555Z",
+      "createdAt": "2026-07-13T02:55:19.378Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "sector",
+      "subjectOriginal": "消费电子",
+      "subjectNormalized": "消费电子",
+      "direction": "positive",
+      "summary": "主播明确鼓励持有消费电子，并判断洗盘接近尾声、后续将开启拉升。",
+      "rationale": "主播使用命令式语气‘给我拿好啊，拿好了’，并给出逻辑链（散户割肉→主力吸筹→即将拉升），属明确看多。",
+      "conditions": [],
+      "evidence": [
+        "所以说你们现在有消费电子的给我拿好啊，拿好了。因为这个方向接下来主力往下洗的幅度已经不会很大了。"
+      ],
+      "confidence": 1,
+      "alertLevel": "normal",
+      "id": 2,
+      "roomId": "59479663913",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        73
+      ],
+      "startedAt": "2026-07-13T02:33:53.075Z",
+      "endedAt": "2026-07-13T02:33:53.075Z",
+      "createdAt": "2026-07-13T02:55:19.378Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "sector",
+      "subjectOriginal": "存储芯片",
+      "subjectNormalized": "存储芯片",
+      "direction": "cautious",
+      "summary": "主播明确建议中长线投资者可继续持有，但短线重仓者应减半仓位。",
+      "rationale": "主播区分了中长线与短线策略，对短线仓位给出明确减仓指令（‘建议你仍然要减一半’），属直接判断。",
+      "conditions": [
+        "做短线的仓位重的"
+      ],
+      "evidence": [
+        "如果说做存储芯片这个方向的话，你做短线的仓位重的，我建议你仍然要减一半，好不好？"
+      ],
+      "confidence": 1,
+      "alertLevel": "normal",
+      "id": 1,
+      "roomId": "59479663913",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        48
+      ],
+      "startedAt": "2026-07-13T02:33:10.210Z",
+      "endedAt": "2026-07-13T02:33:10.210Z",
+      "createdAt": "2026-07-13T02:55:19.378Z"
+    }
+  ],
+  "statuses": {
+    "60872859839": {
+      "state": "idle"
+    },
+    "723327304015": {
+      "state": "idle"
+    },
+    "773107011629": {
+      "state": "idle"
+    },
+    "59479663913": {
+      "state": "idle"
+    },
+    "273112541814": {
+      "state": "idle"
+    }
+  },
+  "resources": 0
+}

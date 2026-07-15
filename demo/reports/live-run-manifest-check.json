@@ -1,0 +1,9 @@
+{
+  "manifest": "demo/reports/live-run-manifests/run-dry-20260709.json",
+  "dry_run": true,
+  "manifest_ok": true,
+  "manifest_issues": [],
+  "cdp_checked": false,
+  "cdp_details": [],
+  "ok": true
+}

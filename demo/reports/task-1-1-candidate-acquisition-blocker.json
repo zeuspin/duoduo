@@ -1,0 +1,16 @@
+{
+  "task": "Task 1.1",
+  "status": "blocked",
+  "blocked_scope": "stock/finance live candidate acquisition",
+  "reason": "Automated anonymous discovery, scroll discovery, anonymous search, public web search, and Safari accessibility readback did not produce 4-5 currently capturable stock/finance live rooms.",
+  "latest_evidence": {
+    "run66_probe_ok_count": 2,
+    "run66_can_run_three_route_capture": false,
+    "run68_probe_ok_count": 0,
+    "run68_can_run_three_route_capture": false
+  },
+  "minimum_required": 3,
+  "recommended_required_with_standby": 5,
+  "requested_user_input": "Provide 4-8 normalized live.douyin.com/{room_id} stock/finance live room links found from Safari logged-in live homepage.",
+  "counts_as_container_failure": false
+}

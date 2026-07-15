@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "pageTitle": "文鼎（文说股市）的抖音直播间 - 抖音直播",
+  "videoCount": 1,
+  "selected": {
+    "paused": false,
+    "muted": false,
+    "volume": 1,
+    "readyState": 4,
+    "networkState": 2,
+    "currentTime": 8.32,
+    "duration": null,
+    "srcPresent": false
+  },
+  "captureStreamAvailable": true,
+  "audioTrackCount": 1,
+  "videoTrackCount": 1,
+  "playAttempt": "ok",
+  "reason": "",
+  "targetTitle": "文鼎（文说股市）的抖音直播间 - 抖音直播",
+  "targetUrl": "https://live.douyin.com/334489081726"
+}

@@ -1,0 +1,1922 @@
+{
+  "run_id": "run60",
+  "created_at": "2026-07-11T02:19:23+08:00",
+  "duration_seconds": 1200,
+  "interval_seconds": 120,
+  "requested_checkpoints": 10,
+  "completed_checkpoints": 10,
+  "initial_active_count": 3,
+  "recovery_event_count": 1,
+  "injection_enabled": false,
+  "inject_close_checkpoint": 0,
+  "inject_close_route": "C1",
+  "all_checkpoints_three_ok_after_recovery": false,
+  "conclusion": "Completed with one or more unrecovered playback checkpoints",
+  "routes": [
+    {
+      "route": "C1",
+      "slot": 1,
+      "candidate": {
+        "code": "SFL1",
+        "room_id": "31544105137",
+        "url": "https://live.douyin.com/31544105137",
+        "source": "run58-user-candidates-gate",
+        "page_title": "先机财经的抖音直播间 - 抖音直播"
+      },
+      "room_id": "31544105137",
+      "url": "https://live.douyin.com/31544105137",
+      "port": 10101,
+      "profile_dir": "demo/runtime/chrome-profiles/run60-recovery-playback-c1",
+      "recovery_count": 1,
+      "replacement_count": 0,
+      "initial_probe": {
+        "ok": true,
+        "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 23.066,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/31544105137",
+        "probe_returncode": 0
+      },
+      "last_probe": {
+        "ok": false,
+        "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 0,
+          "networkState": 2,
+          "currentTime": 0,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 0,
+        "videoTrackCount": 1,
+        "playAttempt": "play-timeout",
+        "reason": "video-not-ready-or-no-audio-track",
+        "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/31544105137",
+        "probe_returncode": 2
+      },
+      "launch_returncode": 0,
+      "launch_stderr": ""
+    },
+    {
+      "route": "C2",
+      "slot": 2,
+      "candidate": {
+        "code": "SFL2",
+        "room_id": "100263212175",
+        "url": "https://live.douyin.com/100263212175",
+        "source": "run58-user-candidates-gate",
+        "page_title": "江哥财经的抖音直播间 - 抖音直播"
+      },
+      "room_id": "100263212175",
+      "url": "https://live.douyin.com/100263212175",
+      "port": 10102,
+      "profile_dir": "demo/runtime/chrome-profiles/run60-recovery-playback-c2",
+      "recovery_count": 0,
+      "replacement_count": 0,
+      "initial_probe": {
+        "ok": true,
+        "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 23.633,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/100263212175",
+        "probe_returncode": 0
+      },
+      "last_probe": {
+        "ok": true,
+        "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 1236.9,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/100263212175",
+        "probe_returncode": 0
+      },
+      "launch_returncode": 0,
+      "launch_stderr": ""
+    },
+    {
+      "route": "C3",
+      "slot": 3,
+      "candidate": {
+        "code": "SFL3",
+        "room_id": "816173758414",
+        "url": "https://live.douyin.com/816173758414",
+        "source": "run58-user-candidates-gate",
+        "page_title": "老李财观的抖音直播间 - 抖音直播"
+      },
+      "room_id": "816173758414",
+      "url": "https://live.douyin.com/816173758414",
+      "port": 10103,
+      "profile_dir": "demo/runtime/chrome-profiles/run60-recovery-playback-c3",
+      "recovery_count": 0,
+      "replacement_count": 0,
+      "initial_probe": {
+        "ok": true,
+        "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 23.533,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/816173758414",
+        "probe_returncode": 0
+      },
+      "last_probe": {
+        "ok": true,
+        "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 1204.365,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/816173758414",
+        "probe_returncode": 0
+      },
+      "launch_returncode": 0,
+      "launch_stderr": ""
+    }
+  ],
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "elapsed_seconds": 120.3,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 156.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 156.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 128.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 128.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 95.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 95.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 2,
+      "elapsed_seconds": 240.32,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 276.767,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 276.767,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 248.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 248.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 215.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 215.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 3,
+      "elapsed_seconds": 360.28,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 396.734,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 396.734,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 368.433,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 368.433,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 335.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 335.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 4,
+      "elapsed_seconds": 480.3,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 516.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 516.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 488.433,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 488.433,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 455.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 455.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 5,
+      "elapsed_seconds": 600.3,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 636.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 636.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 608.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 608.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 575.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 575.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 6,
+      "elapsed_seconds": 720.31,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 756.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 756.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 728.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 728.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 695.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 695.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 7,
+      "elapsed_seconds": 840.36,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 876.767,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 876.767,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 848.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 848.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 815.999,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 815.999,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 8,
+      "elapsed_seconds": 960.31,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 996.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 996.733,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 968.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 968.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 935.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 935.932,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 9,
+      "elapsed_seconds": 1080.33,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1116.767,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1116.767,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1088.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1088.466,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1055.965,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1055.965,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 10,
+      "elapsed_seconds": 1228.71,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "31544105137",
+          "raw_ok": false,
+          "final_ok": false,
+          "raw_probe": {
+            "ok": false,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": true,
+              "muted": false,
+              "volume": 1,
+              "readyState": 0,
+              "networkState": 3,
+              "currentTime": 0,
+              "duration": null,
+              "srcPresent": true
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 0,
+            "videoTrackCount": 0,
+            "playAttempt": "ok",
+            "reason": "video-not-ready-or-no-audio-track",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 2
+          },
+          "final_probe": {
+            "ok": false,
+            "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 0,
+              "networkState": 2,
+              "currentTime": 0,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 0,
+            "videoTrackCount": 1,
+            "playAttempt": "play-timeout",
+            "reason": "video-not-ready-or-no-audio-track",
+            "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/31544105137",
+            "probe_returncode": 2
+          },
+          "recovery_action": "rebuild-same-room-no-standby"
+        },
+        {
+          "route": "C2",
+          "room_id": "100263212175",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1236.9,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1236.9,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "江哥财经的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/100263212175",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "816173758414",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1204.365,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "老李财观的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 1204.365,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "老李财观的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/816173758414",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": false
+    }
+  ],
+  "recovery_events": [
+    {
+      "route": "C1",
+      "old_room_id": "31544105137",
+      "old_url": "https://live.douyin.com/31544105137",
+      "raw_reason": "video-not-ready-or-no-audio-track",
+      "strategy": "rebuild-same-room-no-standby",
+      "ok": false,
+      "probe": {
+        "ok": false,
+        "pageTitle": "先机财经的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 0,
+          "networkState": 2,
+          "currentTime": 0,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 0,
+        "videoTrackCount": 1,
+        "playAttempt": "play-timeout",
+        "reason": "video-not-ready-or-no-audio-track",
+        "targetTitle": "先机财经的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/31544105137",
+        "probe_returncode": 2
+      },
+      "new_room_id": "31544105137",
+      "new_url": "https://live.douyin.com/31544105137",
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "checkpoint": 10
+    }
+  ]
+}

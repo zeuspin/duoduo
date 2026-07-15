@@ -1,0 +1,25 @@
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const read = (name) => JSON.parse(fs.readFileSync(path.join(root, "tests/fixtures/insights", name), "utf8"));
+const segments = read("market-asr.json");
+const gold = read("gold-labels.json");
+const output = read("deterministic-output.json");
+const byId = new Map(segments.map((item) => [item.id, item]));
+const goldById = new Map(gold.map((item) => [item.id, item]));
+const predictedIds = new Set(output.map((item) => item.id));
+const relevant = gold.filter((item) => item.relevant);
+const truePositive = output.filter((item) => goldById.get(item.id)?.relevant).length;
+const precision = output.length ? truePositive / output.length : 1;
+const recall = relevant.length ? truePositive / relevant.length : 1;
+const natureAccuracy = truePositive ? output.filter((item) => goldById.get(item.id)?.nature === item.nature).length / truePositive : 1;
+const evidenceConsistency = output.length ? output.filter((item) => byId.get(item.id)?.text.includes(item.evidence)).length / output.length : 1;
+const schemaValidity = output.length ? output.filter((item) => typeof item.id === "string" && typeof item.evidence === "string" && ["explicit", "conditional", "quote", "inference", "fact"].includes(item.nature)).length / output.length : 1;
+const falsePositives = output.filter((item) => !goldById.get(item.id)?.relevant).map((item) => item.id);
+const falseNegatives = relevant.filter((item) => !predictedIds.has(item.id)).map((item) => item.id);
+const report = { fixtureSegments: segments.length, goldRelevant: relevant.length, predicted: output.length, precision, recall, natureAccuracy, evidenceConsistency, schemaValidity, falsePositives, falseNegatives, note: "Deterministic contract fixture; real-model quality is reported separately by live smoke and replay evidence." };
+fs.mkdirSync(path.join(root, "reports"), { recursive: true });
+fs.writeFileSync(path.join(root, "reports/parser-evaluation.json"), `${JSON.stringify(report, null, 2)}\n`);
+console.log(JSON.stringify(report, null, 2));
+if ([precision, recall, natureAccuracy, evidenceConsistency, schemaValidity].some((value) => value < 1) || segments.length < 20) process.exitCode = 1;

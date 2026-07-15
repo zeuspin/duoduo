@@ -1,0 +1,63 @@
+{
+  "run_id": "run67-public-search-stock-finance-candidates",
+  "source": "public web search results for live.douyin.com stock/finance rooms",
+  "candidate_count": 8,
+  "candidates": [
+    {
+      "code": "WEB1",
+      "room_id": "750713178307",
+      "url": "https://live.douyin.com/750713178307",
+      "label": "财经大刘-指南针",
+      "source_note": "public search result; snippet indicated live ended"
+    },
+    {
+      "code": "WEB2",
+      "room_id": "675319457918",
+      "url": "https://live.douyin.com/675319457918",
+      "label": "和讯财经",
+      "source_note": "public search result"
+    },
+    {
+      "code": "WEB3",
+      "room_id": "432826844691",
+      "url": "https://live.douyin.com/432826844691",
+      "label": "广发粤杨财经",
+      "source_note": "public search result; snippet indicated live ended"
+    },
+    {
+      "code": "WEB4",
+      "room_id": "26139399322",
+      "url": "https://live.douyin.com/26139399322",
+      "label": "央视财经",
+      "source_note": "public search result"
+    },
+    {
+      "code": "WEB5",
+      "room_id": "674848615973",
+      "url": "https://live.douyin.com/674848615973",
+      "label": "高能云策略",
+      "source_note": "public search result; snippet indicated live ended"
+    },
+    {
+      "code": "WEB6",
+      "room_id": "196513990458",
+      "url": "https://live.douyin.com/196513990458",
+      "label": "INBM证券服务频道",
+      "source_note": "public search result"
+    },
+    {
+      "code": "WEB7",
+      "room_id": "779932284214",
+      "url": "https://live.douyin.com/779932284214",
+      "label": "大象论股",
+      "source_note": "public search result"
+    },
+    {
+      "code": "WEB8",
+      "room_id": "882120506793",
+      "url": "https://live.douyin.com/882120506793",
+      "label": "顶点商学院-猛男精算",
+      "source_note": "public search result; snippet indicated live ended"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "run_id": "run31",
+  "created_at": "2026-07-09T09:46:34+08:00",
+  "probe_ok_count": 2,
+  "can_run_three_route_capture": false,
+  "recommended_room_ids": [
+    "334489081726",
+    "773107011629"
+  ],
+  "candidates": [
+    {
+      "code": "U1",
+      "room_id": "873902239044",
+      "url": "https://live.douyin.com/873902239044",
+      "probe_ok": false,
+      "reason": "video-not-ready-or-no-audio-track",
+      "page_title": "股市林教头的抖音直播间 - 抖音直播",
+      "audio_track_count": 0,
+      "video_track_count": 1,
+      "ready_state": 0,
+      "network_state": 2,
+      "play_attempt": "play-timeout",
+      "probe_returncode": 2,
+      "probe_file": "demo/reports/run31-u1-gate-probe.json"
+    },
+    {
+      "code": "U2",
+      "room_id": "334489081726",
+      "url": "https://live.douyin.com/334489081726",
+      "probe_ok": true,
+      "reason": "",
+      "page_title": "文鼎（文说股市）的抖音直播间 - 抖音直播",
+      "audio_track_count": 1,
+      "video_track_count": 1,
+      "ready_state": 4,
+      "network_state": 2,
+      "play_attempt": "ok",
+      "probe_returncode": 0,
+      "probe_file": "demo/reports/run31-u2-gate-probe.json"
+    },
+    {
+      "code": "U3",
+      "room_id": "812755146455",
+      "url": "https://live.douyin.com/812755146455",
+      "probe_ok": false,
+      "reason": "video-not-ready-or-no-audio-track",
+      "page_title": "海派-和众汇富的抖音直播间 - 抖音直播",
+      "audio_track_count": 0,
+      "video_track_count": 1,
+      "ready_state": 0,
+      "network_state": 2,
+      "play_attempt": "play-timeout",
+      "probe_returncode": 2,
+      "probe_file": "demo/reports/run31-u3-gate-probe.json"
+    },
+    {
+      "code": "U4",
+      "room_id": "400595809668",
+      "url": "https://live.douyin.com/400595809668",
+      "probe_ok": false,
+      "reason": "video-not-ready-or-no-audio-track",
+      "page_title": "汇正首席杨Sir的抖音直播间 - 抖音直播",
+      "audio_track_count": 0,
+      "video_track_count": 1,
+      "ready_state": 0,
+      "network_state": 2,
+      "play_attempt": "play-timeout",
+      "probe_returncode": 2,
+      "probe_file": "demo/reports/run31-u4-gate-probe.json"
+    },
+    {
+      "code": "U5",
+      "room_id": "373389160165",
+      "url": "https://live.douyin.com/373389160165",
+      "probe_ok": false,
+      "reason": "video-not-ready-or-no-audio-track",
+      "page_title": "宋半导的抖音直播间 - 抖音直播",
+      "audio_track_count": 0,
+      "video_track_count": 1,
+      "ready_state": 0,
+      "network_state": 2,
+      "play_attempt": "play-timeout",
+      "probe_returncode": 2,
+      "probe_file": "demo/reports/run31-u5-gate-probe.json"
+    },
+    {
+      "code": "U6",
+      "room_id": "773107011629",
+      "url": "https://live.douyin.com/773107011629",
+      "probe_ok": true,
+      "reason": "",
+      "page_title": "低吸一哥奇点的抖音直播间 - 抖音直播",
+      "audio_track_count": 1,
+      "video_track_count": 1,
+      "ready_state": 4,
+      "network_state": 2,
+      "play_attempt": "ok",
+      "probe_returncode": 0,
+      "probe_file": "demo/reports/run31-u6-gate-probe.json"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "run_id": "run44",
+  "page_tone_hz": 440,
+  "system_tone_hz": 1234,
+  "sample_rate": 16000,
+  "sample_count": 127680,
+  "page_tone_power": 55559756.28049654,
+  "system_tone_power": 0.17892093535751058,
+  "page_to_system_power_ratio": 310526860.1993383,
+  "ratio_threshold": 20.0,
+  "pass": true,
+  "interpretation": "捕获音频中页面水印能量显著高于系统声音水印，说明页面级 captureStream 录到的是页面媒体流，系统 afplay 声音没有以可检测水印进入正式捕获文件。",
+  "captured_webm": "demo/samples/audio/raw/run44_page_capture_with_system_1234hz.webm",
+  "captured_wav": "demo/samples/audio/raw/run44_page_capture_with_system_1234hz_16k.wav",
+  "page_media": "demo/runtime/audio-isolation/run44-page-440hz.webm",
+  "system_tone_file": "demo/runtime/audio-isolation/run44-system-1234hz.wav"
+}

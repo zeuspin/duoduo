@@ -1,0 +1,90 @@
+{
+  "all_required_files_exist": true,
+  "missing_files": [],
+  "counts": {
+    "manifest_rows": 191,
+    "asr_segment_rows": 1467,
+    "semantic_seed_rows": 1467,
+    "human_workpack_rows": 1467,
+    "stock_review_pack_rows": 300,
+    "semantic_event_rows": 0
+  },
+  "current_stage": {
+    "stage_acceptance_pass": true,
+    "scope": "multi-route live audio capture and ASR validation only",
+    "capture_summary": "demo/reports/run71-adaptive-three-route-capture-summary.json",
+    "capture_valid_segments": 9,
+    "capture_completed_rounds": 3,
+    "capture_requested_rounds": 3,
+    "replacement_events": 0,
+    "asr_ok": 9,
+    "asr_valid_items": 9,
+    "manual_listening_performed": false,
+    "chrome_profile_dir_count_after_cleanup": 0,
+    "note": "当前阶段只验证多路直播音频捕获和 ASR；股票 / 财经、长稳、人工标注不纳入本阶段通过标准。"
+  },
+  "task_status": {
+    "task_0_1": {
+      "artifact_ready": true,
+      "signoff_pass": false,
+      "approved_count": 0,
+      "required_count": 6,
+      "status": "partial"
+    },
+    "task_0_2": {
+      "baseline_doc_ready": true,
+      "workpack_rows": 1467,
+      "semantic_event_rows": 0,
+      "stock_finance_effective_duration_hours": 3.061,
+      "stock_finance_duration_pass": true,
+      "stock_review_pack_ready": true,
+      "workpack_pass": false,
+      "semantic_events_pass": false,
+      "status": "partial"
+    },
+    "task_1_1": {
+      "report_ready": true,
+      "playback_monitor_ready": true,
+      "interference_test_ready": true,
+      "reload_interference_test_ready": true,
+      "long_monitor_ready": true,
+      "long_monitor_completed_checkpoints": 12,
+      "long_monitor_requested_checkpoints": 12,
+      "long_monitor_all_checkpoints_three_ok": false,
+      "recovery_monitor_ready": true,
+      "recovery_monitor_pass": true,
+      "recovery_event_count": 2,
+      "stock_finance_recovery_monitor_ready": true,
+      "stock_finance_recovery_monitor_pass": true,
+      "stock_finance_recovery_completed_checkpoints": 10,
+      "stock_finance_recovery_requested_checkpoints": 10,
+      "stock_finance_20min_monitor_ready": true,
+      "stock_finance_20min_monitor_pass": false,
+      "stock_finance_20min_completed_checkpoints": 10,
+      "stock_finance_20min_requested_checkpoints": 10,
+      "latest_stock_finance_gate_ok_count": 2,
+      "latest_stock_finance_gate_can_run_three": false,
+      "scroll_discovery_gate_ok_count": 2,
+      "scroll_discovery_gate_can_run_three": false,
+      "public_search_gate_ok_count": 0,
+      "public_search_gate_can_run_three": false,
+      "process_guard_ok": true,
+      "test_chrome_count": 0,
+      "capture_process_count": 0,
+      "status": "partial",
+      "note": "run45 三路播放监控 3 分钟 smoke 通过；run46 关闭一路干扰 smoke 通过；run47 刷新一路干扰 smoke 通过；run49 2 小时监控完成 12/12 checkpoint，但 C1/C3 失去音轨且后段页面调试目标消失，未通过长稳；run53 通用候选三路自愈 smoke 通过，覆盖页面目标消失重建和音轨失效换源；run57 股票 / 财经候选 10 分钟自愈监控 10/10 checkpoint 通过；run60 股票 / 财经 20 分钟监控在第 10 个 checkpoint 因 C1 失去音轨且无 standby 未通过；run63 当前股票 / 财经候选仅 2 路可捕获；run64 滚动发现命中 1 个已有财经候选，run66 门禁仍仅 2 路可捕获；run68 公开搜索候选 0 路可捕获，不继续无效三路监控；后续单次测试最长 20 分钟，超长测试需申请。"
+    },
+    "task_1_2": {
+      "report_ready": true,
+      "status": "partial",
+      "note": "run43 三路 16×60 秒 48/48 有效且 0 次换源；run44 系统声水印隔离通过；人工听检、麦克风输入对照和 2 小时稳定性未完成。"
+    }
+  },
+  "overall_acceptance_pass": false,
+  "blocking_gaps": [
+    "Task 0.1 缺人工签收",
+    "Task 0.2 缺人工标准稿和 500 条正式人工语义标注",
+    "Task 1.1 股票 / 财经 10 分钟自愈 smoke 已通过；20 分钟监控因候选池无 standby 未通过；滚动发现和公开搜索后候选池仍不足，需用户补充 4-8 个实时股票 / 财经候选链接",
+    "Task 1.2 缺人工听检、麦克风输入对照和长稳验证"
+  ]
+}

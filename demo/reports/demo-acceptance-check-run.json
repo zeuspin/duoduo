@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-07-11T09:51:44+08:00",
+  "checks": [
+    {
+      "id": "scope_signoff",
+      "command": [
+        "python3",
+        "demo/scripts/check_scope_signoff.py"
+      ],
+      "required_for_overall": false,
+      "returncode": 0,
+      "stdout": "{\"input\": \"demo/scope-review-signoff.json\", \"output_json\": \"demo/reports/scope-signoff-report.json\", \"output_md\": \"demo/reports/scope-signoff-report.md\", \"task_0_1_signoff_pass\": false, \"approved_count\": 0, \"required_count\": 6}",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "id": "sample_suitability",
+      "command": [
+        "python3",
+        "demo/scripts/audit_sample_suitability.py"
+      ],
+      "required_for_overall": true,
+      "returncode": 0,
+      "stdout": "{\"output_json\": \"demo/reports/sample-suitability-report.json\", \"output_md\": \"demo/reports/sample-suitability-report.md\", \"stock_finance_effective_duration_hours\": 3.061, \"stock_finance_duration_gap_sec\": 0, \"task_0_2_stock_duration_pass\": true}",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "id": "annotation_coverage",
+      "command": [
+        "python3",
+        "demo/scripts/check_annotation_coverage.py"
+      ],
+      "required_for_overall": true,
+      "returncode": 0,
+      "stdout": "{\"input\": \"demo/samples/annotations/human-annotation-workpack.jsonl\", \"output_json\": \"demo/reports/annotation-coverage-report.json\", \"output_md\": \"demo/reports/annotation-coverage-report.md\", \"total_rows\": 1467, \"task_0_2_pass\": false}",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "id": "semantic_events_coverage",
+      "command": [
+        "python3",
+        "demo/scripts/check_annotation_coverage.py",
+        "--input",
+        "demo/samples/annotations/semantic-events.jsonl",
+        "--output-json",
+        "demo/reports/semantic-events-coverage-report.json",
+        "--output-md",
+        "demo/reports/semantic-events-coverage-report.md"
+      ],
+      "required_for_overall": true,
+      "returncode": 0,
+      "stdout": "{\"input\": \"demo/samples/annotations/semantic-events.jsonl\", \"output_json\": \"demo/reports/semantic-events-coverage-report.json\", \"output_md\": \"demo/reports/semantic-events-coverage-report.md\", \"total_rows\": 0, \"task_0_2_pass\": false}",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "id": "stock_review_pack",
+      "command": [
+        "python3",
+        "demo/scripts/check_stock_review_pack.py"
+      ],
+      "required_for_overall": true,
+      "returncode": 0,
+      "stdout": "{\"output_json\": \"demo/reports/stock-finance-review-pack-check.json\", \"output_md\": \"demo/reports/stock-finance-review-pack-check.md\", \"total_rows\": 300, \"review_pack_ready\": true}",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "id": "merge_stock_review_pack_dry_run",
+      "command": [
+        "python3",
+        "demo/scripts/merge_stock_review_pack.py",
+        "--dry-run"
+      ],
+      "required_for_overall": true,
+      "returncode": 0,
+      "stdout": "{\"master_rows\": 1467, \"review_rows\": 300, \"matched_rows\": 300, \"changed_rows\": 0, \"approved_rows_after_merge\": 0, \"skipped_unreviewed_rows\": 300, \"missing_master_ids\": [], \"dry_run\": true, \"input_master\": \"demo/samples/annotations/human-annotation-workpack.jsonl\", \"input_review_pack\": \"demo/samples/annotations/stock-finance-review-pack.jsonl\", \"output\": \"demo/samples/annotations/human-annotation-workpack.jsonl\"}",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "id": "process_guard",
+      "command": [
+        "python3",
+        "demo/scripts/check_test_process_guard.py"
+      ],
+      "required_for_overall": true,
+      "returncode": 0,
+      "stdout": "{\"output_json\": \"demo/reports/test-process-guard-report.json\", \"output_md\": \"demo/reports/test-process-guard-report.md\", \"ok\": true, \"test_chrome_count\": 0, \"capture_process_count\": 0}",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "id": "demo_acceptance_state",
+      "command": [
+        "python3",
+        "demo/scripts/check_demo_acceptance_state.py"
+      ],
+      "required_for_overall": true,
+      "returncode": 0,
+      "stdout": "{\"output_json\": \"demo/reports/demo-acceptance-state.json\", \"output_md\": \"demo/reports/demo-acceptance-state.md\", \"overall_acceptance_pass\": false, \"all_required_files_exist\": true}",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "id": "objective_requirements_audit",
+      "command": [
+        "python3",
+        "demo/scripts/audit_objective_requirements.py"
+      ],
+      "required_for_overall": true,
+      "returncode": 0,
+      "stdout": "{\"output_json\": \"demo/reports/objective-requirements-audit.json\", \"output_md\": \"demo/reports/objective-requirements-audit.md\", \"objective_complete\": false, \"status_counts\": {\"partial\": 5, \"pass\": 7}}",
+      "stderr": "",
+      "ok": true
+    }
+  ],
+  "required_checks_ok": true,
+  "key_scan_ok": true,
+  "key_scan_findings": [],
+  "overall_acceptance_pass": false,
+  "counts": {
+    "manifest_rows": 191,
+    "asr_segment_rows": 1467,
+    "semantic_seed_rows": 1467,
+    "human_workpack_rows": 1467,
+    "stock_review_pack_rows": 300,
+    "semantic_event_rows": 0
+  },
+  "stock_review_pack_ready": true,
+  "stock_finance_effective_duration_hours": 3.061,
+  "stock_finance_duration_gap_sec": 0,
+  "workpack_rows": 1467,
+  "workpack_gap": 0,
+  "semantic_event_rows": 0,
+  "semantic_event_pass": false,
+  "objective_complete": false,
+  "objective_status_counts": {
+    "partial": 5,
+    "pass": 7
+  }
+}

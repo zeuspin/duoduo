@@ -1,0 +1,92 @@
+{
+  "version": "0.5.1",
+  "roomId": "123",
+  "formalInsights": [
+    {
+      "nature": "explicit",
+      "subjectKind": "market",
+      "subjectOriginal": "大盘",
+      "direction": "cautious",
+      "summary": "市场处于修复阶段，尚不能确认反转",
+      "rationale": "指数上涨但量能未放大",
+      "conditions": [],
+      "evidence": [
+        "现在市场情绪只能算修复，还不能说反转。"
+      ],
+      "confidence": 0.96,
+      "alertLevel": "important",
+      "id": 1,
+      "roomId": "123",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        2
+      ],
+      "startedAt": "2026-07-13T02:30:01.000Z",
+      "endedAt": "2026-07-13T02:30:01.000Z",
+      "createdAt": "2026-07-13T05:08:44.634Z"
+    }
+  ],
+  "testRuns": [
+    {
+      "id": "1f209ff8-5b52-4805-9392-d987ade6f3ca",
+      "parserId": "market-insight",
+      "publishedVersionId": 1,
+      "draftVersionId": 2,
+      "roomId": "123",
+      "sampleAsrIds": [
+        1,
+        2,
+        3
+      ],
+      "status": "completed",
+      "publishedResults": [
+        {
+          "nature": "explicit",
+          "subjectKind": "market",
+          "subjectOriginal": "大盘",
+          "direction": "cautious",
+          "summary": "市场处于修复阶段，尚不能确认反转",
+          "rationale": "指数上涨但量能未放大",
+          "conditions": [],
+          "evidence": [
+            "现在市场情绪只能算修复，还不能说反转。"
+          ],
+          "confidence": 0.96,
+          "alertLevel": "important"
+        }
+      ],
+      "draftResults": [
+        {
+          "nature": "explicit",
+          "subjectKind": "market",
+          "subjectOriginal": "大盘",
+          "direction": "cautious",
+          "summary": "市场处于修复阶段，尚不能确认反转",
+          "rationale": "指数上涨但量能未放大",
+          "conditions": [],
+          "evidence": [
+            "现在市场情绪只能算修复，还不能说反转。"
+          ],
+          "confidence": 0.96,
+          "alertLevel": "important"
+        }
+      ],
+      "createdAt": "2026-07-13T05:08:45.722Z",
+      "completedAt": "2026-07-13T05:08:45.727Z"
+    }
+  ],
+  "binding": {
+    "roomId": "123",
+    "parserId": "market-insight",
+    "parserVersionId": 1,
+    "updatedAt": "2026-07-13T05:08:36.569Z"
+  },
+  "notificationVisible": true,
+  "navigation": {
+    "roomCard": true,
+    "focusedInsight": true,
+    "insightTab": true
+  },
+  "resourcesBeforeQuit": 0
+}

@@ -1,0 +1,69 @@
+{
+  "ok": true,
+  "mimeType": "audio/webm;codecs=opus",
+  "size": 142291,
+  "chunkCount": 9,
+  "nonEmptyChunkCount": 9,
+  "chunkSizes": [
+    15618,
+    16438,
+    16438,
+    16438,
+    16438,
+    17404,
+    16438,
+    16438,
+    10641
+  ],
+  "audioTracks": 1,
+  "startState": {
+    "video": {
+      "paused": false,
+      "muted": false,
+      "volume": 1,
+      "readyState": 4,
+      "networkState": 2,
+      "currentTime": 271.270269,
+      "duration": null,
+      "srcPresent": true
+    },
+    "audioTracks": [
+      {
+        "id": "6844d5a8-d655-4e77-9272-ef9b92230929",
+        "kind": "audio",
+        "label": "a01ac0d3-9528-4456-b6cd-7a123270505d",
+        "enabled": true,
+        "muted": false,
+        "readyState": "live"
+      }
+    ],
+    "videoTrackCount": 1
+  },
+  "endState": {
+    "video": {
+      "paused": false,
+      "muted": false,
+      "volume": 1,
+      "readyState": 0,
+      "networkState": 2,
+      "currentTime": 0,
+      "duration": null,
+      "srcPresent": true
+    },
+    "audioTracks": [
+      {
+        "id": "6844d5a8-d655-4e77-9272-ef9b92230929",
+        "kind": "audio",
+        "label": "a01ac0d3-9528-4456-b6cd-7a123270505d",
+        "enabled": true,
+        "muted": false,
+        "readyState": "ended"
+      }
+    ],
+    "recorderState": "inactive"
+  },
+  "durationMs": 60000,
+  "output": "/Users/xuke/Documents/getian/duoduo/demo/samples/audio/raw/run40_C1_848398958216_20260710T192419_r05_seg01_60s_page_capture.webm",
+  "targetTitle": "小溪财经的抖音直播间 - 抖音直播",
+  "targetUrl": "https://live.douyin.com/848398958216"
+}

@@ -1,0 +1,51 @@
+{
+  "created_at": "2026-07-10",
+  "source": "Derived from safari-live-candidates-20260710 and run38 evidence",
+  "safari_usage": "Safari only used to discover room links; playback and capture must use anonymous Chrome profiles.",
+  "selection_reason": "S1 lost audio/video track during run38 round 9, so S2/S3/S4 are promoted as first three candidates for no-replacement retest.",
+  "only_use_these_candidates": false,
+  "candidates": [
+    {
+      "code": "R1",
+      "room_id": "305503141482",
+      "url": "https://live.douyin.com/305503141482",
+      "title": "财经红姐"
+    },
+    {
+      "code": "R2",
+      "room_id": "848398958216",
+      "url": "https://live.douyin.com/848398958216",
+      "title": "小溪财经"
+    },
+    {
+      "code": "R3",
+      "room_id": "857559947435",
+      "url": "https://live.douyin.com/857559947435",
+      "title": "老李财经"
+    },
+    {
+      "code": "R4",
+      "room_id": "56106509963",
+      "url": "https://live.douyin.com/56106509963",
+      "title": "国海小飞鱼"
+    },
+    {
+      "code": "R5",
+      "room_id": "88057849963",
+      "url": "https://live.douyin.com/88057849963",
+      "title": "广发证券修多多"
+    },
+    {
+      "code": "R6",
+      "room_id": "142040264912",
+      "url": "https://live.douyin.com/142040264912",
+      "title": "来来财经"
+    },
+    {
+      "code": "R7",
+      "room_id": "583183556429",
+      "url": "https://live.douyin.com/583183556429",
+      "title": "海能-叨哥财经"
+    }
+  ]
+}

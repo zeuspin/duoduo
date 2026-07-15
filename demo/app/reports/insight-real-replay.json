@@ -1,0 +1,346 @@
+{
+  "source": "saved-real-asr-replay",
+  "rooms": [
+    {
+      "roomId": "60872859839",
+      "asrCount": 46
+    },
+    {
+      "roomId": "723327304015",
+      "asrCount": 48
+    },
+    {
+      "roomId": "773107011629",
+      "asrCount": 36
+    },
+    {
+      "roomId": "59479663913",
+      "asrCount": 35
+    },
+    {
+      "roomId": "273112541814",
+      "asrCount": 0
+    }
+  ],
+  "insights": [
+    {
+      "nature": "explicit",
+      "subjectKind": "sector",
+      "subjectOriginal": "轮动方向",
+      "direction": "cautious",
+      "summary": "对当日轮动到的板块，应在冲高时做减仓操作",
+      "rationale": "主播多次重复‘冲高的时候轮动道的做减法’，并强调‘只讲了一句’，属明确、单次有效的操作指令，非假设或引用",
+      "conditions": [],
+      "evidence": [
+        "我只讲了一句，冲高的时候轮动道的做减法。"
+      ],
+      "confidence": 0.96,
+      "alertLevel": "normal",
+      "id": 60,
+      "roomId": "723327304015",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        68
+      ],
+      "startedAt": "2026-07-13T02:33:46.061Z",
+      "endedAt": "2026-07-13T02:33:46.061Z",
+      "createdAt": "2026-07-13T03:34:43.173Z"
+    },
+    {
+      "nature": "fact",
+      "subjectKind": "indicator",
+      "subjectOriginal": "成交量",
+      "direction": "neutral",
+      "summary": "预计全天成交量缩至4000亿，当前（10:32）已成交3万亿",
+      "rationale": "‘预计…缩量4000亿’与‘今天3万亿’为可验证数值陈述，未含方向性判断；注意‘3万亿’与‘4000亿’存在数量级矛盾，但按ASR原意保留，属事实描述范畴",
+      "conditions": [],
+      "evidence": [
+        "预计的成交量全天应该是缩量4000亿。今天3万亿。"
+      ],
+      "confidence": 0.99,
+      "alertLevel": "none",
+      "id": 59,
+      "roomId": "723327304015",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        24,
+        26
+      ],
+      "startedAt": "2026-07-13T02:32:46.431Z",
+      "endedAt": "2026-07-13T02:32:48.247Z",
+      "createdAt": "2026-07-13T03:34:43.173Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "indicator",
+      "subjectOriginal": "量能曲线",
+      "direction": "cautious",
+      "summary": "当前市场量能处于极度低迷状态，呈‘趴地板不动’特征",
+      "rationale": "主播用‘趴地板上的，是不动的’作直接定性描述，属明确、具象化判断，非转述亦无条件限定",
+      "conditions": [],
+      "evidence": [
+        "亮能的曲线图，目前在他地板上的，你看到没有？是趴地板上的，是不动的。"
+      ],
+      "confidence": 0.95,
+      "alertLevel": "normal",
+      "id": 58,
+      "roomId": "723327304015",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        20
+      ],
+      "startedAt": "2026-07-13T02:32:42.796Z",
+      "endedAt": "2026-07-13T02:32:42.796Z",
+      "createdAt": "2026-07-13T03:34:43.173Z"
+    },
+    {
+      "nature": "conditional",
+      "subjectKind": "market",
+      "subjectOriginal": "探底过程",
+      "direction": "cautious",
+      "summary": "可能在周二或周三上午再次确认并探底",
+      "rationale": "主播使用‘还有可能’‘再去做确认，去探底的这个过程’，并限定时间范围（周二/周三上午），属带明确时间条件的谨慎预判",
+      "conditions": [
+        "时间：周二或周三上午"
+      ],
+      "evidence": [
+        "啊，周二3，特别是周三的上午，还有可能好吧，还有可能在我们的这一周过程当中再去做确认，去探底的这个过程。"
+      ],
+      "confidence": 0.96,
+      "alertLevel": "important",
+      "id": 57,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        90
+      ],
+      "startedAt": "2026-07-13T02:34:27.168Z",
+      "endedAt": "2026-07-13T02:34:27.168Z",
+      "createdAt": "2026-07-13T03:34:39.966Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "market",
+      "subjectOriginal": "涨跌家数",
+      "direction": "cautious",
+      "summary": "当前跌停家数多于涨停家数，显示市场弱势",
+      "rationale": "主播将‘跌幅明显’与‘涨停加速还跌于低于跌停家速’并列陈述，用‘甚至’加强对比，构成对市场强度的负面判断",
+      "conditions": [],
+      "evidence": [
+        "因为今天的话呢跌幅相对来说会比较明显一点啊，甚至现在的这个呃涨停的加速还跌于低于呃低于这个跌停的家速。"
+      ],
+      "confidence": 0.97,
+      "alertLevel": "normal",
+      "id": 56,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        135
+      ],
+      "startedAt": "2026-07-13T02:35:45.305Z",
+      "endedAt": "2026-07-13T02:35:45.305Z",
+      "createdAt": "2026-07-13T03:34:39.966Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "indicator",
+      "subjectOriginal": "点位区间",
+      "direction": "neutral",
+      "summary": "大盘运行区间为3950–4000点",
+      "rationale": "主播明确给出上下限数值并强调‘记一个大的数’‘讲的都是一个区间范围’，属事实性区间锚定，不含方向倾向",
+      "conditions": [],
+      "evidence": [
+        "下方有支撑3950点附近，上方有压力4000点附近。那么到目前为止的话就3950，你记一个大的数吧，好吧，3950到4000点吧，好吧，因为在我的直播间的话讲的都是一个呃区间范围嘛。"
+      ],
+      "confidence": 1,
+      "alertLevel": "none",
+      "id": 55,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        126
+      ],
+      "startedAt": "2026-07-13T02:35:30.728Z",
+      "endedAt": "2026-07-13T02:35:30.728Z",
+      "createdAt": "2026-07-13T03:34:39.966Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "indicator",
+      "subjectOriginal": "量能水平",
+      "direction": "cautious",
+      "summary": "量能已快速萎缩，反映市场谨慎情绪",
+      "rationale": "主播将缩量与‘市场周一就开始谨慎’直接关联，并强调‘缩量给我们带来的节奏就是…’，属明确归因判断",
+      "conditions": [],
+      "evidence": [
+        "一个的话呢是因为到目前为止，整个的量能水平的话呢已经开始出现了快速的萎缩。就市场到目前为止，周一的时候开始谨慎的时候，接下来这一周啊你还是要跟着我的直播间的节奏来。"
+      ],
+      "confidence": 0.98,
+      "alertLevel": "normal",
+      "id": 54,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        77
+      ],
+      "startedAt": "2026-07-13T02:34:03.827Z",
+      "endedAt": "2026-07-13T02:34:03.827Z",
+      "createdAt": "2026-07-13T03:34:39.966Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "market",
+      "subjectOriginal": "指数",
+      "direction": "cautious",
+      "summary": "指数低开后两次冲击前期高点或跳空缺口均失败，十点后走势趋缓",
+      "rationale": "主播明确描述指数行为（低开、冲击失败、走势缓慢），属对当前大盘走势的直接判断",
+      "conditions": [],
+      "evidence": [
+        "总结第一个指数，指数今天低开之后的话呢，试图去冲击前期的高点，或者是回补目前的这个跳空缺口位。呃，但是两次都失败了，这个情况之下的话呢，十点钟之后的走势开始的非常的缓慢了。"
+      ],
+      "confidence": 1,
+      "alertLevel": "normal",
+      "id": 53,
+      "roomId": "773107011629",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        71
+      ],
+      "startedAt": "2026-07-13T02:33:49.793Z",
+      "endedAt": "2026-07-13T02:33:49.793Z",
+      "createdAt": "2026-07-13T03:34:39.966Z"
+    },
+    {
+      "nature": "fact",
+      "subjectKind": "indicator",
+      "subjectOriginal": "中证机床ETF",
+      "subjectNormalized": "中证机床ETF",
+      "direction": "neutral",
+      "summary": "主播指出中证机床ETF关联母机板块",
+      "rationale": "纯事实性陈述，无方向性判断或价值评估，仅建立ETF与板块的映射关系",
+      "conditions": [],
+      "evidence": [
+        "中证机床E天赋啊，关联母机板块，你看吧，大概齐吧，就是你也你也照着我这个线去画一画，它大概的支撑呃在哪儿？"
+      ],
+      "confidence": 1,
+      "alertLevel": "none",
+      "id": 52,
+      "roomId": "60872859839",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        114
+      ],
+      "startedAt": "2026-07-13T02:35:08.001Z",
+      "endedAt": "2026-07-13T02:35:08.001Z",
+      "createdAt": "2026-07-13T03:34:34.857Z"
+    },
+    {
+      "nature": "conditional",
+      "subjectKind": "indicator",
+      "subjectOriginal": "当前位置",
+      "subjectNormalized": "当前支撑位",
+      "direction": "cautious",
+      "summary": "若当前位置能撑住，则可能开启反弹",
+      "rationale": "主播使用‘如果在这儿它直接撑住的话……是不是有可能他他咔咔咔再往上走’句式，完整呈现‘条件+结果’逻辑链，且‘撑住’为明确动作阈值，属典型条件观点；该判断聚焦技术结构（M点、顶部、前期底部等）",
+      "conditions": [
+        "当前位置直接撑住"
+      ],
+      "evidence": [
+        "如果在这儿它直接撑住的话。是不是有可能他他咔咔咔再往上走，又又要过他再往上打，对不对？"
+      ],
+      "confidence": 0.97,
+      "alertLevel": "normal",
+      "id": 51,
+      "roomId": "60872859839",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        56,
+        62
+      ],
+      "startedAt": "2026-07-13T02:33:24.561Z",
+      "endedAt": "2026-07-13T02:33:32.266Z",
+      "createdAt": "2026-07-13T03:34:34.857Z"
+    },
+    {
+      "nature": "explicit",
+      "subjectKind": "sector",
+      "subjectOriginal": "母鸡",
+      "subjectNormalized": "母机",
+      "direction": "positive",
+      "summary": "主播认为母鸡（母机）当前基本面或资金面不错",
+      "rationale": "‘母鸡的东西还挺不错的哎’为直接评价性表达，无修饰、无条件限定，属明确观点；结合上下文‘母鸡’为‘母机’口误（ASR:114明确提及‘中证机床ETF，关联母机板块’），且ASR:152/160均以‘母鸡’指代同一板块，故可归一",
+      "conditions": [],
+      "evidence": [
+        "我觉得不至于吧，母鸡的东西还挺不错的哎。"
+      ],
+      "confidence": 0.98,
+      "alertLevel": "normal",
+      "id": 50,
+      "roomId": "60872859839",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        75
+      ],
+      "startedAt": "2026-07-13T02:33:55.654Z",
+      "endedAt": "2026-07-13T02:33:55.654Z",
+      "createdAt": "2026-07-13T03:34:34.857Z"
+    },
+    {
+      "nature": "conditional",
+      "subjectKind": "sector",
+      "subjectOriginal": "母机板块",
+      "subjectNormalized": "母机",
+      "direction": "positive",
+      "summary": "若不跌破当前支撑位，母机板块仍可等待",
+      "rationale": "主播明确将‘不破’作为前提条件，叠加‘我们觉得还是可以等’的判断，构成典型条件观点；该判断基于近期强势表现（‘这两项走的还挺强’）及资金偏好（‘有一些资金愿意去往里面去切一切的方向’）",
+      "conditions": [
+        "不跌破当前支撑位"
+      ],
+      "evidence": [
+        "而他确实前段时间这这这两项走的还挺强的，所以这个方向呢你只要不破，我们觉得我觉得还是可以等啊。"
+      ],
+      "confidence": 0.95,
+      "alertLevel": "normal",
+      "id": 49,
+      "roomId": "60872859839",
+      "parserId": "market-insight",
+      "parserVersionId": 1,
+      "sourceAsrIds": [
+        160
+      ],
+      "startedAt": "2026-07-13T02:36:40.411Z",
+      "endedAt": "2026-07-13T02:36:40.411Z",
+      "createdAt": "2026-07-13T03:34:34.857Z"
+    }
+  ],
+  "statuses": {
+    "60872859839": {
+      "state": "idle"
+    },
+    "723327304015": {
+      "state": "idle"
+    },
+    "773107011629": {
+      "state": "idle"
+    },
+    "59479663913": {
+      "state": "error",
+      "error": "This operation was aborted"
+    },
+    "273112541814": {
+      "state": "idle"
+    }
+  },
+  "resources": 0
+}

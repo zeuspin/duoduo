@@ -1,0 +1,53 @@
+{
+  "run_id": "run49",
+  "task": "Task 1.1",
+  "decision": "no-go",
+  "gate_run_id": "run48",
+  "gate_probe_ok_count": 3,
+  "duration_seconds": 7200,
+  "completed_checkpoints": 12,
+  "requested_checkpoints": 12,
+  "initial_active_count": 3,
+  "all_checkpoints_three_ok": false,
+  "route_summary": [
+    {
+      "route": "C1",
+      "room_id": "5583822346",
+      "ok_checkpoints": 1,
+      "total_checkpoints": 12,
+      "bad_checkpoints": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "primary_failure_modes": [
+        "video-not-ready-or-no-audio-track",
+        "no-live-douyin-page-target"
+      ]
+    },
+    {
+      "route": "C2",
+      "room_id": "632263122130",
+      "ok_checkpoints": 10,
+      "total_checkpoints": 12,
+      "bad_checkpoints": [11, 12],
+      "primary_failure_modes": [
+        "no-live-douyin-page-target"
+      ]
+    },
+    {
+      "route": "C3",
+      "room_id": "746541295999",
+      "ok_checkpoints": 3,
+      "total_checkpoints": 12,
+      "bad_checkpoints": [4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "primary_failure_modes": [
+        "video-not-ready-or-no-audio-track",
+        "no-live-douyin-page-target"
+      ]
+    }
+  ],
+  "root_cause_hypothesis": "The three anonymous containers can start and play concurrently, but the long-running playback monitor lacks self-healing for live source loss, audio-track disappearance, and page target exit.",
+  "required_before_pass": [
+    "recover from video-not-ready-or-no-audio-track by replacing the failed room",
+    "recover from missing live.douyin.com page target by rebuilding only the failed route",
+    "record every recovery action without restarting unaffected routes",
+    "rerun and pass a 2-hour three-route long monitor"
+  ]
+}

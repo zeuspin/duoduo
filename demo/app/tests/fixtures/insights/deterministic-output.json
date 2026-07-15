@@ -1,0 +1,15 @@
+[
+  {"id":"s01","nature":"explicit","evidence":"半导体板块今天放量走强，我认为短线仍然偏强。"},
+  {"id":"s02","nature":"conditional","evidence":"如果指数跌破三千九百五十点，就要注意进一步回撤风险。"},
+  {"id":"s03","nature":"explicit","evidence":"目前上涨家数少于下跌家数，市场情绪偏谨慎。"},
+  {"id":"s08","nature":"explicit","evidence":"大盘成交量比昨天同期缩小，反弹力度仍然有限。"},
+  {"id":"s09","nature":"conditional","evidence":"证券板块只有站稳前高，才可能打开上行空间。"},
+  {"id":"s10","nature":"explicit","evidence":"存储芯片出现资金回流，但现在还不能确认趋势反转。"},
+  {"id":"s12","nature":"explicit","evidence":"我明确不看好当前高位白酒的短线性价比。"},
+  {"id":"s13","nature":"fact","evidence":"北向资金上午净流出，指数维持震荡。"},
+  {"id":"s14","nature":"conditional","evidence":"要是午后量能补上来，科技方向可能重新活跃。"},
+  {"id":"s15","nature":"explicit","evidence":"机器人方向目前只是跟随反弹，不算主线。"},
+  {"id":"s17","nature":"fact","evidence":"银行板块拉升对指数形成支撑。"},
+  {"id":"s19","nature":"explicit","evidence":"指数上方四千点有压力，下方三千九百五十点有支撑。"},
+  {"id":"s20","nature":"conditional","evidence":"消费电子连续回落后有修复需求，但要观察成交量。"}
+]

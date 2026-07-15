@@ -1,0 +1,111 @@
+{
+  "required_roles": [
+    "asr_ai_engineering",
+    "backend_engineering",
+    "client_capture_engineering",
+    "compliance_ops",
+    "product",
+    "qa"
+  ],
+  "approved_roles": [],
+  "pending_roles": [
+    "asr_ai_engineering",
+    "backend_engineering",
+    "client_capture_engineering",
+    "compliance_ops",
+    "product",
+    "qa"
+  ],
+  "missing_roles": [],
+  "duplicate_roles": [],
+  "invalid_signoffs": [],
+  "role_details": [
+    {
+      "role": "asr_ai_engineering",
+      "display_name": "ASR / AI 研发",
+      "status": "pending",
+      "reviewer": "",
+      "confirmed_at": "",
+      "result": "pending",
+      "missing_fields": [
+        "approved status",
+        "reviewer",
+        "confirmed_at"
+      ],
+      "confirmation": "ASR 指标、语义完整性指标、事件字段和降级边界可执行。"
+    },
+    {
+      "role": "backend_engineering",
+      "display_name": "服务端研发",
+      "status": "pending",
+      "reviewer": "",
+      "confirmed_at": "",
+      "result": "pending",
+      "missing_fields": [
+        "approved status",
+        "reviewer",
+        "confirmed_at"
+      ],
+      "confirmation": "私人数据、结构化共建、版本链和权限隔离边界可执行。"
+    },
+    {
+      "role": "client_capture_engineering",
+      "display_name": "客户端 / 采集研发",
+      "status": "pending",
+      "reviewer": "",
+      "confirmed_at": "",
+      "result": "pending",
+      "missing_fields": [
+        "approved status",
+        "reviewer",
+        "confirmed_at"
+      ],
+      "confirmation": "3 路匿名容器、独立音频、后台稳定性验收口径可执行。"
+    },
+    {
+      "role": "compliance_ops",
+      "display_name": "合规 / 运营",
+      "status": "pending",
+      "reviewer": "",
+      "confirmed_at": "",
+      "result": "pending",
+      "missing_fields": [
+        "approved status",
+        "reviewer",
+        "confirmed_at"
+      ],
+      "confirmation": "不登录、不荐股、不公开逐字稿、投诉删除入口等边界足够。"
+    },
+    {
+      "role": "product",
+      "display_name": "产品负责人",
+      "status": "pending",
+      "reviewer": "",
+      "confirmed_at": "",
+      "result": "pending",
+      "missing_fields": [
+        "approved status",
+        "reviewer",
+        "confirmed_at"
+      ],
+      "confirmation": "MUST / SHOULD / LATER 分类符合首版目标；非目标足够明确。"
+    },
+    {
+      "role": "qa",
+      "display_name": "测试 / 质量",
+      "status": "pending",
+      "reviewer": "",
+      "confirmed_at": "",
+      "result": "pending",
+      "missing_fields": [
+        "approved status",
+        "reviewer",
+        "confirmed_at"
+      ],
+      "confirmation": "每个 MUST 项都有可复算或可观察的验收方式。"
+    }
+  ],
+  "approved_count": 0,
+  "required_count": 6,
+  "task_0_1_signoff_pass": false
+}

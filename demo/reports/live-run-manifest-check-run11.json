@@ -1,0 +1,52 @@
+{
+  "manifest": "demo/reports/live-run-manifests/run11.json",
+  "dry_run": false,
+  "manifest_ok": true,
+  "manifest_issues": [],
+  "cdp_checked": true,
+  "cdp_details": [
+    {
+      "debug_port": 9241,
+      "expected_url": "https://live.douyin.com/782837937233",
+      "cdp_ok": true,
+      "error": "",
+      "live_page_count": 1,
+      "live_pages": [
+        {
+          "title": "财经小板总的抖音直播间 - 抖音直播",
+          "url": "https://live.douyin.com/782837937233"
+        }
+      ],
+      "expected_url_found": true
+    },
+    {
+      "debug_port": 9242,
+      "expected_url": "https://live.douyin.com/816173758414",
+      "cdp_ok": true,
+      "error": "",
+      "live_page_count": 1,
+      "live_pages": [
+        {
+          "title": "老李财观的抖音直播间 - 抖音直播",
+          "url": "https://live.douyin.com/816173758414"
+        }
+      ],
+      "expected_url_found": true
+    },
+    {
+      "debug_port": 9243,
+      "expected_url": "https://live.douyin.com/59041165350",
+      "cdp_ok": true,
+      "error": "",
+      "live_page_count": 1,
+      "live_pages": [
+        {
+          "title": "老林故事会的抖音直播间 - 抖音直播",
+          "url": "https://live.douyin.com/59041165350"
+        }
+      ],
+      "expected_url_found": true
+    }
+  ],
+  "ok": true
+}

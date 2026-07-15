@@ -1,0 +1,771 @@
+{
+  "run_id": "run53",
+  "created_at": "2026-07-11T00:10:57+08:00",
+  "duration_seconds": 180,
+  "interval_seconds": 60,
+  "requested_checkpoints": 3,
+  "completed_checkpoints": 3,
+  "initial_active_count": 3,
+  "recovery_event_count": 2,
+  "injection_enabled": true,
+  "inject_close_checkpoint": 2,
+  "inject_close_route": "C1",
+  "all_checkpoints_three_ok_after_recovery": true,
+  "conclusion": "Pass",
+  "routes": [
+    {
+      "route": "C1",
+      "slot": 1,
+      "candidate": {
+        "code": "D1",
+        "room_id": "832957564336",
+        "url": "https://live.douyin.com/832957564336",
+        "source": "discovery-run51-all-links",
+        "text": ""
+      },
+      "room_id": "832957564336",
+      "url": "https://live.douyin.com/832957564336",
+      "port": 9931,
+      "profile_dir": "demo/runtime/chrome-profiles/run53-recovery-playback-c1",
+      "recovery_count": 1,
+      "replacement_count": 0,
+      "initial_probe": {
+        "ok": true,
+        "pageTitle": "趣游台州的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 22.366,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "趣游台州的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/832957564336",
+        "probe_returncode": 0
+      },
+      "last_probe": {
+        "ok": true,
+        "pageTitle": "趣游台州的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 14.334,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "趣游台州的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/832957564336",
+        "probe_returncode": 0
+      },
+      "launch_returncode": 0,
+      "launch_stderr": ""
+    },
+    {
+      "route": "C2",
+      "slot": 2,
+      "candidate": {
+        "code": "D4",
+        "room_id": "276124613032",
+        "url": "https://live.douyin.com/276124613032",
+        "source": "discovery-run51-all-links",
+        "text": "1228 超强台风巴威 靳七游戏"
+      },
+      "room_id": "276124613032",
+      "url": "https://live.douyin.com/276124613032",
+      "port": 9932,
+      "profile_dir": "demo/runtime/chrome-profiles/run53-recovery-playback-c2",
+      "recovery_count": 1,
+      "replacement_count": 1,
+      "initial_probe": {
+        "ok": true,
+        "pageTitle": "竞锐体育毛锅的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 23.733,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "竞锐体育毛锅的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/539351689019",
+        "probe_returncode": 0
+      },
+      "last_probe": {
+        "ok": true,
+        "pageTitle": "靳七游戏的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 29.833,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "靳七游戏的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/276124613032",
+        "probe_returncode": 0
+      },
+      "launch_returncode": 0,
+      "launch_stderr": ""
+    },
+    {
+      "route": "C3",
+      "slot": 3,
+      "candidate": {
+        "code": "D3",
+        "room_id": "346291052058",
+        "url": "https://live.douyin.com/346291052058",
+        "source": "discovery-run51-all-links",
+        "text": "1303 新人主播第七年 璐崽（声控助眠）"
+      },
+      "room_id": "346291052058",
+      "url": "https://live.douyin.com/346291052058",
+      "port": 9933,
+      "profile_dir": "demo/runtime/chrome-profiles/run53-recovery-playback-c3",
+      "recovery_count": 0,
+      "replacement_count": 0,
+      "initial_probe": {
+        "ok": true,
+        "pageTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 24.717,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/346291052058",
+        "probe_returncode": 0
+      },
+      "last_probe": {
+        "ok": true,
+        "pageTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 162.667,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/346291052058",
+        "probe_returncode": 0
+      },
+      "launch_returncode": 0,
+      "launch_stderr": ""
+    }
+  ],
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "elapsed_seconds": 60.31,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "832957564336",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 87.84,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/832957564336",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 87.84,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/832957564336",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "539351689019",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "竞锐体育毛锅的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 68.7,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "竞锐体育毛锅的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/539351689019",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "竞锐体育毛锅的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 68.7,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "竞锐体育毛锅的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/539351689019",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "346291052058",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 42.651,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/346291052058",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 42.651,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/346291052058",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 2,
+      "elapsed_seconds": 174.18,
+      "injected_close": true,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "832957564336",
+          "raw_ok": false,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": false,
+            "reason": "TypeError: fetch failed\n    at node:internal/deps/undici/undici:15845:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async getPageTarget (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:6:20)\n    at async /Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:134:18",
+            "probe_returncode": 1
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 24.4,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/832957564336",
+            "probe_returncode": 0
+          },
+          "recovery_action": "rebuild-same-room"
+        },
+        {
+          "route": "C2",
+          "room_id": "276124613032",
+          "raw_ok": false,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": false,
+            "pageTitle": "竞锐体育毛锅的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": true,
+              "muted": false,
+              "volume": 1,
+              "readyState": 0,
+              "networkState": 3,
+              "currentTime": 0,
+              "duration": null,
+              "srcPresent": true
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 0,
+            "videoTrackCount": 0,
+            "playAttempt": "ok",
+            "reason": "video-not-ready-or-no-audio-track",
+            "targetTitle": "竞锐体育毛锅的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/539351689019",
+            "probe_returncode": 2
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "靳七游戏的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 23.666,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "靳七游戏的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/276124613032",
+            "probe_returncode": 0
+          },
+          "recovery_action": "replace-room"
+        },
+        {
+          "route": "C3",
+          "room_id": "346291052058",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 156.501,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/346291052058",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 156.501,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/346291052058",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    },
+    {
+      "checkpoint": 3,
+      "elapsed_seconds": 180.35,
+      "injected_close": false,
+      "routes": [
+        {
+          "route": "C1",
+          "room_id": "832957564336",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 14.334,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/832957564336",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 14.334,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "趣游台州的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/832957564336",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C2",
+          "room_id": "276124613032",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "靳七游戏的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 29.833,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "靳七游戏的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/276124613032",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "靳七游戏的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 29.833,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "靳七游戏的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/276124613032",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        },
+        {
+          "route": "C3",
+          "room_id": "346291052058",
+          "raw_ok": true,
+          "final_ok": true,
+          "raw_probe": {
+            "ok": true,
+            "pageTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 162.667,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/346291052058",
+            "probe_returncode": 0
+          },
+          "final_probe": {
+            "ok": true,
+            "pageTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "videoCount": 1,
+            "selected": {
+              "paused": false,
+              "muted": false,
+              "volume": 1,
+              "readyState": 4,
+              "networkState": 2,
+              "currentTime": 162.667,
+              "duration": null,
+              "srcPresent": false
+            },
+            "captureStreamAvailable": true,
+            "audioTrackCount": 1,
+            "videoTrackCount": 1,
+            "playAttempt": "ok",
+            "reason": "",
+            "targetTitle": "璐崽（声控助眠）的抖音直播间 - 抖音直播",
+            "targetUrl": "https://live.douyin.com/346291052058",
+            "probe_returncode": 0
+          },
+          "recovery_action": "none"
+        }
+      ],
+      "three_ok_after_recovery": true
+    }
+  ],
+  "recovery_events": [
+    {
+      "route": "C1",
+      "old_room_id": "832957564336",
+      "old_url": "https://live.douyin.com/832957564336",
+      "raw_reason": "TypeError: fetch failed\n    at node:internal/deps/undici/undici:15845:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async getPageTarget (/Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:6:20)\n    at async /Users/xuke/Documents/getian/duoduo/demo/scripts/cdp_live_page_probe.js:134:18",
+      "strategy": "rebuild-same-room",
+      "ok": true,
+      "probe": {
+        "ok": true,
+        "pageTitle": "趣游台州的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 24.4,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "趣游台州的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/832957564336",
+        "probe_returncode": 0
+      },
+      "new_room_id": "832957564336",
+      "new_url": "https://live.douyin.com/832957564336",
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "checkpoint": 2
+    },
+    {
+      "route": "C2",
+      "old_room_id": "539351689019",
+      "old_url": "https://live.douyin.com/539351689019",
+      "raw_reason": "video-not-ready-or-no-audio-track",
+      "strategy": "replace-room",
+      "ok": true,
+      "probe": {
+        "ok": true,
+        "pageTitle": "靳七游戏的抖音直播间 - 抖音直播",
+        "videoCount": 1,
+        "selected": {
+          "paused": false,
+          "muted": false,
+          "volume": 1,
+          "readyState": 4,
+          "networkState": 2,
+          "currentTime": 23.666,
+          "duration": null,
+          "srcPresent": false
+        },
+        "captureStreamAvailable": true,
+        "audioTrackCount": 1,
+        "videoTrackCount": 1,
+        "playAttempt": "ok",
+        "reason": "",
+        "targetTitle": "靳七游戏的抖音直播间 - 抖音直播",
+        "targetUrl": "https://live.douyin.com/276124613032",
+        "probe_returncode": 0
+      },
+      "new_room_id": "276124613032",
+      "new_url": "https://live.douyin.com/276124613032",
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "checkpoint": 2
+    }
+  ]
+}

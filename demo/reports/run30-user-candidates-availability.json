@@ -1,0 +1,80 @@
+{
+  "run_id": "run30",
+  "purpose": "current availability re-check for user-specified candidates",
+  "candidates": [
+    {
+      "code": "U1",
+      "room_id": "873902239044",
+      "url": "https://live.douyin.com/873902239044",
+      "probe_ok": false,
+      "reason": "video-not-ready-or-no-audio-track",
+      "page_title": "股市林教头的抖音直播间 - 抖音直播",
+      "audio_track_count": 0,
+      "ready_state": 0,
+      "play_attempt": "play-timeout",
+      "source_file": "demo/reports/run30-u1-probe.json"
+    },
+    {
+      "code": "U2",
+      "room_id": "334489081726",
+      "url": "https://live.douyin.com/334489081726",
+      "probe_ok": true,
+      "reason": "",
+      "page_title": "文鼎（文说股市）的抖音直播间 - 抖音直播",
+      "audio_track_count": 1,
+      "ready_state": 4,
+      "play_attempt": "ok",
+      "source_file": "demo/reports/run30-u2-probe.json"
+    },
+    {
+      "code": "U3",
+      "room_id": "812755146455",
+      "url": "https://live.douyin.com/812755146455",
+      "probe_ok": false,
+      "reason": "video-not-ready-or-no-audio-track",
+      "page_title": "海派-和众汇富的抖音直播间 - 抖音直播",
+      "audio_track_count": 0,
+      "ready_state": 0,
+      "play_attempt": "play-timeout",
+      "source_file": "demo/reports/run30-u3-probe.json"
+    },
+    {
+      "code": "U4",
+      "room_id": "400595809668",
+      "url": "https://live.douyin.com/400595809668",
+      "probe_ok": false,
+      "reason": "video-not-ready-or-no-audio-track",
+      "page_title": "汇正首席杨Sir的抖音直播间 - 抖音直播",
+      "audio_track_count": 0,
+      "ready_state": 0,
+      "play_attempt": "play-timeout",
+      "source_file": "demo/reports/run30-u4-probe.json"
+    },
+    {
+      "code": "U5",
+      "room_id": "373389160165",
+      "url": "https://live.douyin.com/373389160165",
+      "probe_ok": false,
+      "reason": "video-not-ready-or-no-audio-track",
+      "page_title": "宋半导的抖音直播间 - 抖音直播",
+      "audio_track_count": 0,
+      "ready_state": 0,
+      "play_attempt": "play-timeout",
+      "source_file": "demo/reports/run30-u5-probe.json"
+    },
+    {
+      "code": "U6",
+      "room_id": "773107011629",
+      "url": "https://live.douyin.com/773107011629",
+      "probe_ok": true,
+      "reason": "",
+      "page_title": "低吸一哥奇点的抖音直播间 - 抖音直播",
+      "audio_track_count": 1,
+      "ready_state": 4,
+      "play_attempt": "ok",
+      "source_file": "demo/reports/run30-u6-probe.json"
+    }
+  ],
+  "probe_ok_count": 2,
+  "can_run_three_route_capture": false
+}

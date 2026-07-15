@@ -1,0 +1,40 @@
+{
+  "total_rows": 0,
+  "target_total": 500,
+  "total_gap": 500,
+  "manual_text_rows": 0,
+  "reviewed_rows": 0,
+  "review_status": {},
+  "missing_required_fields": {},
+  "empty_required_fields": {},
+  "category_counts": {},
+  "coverage_targets": {
+    "topic_or_market_entity": 150,
+    "number_expression": 80,
+    "negative_expression": 50,
+    "condition_expression": 50,
+    "risk_expression": 50,
+    "news_relay": 40,
+    "independent_view": 80,
+    "same_source_relay": 30,
+    "reversal_or_correction": 20,
+    "low_value_or_ad": 60
+  },
+  "coverage_gaps": {
+    "topic_or_market_entity": 150,
+    "number_expression": 80,
+    "negative_expression": 50,
+    "condition_expression": 50,
+    "risk_expression": 50,
+    "news_relay": 40,
+    "independent_view": 80,
+    "same_source_relay": 30,
+    "reversal_or_correction": 20,
+    "low_value_or_ad": 60
+  },
+  "risk_condition_reversal_rows": 0,
+  "risk_condition_reversal_ratio": 0,
+  "target_risk_condition_reversal_ratio": 0.2,
+  "risk_condition_reversal_ratio_pass": false,
+  "task_0_2_pass": false
+}

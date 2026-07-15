@@ -1,0 +1,16 @@
+{
+  "run_id": "discovery-run61-stock-search",
+  "created_at": "2026-07-11T02:24:32+08:00",
+  "source_url": "https://www.douyin.com/search/%E8%82%A1%E7%A5%A8%E7%9B%B4%E6%92%AD?type=live",
+  "profile_dir": "demo/runtime/chrome-profiles/discovery-run61-stock-search",
+  "profile_kept": false,
+  "launch_returncode": 0,
+  "extract_returncode": 0,
+  "pageTitle": "发现更多精彩视频 - 抖音搜索",
+  "pageUrl": "https://www.douyin.com/search/%E8%82%A1%E7%A5%A8%E7%9B%B4%E6%92%AD?type=live",
+  "link_count": 0,
+  "finance_candidate_count": 0,
+  "finance_candidates": [],
+  "links": [],
+  "stderr": ""
+}

@@ -1,0 +1,148 @@
+{
+  "run_id": "run69-generic-live-candidates",
+  "source_report": "demo/reports/discovery-run69-generic-live-links.json",
+  "purpose": "multi-route audio capture and ASR validation; no stock/finance requirement",
+  "candidate_count": 20,
+  "candidates": [
+    {
+      "code": "G1",
+      "room_id": "478068897604",
+      "url": "https://live.douyin.com/478068897604",
+      "source": "discovery-run69-generic-live-links",
+      "text": ""
+    },
+    {
+      "code": "G2",
+      "room_id": "575973340980",
+      "url": "https://live.douyin.com/575973340980",
+      "source": "discovery-run69-generic-live-links",
+      "text": "13 新人主播百段阿古朵打野无敌超绝节奏/不C包补/会走路就能赢！ 王者荣耀猪八（国服阿骨朵）"
+    },
+    {
+      "code": "G3",
+      "room_id": "744549703134",
+      "url": "https://live.douyin.com/744549703134",
+      "source": "discovery-run69-generic-live-links",
+      "text": "3741 台风来了 小白龙🐲¹¹¹"
+    },
+    {
+      "code": "G4",
+      "room_id": "282968601210",
+      "url": "https://live.douyin.com/282968601210",
+      "source": "discovery-run69-generic-live-links",
+      "text": "179 静静听歌，好好生活～ 千屿FM"
+    },
+    {
+      "code": "G5",
+      "room_id": "88063196303",
+      "url": "https://live.douyin.com/88063196303",
+      "source": "discovery-run69-generic-live-links",
+      "text": "1150 这么多人，发生什么事情了？ 田甜有话说（洁邦）"
+    },
+    {
+      "code": "G6",
+      "room_id": "727049857675",
+      "url": "https://live.douyin.com/727049857675",
+      "source": "discovery-run69-generic-live-links",
+      "text": "户外搞笑娱乐 @张老板搞笑娱乐 2万"
+    },
+    {
+      "code": "G7",
+      "room_id": "327014106755",
+      "url": "https://live.douyin.com/327014106755",
+      "source": "discovery-run69-generic-live-links",
+      "text": "暴雨中的和珅家人山人海 @光夫话北京 2968"
+    },
+    {
+      "code": "G8",
+      "room_id": "510196292003",
+      "url": "https://live.douyin.com/510196292003",
+      "source": "discovery-run69-generic-live-links",
+      "text": "不点赞进不来 @维斯塔 37"
+    },
+    {
+      "code": "G9",
+      "room_id": "747566496646",
+      "url": "https://live.douyin.com/747566496646",
+      "source": "discovery-run69-generic-live-links",
+      "text": "古风沉浸式直播间 @千娇·锦绣 37"
+    },
+    {
+      "code": "G10",
+      "room_id": "791332030924",
+      "url": "https://live.douyin.com/791332030924",
+      "source": "discovery-run69-generic-live-links",
+      "text": "哎！苦婆婆啊！ @良言破局99 1561"
+    },
+    {
+      "code": "G11",
+      "room_id": "5173436998",
+      "url": "https://live.douyin.com/5173436998",
+      "source": "discovery-run69-generic-live-links",
+      "text": "萌叔解读《红楼梦》，好听有趣有内涵 @萌叔彼得潘 1949"
+    },
+    {
+      "code": "G12",
+      "room_id": "837490462367",
+      "url": "https://live.douyin.com/837490462367",
+      "source": "discovery-run69-generic-live-links",
+      "text": "传奇手游推荐！马年新服，六米就可以玩到毕业的版本！185沉默西游！ @传奇保时捷 130"
+    },
+    {
+      "code": "G13",
+      "room_id": "87561737538",
+      "url": "https://live.douyin.com/87561737538",
+      "source": "discovery-run69-generic-live-links",
+      "text": "徐律师婚姻法律咨询 @徐律师聊婚姻 4165"
+    },
+    {
+      "code": "G14",
+      "room_id": "574604270116",
+      "url": "https://live.douyin.com/574604270116",
+      "source": "discovery-run69-generic-live-links",
+      "text": "一个小心心一个真心话 @恐龙妙脆角🦖 7"
+    },
+    {
+      "code": "G15",
+      "room_id": "239733517544",
+      "url": "https://live.douyin.com/239733517544",
+      "source": "discovery-run69-generic-live-links",
+      "text": "恐龙岛大猎杀夹缝中生存？？？ @潇龙飞 4330"
+    },
+    {
+      "code": "G16",
+      "room_id": "656801563756",
+      "url": "https://live.douyin.com/656801563756",
+      "source": "discovery-run69-generic-live-links",
+      "text": "你到底分手了没 @云舒儿 3"
+    },
+    {
+      "code": "G17",
+      "room_id": "171974652438",
+      "url": "https://live.douyin.com/171974652438",
+      "source": "discovery-run69-generic-live-links",
+      "text": "好久久不见吖~ @垚垚. 23"
+    },
+    {
+      "code": "G18",
+      "room_id": "669714636096",
+      "url": "https://live.douyin.com/669714636096",
+      "source": "discovery-run69-generic-live-links",
+      "text": "关注主播一起来锻炼。 @群子爱运动 1972"
+    },
+    {
+      "code": "G19",
+      "room_id": "258871664409",
+      "url": "https://live.douyin.com/258871664409",
+      "source": "discovery-run69-generic-live-links",
+      "text": "巴威到哪里了 @无限临海 3011"
+    },
+    {
+      "code": "G20",
+      "room_id": "745596322334",
+      "url": "https://live.douyin.com/745596322334",
+      "source": "discovery-run69-generic-live-links",
+      "text": "新团第一天 @沐汐湾 16"
+    }
+  ]
+}

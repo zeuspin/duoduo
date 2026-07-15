@@ -1,0 +1,27 @@
+{
+  "command_returncode": 0,
+  "stdout": "{\n  \"ok\": true,\n  \"pageTitle\": \"文鼎（文说股市）的抖音直播间 - 抖音直播\",\n  \"videoCount\": 1,\n  \"selected\": {\n    \"paused\": false,\n    \"muted\": false,\n    \"volume\": 1,\n    \"readyState\": 4,\n    \"networkState\": 2,\n    \"currentTime\": 43.734,\n    \"duration\": null,\n    \"srcPresent\": false\n  },\n  \"captureStreamAvailable\": true,\n  \"audioTrackCount\": 1,\n  \"videoTrackCount\": 1,\n  \"playAttempt\": \"ok\",\n  \"reason\": \"\",\n  \"targetTitle\": \"文鼎（文说股市）的抖音直播间 - 抖音直播\",\n  \"targetUrl\": \"https://live.douyin.com/334489081726\"\n}",
+  "stderr": "",
+  "probe": {
+    "ok": true,
+    "pageTitle": "文鼎（文说股市）的抖音直播间 - 抖音直播",
+    "videoCount": 1,
+    "selected": {
+      "paused": false,
+      "muted": false,
+      "volume": 1,
+      "readyState": 4,
+      "networkState": 2,
+      "currentTime": 43.734,
+      "duration": null,
+      "srcPresent": false
+    },
+    "captureStreamAvailable": true,
+    "audioTrackCount": 1,
+    "videoTrackCount": 1,
+    "playAttempt": "ok",
+    "reason": "",
+    "targetTitle": "文鼎（文说股市）的抖音直播间 - 抖音直播",
+    "targetUrl": "https://live.douyin.com/334489081726"
+  }
+}

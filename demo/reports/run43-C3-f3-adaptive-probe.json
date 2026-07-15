@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "pageTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+  "videoCount": 1,
+  "selected": {
+    "paused": false,
+    "muted": false,
+    "volume": 1,
+    "readyState": 4,
+    "networkState": 2,
+    "currentTime": 28.132,
+    "duration": null,
+    "srcPresent": false
+  },
+  "captureStreamAvailable": true,
+  "audioTrackCount": 1,
+  "videoTrackCount": 1,
+  "playAttempt": "ok",
+  "reason": "",
+  "targetTitle": "峰哥说财经的抖音直播间 - 抖音直播",
+  "targetUrl": "https://live.douyin.com/746541295999"
+}

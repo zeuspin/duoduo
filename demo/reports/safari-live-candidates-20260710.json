@@ -1,0 +1,50 @@
+{
+  "created_at": "2026-07-10",
+  "source": "Safari live.douyin.com homepage",
+  "safari_usage": "Safari only used to discover room links; playback and capture must use anonymous Chrome profiles.",
+  "only_use_these_candidates": false,
+  "candidates": [
+    {
+      "code": "S1",
+      "room_id": "583183556429",
+      "url": "https://live.douyin.com/583183556429",
+      "title": "海能-叨哥财经：7月行情复杂，主线到底怎么看？"
+    },
+    {
+      "code": "S2",
+      "room_id": "305503141482",
+      "url": "https://live.douyin.com/305503141482",
+      "title": "大盘跌破4000点，科技股大跌，行情就此熄火了？"
+    },
+    {
+      "code": "S3",
+      "room_id": "848398958216",
+      "url": "https://live.douyin.com/848398958216",
+      "title": "接下来的核心主线是什么？"
+    },
+    {
+      "code": "S4",
+      "room_id": "857559947435",
+      "url": "https://live.douyin.com/857559947435",
+      "title": "黄金的机会与风险？"
+    },
+    {
+      "code": "S5",
+      "room_id": "56106509963",
+      "url": "https://live.douyin.com/56106509963",
+      "title": "放量下跌，下周怎么看？"
+    },
+    {
+      "code": "S6",
+      "room_id": "88057849963",
+      "url": "https://live.douyin.com/88057849963",
+      "title": "倒车接人还是行情结束？"
+    },
+    {
+      "code": "S7",
+      "room_id": "142040264912",
+      "url": "https://live.douyin.com/142040264912",
+      "title": "科技退潮？下周还要调吗？"
+    }
+  ]
+}

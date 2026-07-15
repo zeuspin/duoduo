@@ -1,0 +1,260 @@
+{
+  "valid_items": 9,
+  "transcoded": [
+    {
+      "sample_id": "RUN71-C1-R01",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "stderr_tail": [
+        "    Metadata:",
+        "      encoder         : Lavc62.11.100 pcm_s16le",
+        "[opus @ 0xaa0c0c700] Error parsing Opus packet header.",
+        "[out#0/wav @ 0xaa1044f00] video:0KiB audio:1875KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.004063%",
+        "size=    1875KiB time=00:00:59.99 bitrate= 256.0kbits/s speed= 516x elapsed=0:00:00.11"
+      ]
+    },
+    {
+      "sample_id": "RUN71-C2-R01",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "stderr_tail": [
+        "    Metadata:",
+        "      encoder         : Lavc62.11.100 pcm_s16le",
+        "[opus @ 0xac6838700] Error parsing Opus packet header.",
+        "[out#0/wav @ 0xac6810240] video:0KiB audio:1875KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.004063%",
+        "size=    1875KiB time=00:00:59.99 bitrate= 256.0kbits/s speed= 559x elapsed=0:00:00.10"
+      ]
+    },
+    {
+      "sample_id": "RUN71-C3-R01",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "stderr_tail": [
+        "    Metadata:",
+        "      encoder         : Lavc62.11.100 pcm_s16le",
+        "[opus @ 0x848804700] Error parsing Opus packet header.",
+        "[out#0/wav @ 0x849440f00] video:0KiB audio:1875KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.004063%",
+        "size=    1875KiB time=00:00:59.99 bitrate= 256.0kbits/s speed= 631x elapsed=0:00:00.09"
+      ]
+    },
+    {
+      "sample_id": "RUN71-C1-R02",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "stderr_tail": [
+        "    Metadata:",
+        "      encoder         : Lavc62.11.100 pcm_s16le",
+        "[opus @ 0xb0c824700] Error parsing Opus packet header.",
+        "[out#0/wav @ 0xb0cc38240] video:0KiB audio:1875KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.004063%",
+        "size=    1875KiB time=00:01:00.00 bitrate= 256.0kbits/s speed= 540x elapsed=0:00:00.11"
+      ]
+    },
+    {
+      "sample_id": "RUN71-C2-R02",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "stderr_tail": [
+        "    Metadata:",
+        "      encoder         : Lavc62.11.100 pcm_s16le",
+        "[opus @ 0xca6804700] Error parsing Opus packet header.",
+        "[out#0/wav @ 0xca703c240] video:0KiB audio:1875KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.004063%",
+        "size=    1875KiB time=00:00:59.99 bitrate= 256.0kbits/s speed= 578x elapsed=0:00:00.10"
+      ]
+    },
+    {
+      "sample_id": "RUN71-C3-R02",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "stderr_tail": [
+        "    Metadata:",
+        "      encoder         : Lavc62.11.100 pcm_s16le",
+        "[opus @ 0xbba810700] Error parsing Opus packet header.",
+        "[out#0/wav @ 0xbbb40c240] video:0KiB audio:1875KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.004063%",
+        "size=    1875KiB time=00:00:59.99 bitrate= 256.0kbits/s speed= 616x elapsed=0:00:00.09"
+      ]
+    },
+    {
+      "sample_id": "RUN71-C1-R03",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "stderr_tail": [
+        "    Metadata:",
+        "      encoder         : Lavc62.11.100 pcm_s16le",
+        "[opus @ 0xba4c38700] Error parsing Opus packet header.",
+        "[out#0/wav @ 0xba505c240] video:0KiB audio:1875KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.004063%",
+        "size=    1875KiB time=00:00:59.99 bitrate= 256.0kbits/s speed= 535x elapsed=0:00:00.11"
+      ]
+    },
+    {
+      "sample_id": "RUN71-C2-R03",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "stderr_tail": [
+        "    Metadata:",
+        "      encoder         : Lavc62.11.100 pcm_s16le",
+        "[opus @ 0xa84c14700] Error parsing Opus packet header.",
+        "[out#0/wav @ 0xa85045b00] video:0KiB audio:1875KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.004063%",
+        "size=    1875KiB time=00:00:59.99 bitrate= 256.0kbits/s speed= 562x elapsed=0:00:00.10"
+      ]
+    },
+    {
+      "sample_id": "RUN71-C3-R03",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "stderr_tail": [
+        "    Metadata:",
+        "      encoder         : Lavc62.11.100 pcm_s16le",
+        "[opus @ 0xaa0c3c700] Error parsing Opus packet header.",
+        "[out#0/wav @ 0xaa0c14240] video:0KiB audio:1875KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.004063%",
+        "size=    1875KiB time=00:01:00.00 bitrate= 256.0kbits/s speed= 607x elapsed=0:00:00.09"
+      ]
+    }
+  ],
+  "asr": [
+    {
+      "sample_id": "RUN71-C1-R01",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "payload": {
+        "ok": true,
+        "model": "paraformer-realtime-v2",
+        "audio_file": "demo/samples/audio/raw/run71_C1_478068897604_20260711T093858_r01_seg01_60s_page_capture_16k_mono.wav",
+        "event_count": 0,
+        "sentence_count": 1,
+        "output_file": "demo/samples/transcripts/asr/run71_C1_478068897604_20260711T093858_r01_seg01_60s_page_capture_bailian_asr.json"
+      },
+      "stderr_tail": []
+    },
+    {
+      "sample_id": "RUN71-C2-R01",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "payload": {
+        "ok": true,
+        "model": "paraformer-realtime-v2",
+        "audio_file": "demo/samples/audio/raw/run71_C2_575973340980_20260711T093858_r01_seg01_60s_page_capture_16k_mono.wav",
+        "event_count": 0,
+        "sentence_count": 10,
+        "output_file": "demo/samples/transcripts/asr/run71_C2_575973340980_20260711T093858_r01_seg01_60s_page_capture_bailian_asr.json"
+      },
+      "stderr_tail": []
+    },
+    {
+      "sample_id": "RUN71-C3-R01",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "payload": {
+        "ok": true,
+        "model": "paraformer-realtime-v2",
+        "audio_file": "demo/samples/audio/raw/run71_C3_744549703134_20260711T093858_r01_seg01_60s_page_capture_16k_mono.wav",
+        "event_count": 0,
+        "sentence_count": 11,
+        "output_file": "demo/samples/transcripts/asr/run71_C3_744549703134_20260711T093858_r01_seg01_60s_page_capture_bailian_asr.json"
+      },
+      "stderr_tail": []
+    },
+    {
+      "sample_id": "RUN71-C1-R02",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "payload": {
+        "ok": true,
+        "model": "paraformer-realtime-v2",
+        "audio_file": "demo/samples/audio/raw/run71_C1_478068897604_20260711T093958_r02_seg01_60s_page_capture_16k_mono.wav",
+        "event_count": 0,
+        "sentence_count": 2,
+        "output_file": "demo/samples/transcripts/asr/run71_C1_478068897604_20260711T093958_r02_seg01_60s_page_capture_bailian_asr.json"
+      },
+      "stderr_tail": []
+    },
+    {
+      "sample_id": "RUN71-C2-R02",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "payload": {
+        "ok": true,
+        "model": "paraformer-realtime-v2",
+        "audio_file": "demo/samples/audio/raw/run71_C2_575973340980_20260711T093958_r02_seg01_60s_page_capture_16k_mono.wav",
+        "event_count": 0,
+        "sentence_count": 8,
+        "output_file": "demo/samples/transcripts/asr/run71_C2_575973340980_20260711T093958_r02_seg01_60s_page_capture_bailian_asr.json"
+      },
+      "stderr_tail": []
+    },
+    {
+      "sample_id": "RUN71-C3-R02",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "payload": {
+        "ok": true,
+        "model": "paraformer-realtime-v2",
+        "audio_file": "demo/samples/audio/raw/run71_C3_744549703134_20260711T093958_r02_seg01_60s_page_capture_16k_mono.wav",
+        "event_count": 0,
+        "sentence_count": 12,
+        "output_file": "demo/samples/transcripts/asr/run71_C3_744549703134_20260711T093958_r02_seg01_60s_page_capture_bailian_asr.json"
+      },
+      "stderr_tail": []
+    },
+    {
+      "sample_id": "RUN71-C1-R03",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "payload": {
+        "ok": true,
+        "model": "paraformer-realtime-v2",
+        "audio_file": "demo/samples/audio/raw/run71_C1_478068897604_20260711T094059_r03_seg01_60s_page_capture_16k_mono.wav",
+        "event_count": 0,
+        "sentence_count": 2,
+        "output_file": "demo/samples/transcripts/asr/run71_C1_478068897604_20260711T094059_r03_seg01_60s_page_capture_bailian_asr.json"
+      },
+      "stderr_tail": []
+    },
+    {
+      "sample_id": "RUN71-C2-R03",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "payload": {
+        "ok": true,
+        "model": "paraformer-realtime-v2",
+        "audio_file": "demo/samples/audio/raw/run71_C2_575973340980_20260711T094059_r03_seg01_60s_page_capture_16k_mono.wav",
+        "event_count": 0,
+        "sentence_count": 15,
+        "output_file": "demo/samples/transcripts/asr/run71_C2_575973340980_20260711T094059_r03_seg01_60s_page_capture_bailian_asr.json"
+      },
+      "stderr_tail": []
+    },
+    {
+      "sample_id": "RUN71-C3-R03",
+      "ok": true,
+      "skipped": false,
+      "returncode": 0,
+      "payload": {
+        "ok": true,
+        "model": "paraformer-realtime-v2",
+        "audio_file": "demo/samples/audio/raw/run71_C3_744549703134_20260711T094059_r03_seg01_60s_page_capture_16k_mono.wav",
+        "event_count": 0,
+        "sentence_count": 10,
+        "output_file": "demo/samples/transcripts/asr/run71_C3_744549703134_20260711T094059_r03_seg01_60s_page_capture_bailian_asr.json"
+      },
+      "stderr_tail": []
+    }
+  ],
+  "manifest_appended": 9
+}

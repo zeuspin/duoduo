@@ -1,0 +1,271 @@
+{
+  "run_id": "run9",
+  "manifest": "demo/reports/live-run-manifests/run9.json",
+  "created_at": "2026-07-09T04:01:57+08:00",
+  "manifest_created_at": "2026-07-09T04:01:24+08:00",
+  "dry_run": false,
+  "started_at": "2026-07-09T04:01:57+08:00",
+  "eligible_for_timer": true,
+  "preflight": {
+    "guard_ok": true,
+    "three_routes": true,
+    "unique_urls_profiles_ports": true,
+    "safari_playback_allowed": false,
+    "normalized_urls_only": true,
+    "issues": []
+  },
+  "actions": [
+    {
+      "index": 1,
+      "room_id": "782837937233",
+      "url": "https://live.douyin.com/782837937233",
+      "profile_dir": "demo/runtime/chrome-profiles/run9-a",
+      "debug_port": 9241,
+      "launched": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "index": 2,
+      "room_id": "31544105137",
+      "url": "https://live.douyin.com/31544105137",
+      "profile_dir": "demo/runtime/chrome-profiles/run9-b",
+      "debug_port": 9242,
+      "launched": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "index": 3,
+      "room_id": "414092641626",
+      "url": "https://live.douyin.com/414092641626",
+      "profile_dir": "demo/runtime/chrome-profiles/run9-c",
+      "debug_port": 9243,
+      "launched": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "start_criteria": [
+    "只使用未登录的独立 Chrome user-data-dir 播放直播。",
+    "每轮最多 3 个测试 Chrome 实例。",
+    "三路 URL 必须形如 https://live.douyin.com/{room_id}，不保留多余参数。",
+    "三路页面均为目标直播间，且观察到正在播放音频，才可开始 2 小时计时。",
+    "若为 dry-run，只能验证计划和参数，不能作为播放稳定性证据。"
+  ],
+  "checkpoints": [
+    {
+      "checkpoint": "start",
+      "target_at": "2026-07-09T04:01:57+08:00",
+      "instruction": "三路均显示目标直播页和正在播放音频，才可开始计时。",
+      "route_status": [
+        {
+          "index": 1,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 2,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 3,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "checkpoint": "plus_10m",
+      "target_at": "2026-07-09T04:11:57+08:00",
+      "instruction": "流程可行性 smoke checkpoint。",
+      "route_status": [
+        {
+          "index": 1,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 2,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 3,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "checkpoint": "plus_30m",
+      "target_at": "2026-07-09T04:31:57+08:00",
+      "instruction": "确认无登录弹窗、停流、页面异常。",
+      "route_status": [
+        {
+          "index": 1,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 2,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 3,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "checkpoint": "plus_60m",
+      "target_at": "2026-07-09T05:01:57+08:00",
+      "instruction": "确认三路仍独立播放。",
+      "route_status": [
+        {
+          "index": 1,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 2,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 3,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "checkpoint": "plus_90m",
+      "target_at": "2026-07-09T05:31:57+08:00",
+      "instruction": "确认无静音误判或页面刷新需求。",
+      "route_status": [
+        {
+          "index": 1,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 2,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 3,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "checkpoint": "plus_120m",
+      "target_at": "2026-07-09T06:01:57+08:00",
+      "instruction": "正式 2 小时稳定性 checkpoint。",
+      "route_status": [
+        {
+          "index": 1,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 2,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        },
+        {
+          "index": 3,
+          "page_title": "",
+          "live_status": "",
+          "audio_status": "",
+          "login_prompt": "",
+          "notes": ""
+        }
+      ]
+    }
+  ],
+  "interference_tests": [
+    {
+      "id": "refresh_one_route",
+      "action": "刷新一路直播页面",
+      "pass_criteria": "被刷新一路可恢复播放，其他两路不停止、不刷新、不弹登录。"
+    },
+    {
+      "id": "close_one_route",
+      "action": "关闭一路 Chrome 测试实例",
+      "pass_criteria": "关闭一路后，其他两路继续播放并保持独立音频状态。"
+    },
+    {
+      "id": "abnormal_exit_one_route",
+      "action": "异常结束一路测试 Chrome 进程",
+      "pass_criteria": "其他两路不受影响；被结束一路在重新启动后仍使用独立 profile。"
+    }
+  ],
+  "acceptance_criteria": [
+    "至少一种方案满足 3 路直播连续播放 2 小时。",
+    "任一路刷新、关闭、异常退出不导致其他直播停止。",
+    "不要求、不输入、不保存任何抖音账号信息。",
+    "重复 3 个交易日后，核心方案仍能稳定并行。"
+  ],
+  "current_status": "ready_for_observation"
+}

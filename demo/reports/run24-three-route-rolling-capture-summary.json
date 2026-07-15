@@ -1,0 +1,82 @@
+{
+  "run_id": "run24",
+  "stamp": "20260709T0901",
+  "room_ids": [
+    "873902239044",
+    "334489081726",
+    "812755146455"
+  ],
+  "all_probe_ok": true,
+  "all_capture_ok": false,
+  "routes": [
+    {
+      "route": "C1",
+      "room_id": "873902239044",
+      "port": 9381,
+      "profile_dir": "demo/runtime/chrome-profiles/run24-C1-capture",
+      "stream_code": "run24_C1",
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run24-C1-page-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "股市林教头的抖音直播间 - 抖音直播",
+      "audio_track_count": 1,
+      "rolling_summary_file": "demo/reports/rolling-capture-logs/run24_C1_873902239044_20260709T0901_summary.jsonl",
+      "capture_returncode": 0,
+      "capture_stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run24_C1\",\"room_id\":\"873902239044\",\"segment\":9,\"started_at\":\"2026-07-09T09:10:14+08:00\",\"ended_at\":\"2026-07-09T09:11:14+08:00\",\"audio_file\":\"demo/samples/audio/raw/run24_C1_873902239044_20260709T0901_seg09_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run24_C1_873902239044_20260709T0901_seg09.json\"}",
+        "{\"ok\":true,\"stream_code\":\"run24_C1\",\"room_id\":\"873902239044\",\"segment\":10,\"started_at\":\"2026-07-09T09:11:14+08:00\",\"ended_at\":\"2026-07-09T09:12:15+08:00\",\"audio_file\":\"demo/samples/audio/raw/run24_C1_873902239044_20260709T0901_seg10_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run24_C1_873902239044_20260709T0901_seg10.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run24_C1\",\"room_id\":\"873902239044\",\"requested_segments\":10,\"ok_segments\":10,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run24_C1_873902239044_20260709T0901_summary.jsonl\"}"
+      ],
+      "capture_stderr_tail": []
+    },
+    {
+      "route": "C2",
+      "room_id": "334489081726",
+      "port": 9382,
+      "profile_dir": "demo/runtime/chrome-profiles/run24-C2-capture",
+      "stream_code": "run24_C2",
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run24-C2-page-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "文鼎（文说股市）的抖音直播间 - 抖音直播",
+      "audio_track_count": 1,
+      "rolling_summary_file": "demo/reports/rolling-capture-logs/run24_C2_334489081726_20260709T0901_summary.jsonl",
+      "capture_returncode": 0,
+      "capture_stdout_tail": [
+        "{\"ok\":true,\"stream_code\":\"run24_C2\",\"room_id\":\"334489081726\",\"segment\":9,\"started_at\":\"2026-07-09T09:10:14+08:00\",\"ended_at\":\"2026-07-09T09:11:14+08:00\",\"audio_file\":\"demo/samples/audio/raw/run24_C2_334489081726_20260709T0901_seg09_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run24_C2_334489081726_20260709T0901_seg09.json\"}",
+        "{\"ok\":true,\"stream_code\":\"run24_C2\",\"room_id\":\"334489081726\",\"segment\":10,\"started_at\":\"2026-07-09T09:11:14+08:00\",\"ended_at\":\"2026-07-09T09:12:15+08:00\",\"audio_file\":\"demo/samples/audio/raw/run24_C2_334489081726_20260709T0901_seg10_60s_page_capture.webm\",\"bytes\":967089,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run24_C2_334489081726_20260709T0901_seg10.json\"}",
+        "{\"ok\":true,\"type\":\"summary\",\"stream_code\":\"run24_C2\",\"room_id\":\"334489081726\",\"requested_segments\":10,\"ok_segments\":10,\"failed_segments\":0,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run24_C2_334489081726_20260709T0901_summary.jsonl\"}"
+      ],
+      "capture_stderr_tail": []
+    },
+    {
+      "route": "C3",
+      "room_id": "812755146455",
+      "port": 9383,
+      "profile_dir": "demo/runtime/chrome-profiles/run24-C3-capture",
+      "stream_code": "run24_C3",
+      "launch_returncode": 0,
+      "launch_stderr": "",
+      "probe_file": "demo/reports/run24-C3-page-probe.json",
+      "probe_returncode": 0,
+      "probe_ok": true,
+      "probe_reason": "",
+      "page_title": "海派-和众汇富的抖音直播间 - 抖音直播",
+      "audio_track_count": 1,
+      "rolling_summary_file": "demo/reports/rolling-capture-logs/run24_C3_812755146455_20260709T0901_summary.jsonl",
+      "capture_returncode": 1,
+      "capture_stdout_tail": [
+        "{\"ok\":false,\"reason\":\"audio-file-too-small\",\"stream_code\":\"run24_C3\",\"room_id\":\"812755146455\",\"segment\":9,\"started_at\":\"2026-07-09T09:10:13+08:00\",\"ended_at\":\"2026-07-09T09:11:13+08:00\",\"audio_file\":\"demo/samples/audio/raw/run24_C3_812755146455_20260709T0901_seg09_60s_page_capture.webm\",\"bytes\":0,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run24_C3_812755146455_20260709T0901_seg09.json\"}",
+        "{\"ok\":false,\"reason\":\"audio-file-too-small\",\"stream_code\":\"run24_C3\",\"room_id\":\"812755146455\",\"segment\":10,\"started_at\":\"2026-07-09T09:11:13+08:00\",\"ended_at\":\"2026-07-09T09:12:13+08:00\",\"audio_file\":\"demo/samples/audio/raw/run24_C3_812755146455_20260709T0901_seg10_60s_page_capture.webm\",\"bytes\":0,\"min_bytes\":1000,\"log_file\":\"demo/reports/rolling-capture-logs/run24_C3_812755146455_20260709T0901_seg10.json\"}",
+        "{\"ok\":false,\"type\":\"summary\",\"stream_code\":\"run24_C3\",\"room_id\":\"812755146455\",\"requested_segments\":10,\"ok_segments\":3,\"failed_segments\":7,\"segment_seconds\":60,\"summary_file\":\"demo/reports/rolling-capture-logs/run24_C3_812755146455_20260709T0901_summary.jsonl\"}"
+      ],
+      "capture_stderr_tail": []
+    }
+  ]
+}

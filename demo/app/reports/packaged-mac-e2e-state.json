@@ -1,0 +1,227 @@
+2026-07-11T19:09:42.936Z main-loaded
+2026-07-11T19:09:43.001Z app-ready
+2026-07-11T19:09:43.002Z before-window
+2026-07-11T19:09:43.257Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+2026-07-11T19:11:19.823Z main-loaded
+2026-07-11T19:11:19.888Z app-ready
+2026-07-11T19:11:19.888Z before-window
+2026-07-11T19:11:20.126Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+2026-07-11T19:14:17.337Z main-loaded
+2026-07-11T19:14:17.401Z app-ready
+2026-07-11T19:14:17.401Z before-window
+2026-07-11T19:14:17.640Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":0},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-11T19:14:49.495Z main-loaded
+2026-07-11T19:14:49.575Z app-ready
+2026-07-11T19:14:49.575Z before-window
+2026-07-11T19:14:49.863Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-11T19:14:54.093Z main-loaded
+2026-07-11T19:14:54.145Z app-ready
+2026-07-11T19:14:54.145Z before-window
+2026-07-11T19:14:54.365Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-11T19:14:58.297Z main-loaded
+2026-07-11T19:14:58.358Z app-ready
+2026-07-11T19:14:58.359Z before-window
+2026-07-11T19:14:58.588Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-11T19:19:53.982Z main-loaded
+2026-07-11T19:19:54.064Z app-ready
+2026-07-11T19:19:54.065Z before-window
+2026-07-11T19:19:54.377Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-12T01:34:38.431Z main-loaded
+2026-07-12T01:34:38.561Z app-ready
+2026-07-12T01:34:38.604Z before-window
+2026-07-12T01:34:38.956Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-12T01:44:19.504Z main-loaded
+2026-07-12T01:44:19.688Z app-ready
+2026-07-12T01:44:19.743Z before-window
+2026-07-12T01:44:20.123Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-12T02:18:42.667Z main-loaded
+2026-07-12T02:18:42.774Z app-ready
+2026-07-12T02:18:42.816Z before-window
+2026-07-12T02:18:43.202Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-12T02:18:47.839Z main-loaded
+2026-07-12T02:18:47.917Z app-ready
+2026-07-12T02:18:47.945Z before-window
+2026-07-12T02:18:48.273Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":0},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-12T02:18:53.006Z main-loaded
+2026-07-12T02:18:53.107Z app-ready
+2026-07-12T02:18:53.135Z before-window
+2026-07-12T02:18:53.478Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":0},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-12T02:46:00.335Z main-loaded
+2026-07-12T02:46:00.472Z app-ready
+2026-07-12T02:46:00.579Z before-window
+2026-07-12T02:46:00.868Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-12T03:50:13.049Z main-loaded
+2026-07-12T03:50:13.266Z app-ready
+2026-07-12T03:50:13.307Z before-window
+2026-07-12T03:50:13.664Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-12T06:18:25.638Z main-loaded
+2026-07-12T06:18:25.764Z app-ready
+2026-07-12T06:18:25.797Z before-window
+2026-07-12T06:18:26.137Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-12T15:40:07.459Z main-loaded
+2026-07-12T15:40:07.632Z app-ready
+2026-07-12T15:40:07.673Z before-window
+2026-07-12T15:40:08.035Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":0},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":0},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-13T03:29:42.220Z main-loaded
+2026-07-13T03:29:42.418Z app-ready
+2026-07-13T03:29:42.484Z before-window
+2026-07-13T03:29:43.097Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-13T03:36:43.146Z main-loaded
+2026-07-13T03:36:43.395Z app-ready
+2026-07-13T03:36:43.459Z before-window
+2026-07-13T03:36:43.996Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-13T03:46:27.561Z main-loaded
+2026-07-13T03:46:27.689Z app-ready
+2026-07-13T03:46:27.741Z before-window
+2026-07-13T03:46:28.297Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-13T04:40:58.748Z main-loaded
+2026-07-13T04:40:58.823Z app-ready
+2026-07-13T04:40:58.853Z before-window
+2026-07-13T04:40:59.142Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-13T05:09:46.032Z main-loaded
+2026-07-13T05:09:46.311Z app-ready
+2026-07-13T05:09:46.402Z before-window
+2026-07-13T05:09:47.334Z window-loaded
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"starting","liveStatus":"checking","asr":0},{"roomId":"660","state":"starting","liveStatus":"checking","asr":0},{"roomId":"880","state":"starting","liveStatus":"checking","asr":0}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":0},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]

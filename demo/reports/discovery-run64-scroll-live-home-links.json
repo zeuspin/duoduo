@@ -1,0 +1,192 @@
+{
+  "run_id": "discovery-run64-scroll-live-home",
+  "created_at": "2026-07-11T02:34:39+08:00",
+  "source_url": "https://live.douyin.com/?from_nav=1",
+  "profile_dir": "demo/runtime/chrome-profiles/discovery-run64-scroll-live-home",
+  "profile_kept": false,
+  "launch_returncode": 0,
+  "scroll_count": 8,
+  "scroll_wait_ms": 1500,
+  "extract_returncode": 0,
+  "pageTitle": "抖音直播电脑版_抖音直播网页版入口_抖音直播",
+  "pageUrl": "https://live.douyin.com/",
+  "link_count": 20,
+  "finance_candidate_count": 1,
+  "finance_candidates": [
+    {
+      "room_id": "782837937233",
+      "href": "https://live.douyin.com/782837937233",
+      "text": "假摔晃人？周一阳包阴？看啥？ @财经小板总 3114",
+      "finance_keyword_hits": [
+        "财经"
+      ],
+      "finance_score": 1,
+      "normalized_url": "https://live.douyin.com/782837937233"
+    }
+  ],
+  "links": [
+    {
+      "room_id": "591633490864",
+      "href": "https://live.douyin.com/591633490864",
+      "text": "",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/591633490864"
+    },
+    {
+      "room_id": "824106410657",
+      "href": "https://live.douyin.com/824106410657",
+      "text": "台风路线预测 @巴威 849",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/824106410657"
+    },
+    {
+      "room_id": "902481660902",
+      "href": "https://live.douyin.com/902481660902",
+      "text": "煮面大王在此 @不知道（助眠版.zip） 510",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/902481660902"
+    },
+    {
+      "room_id": "920389613544",
+      "href": "https://live.douyin.com/920389613544",
+      "text": "小鱼大王来助眠啦 @一条鱼（轻语助眠） 86",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/920389613544"
+    },
+    {
+      "room_id": "250419935532",
+      "href": "https://live.douyin.com/250419935532",
+      "text": "娱乐一把 @c.. 225",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/250419935532"
+    },
+    {
+      "room_id": "215445501686",
+      "href": "https://live.douyin.com/215445501686",
+      "text": "带土别进来 @小柔（轻语助眠） 344",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/215445501686"
+    },
+    {
+      "room_id": "443543513674",
+      "href": "https://live.douyin.com/443543513674",
+      "text": "国一法师在榜来个瑶免费玩 @雪（国服西施） 5",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/443543513674"
+    },
+    {
+      "room_id": "541161813285",
+      "href": "https://live.douyin.com/541161813285",
+      "text": "不要送小心心啊 @芊芊（asmr哄睡版） 33",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/541161813285"
+    },
+    {
+      "room_id": "20661662119",
+      "href": "https://live.douyin.com/20661662119",
+      "text": "剁手王正在直播 @英子姐🔥💰 40",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/20661662119"
+    },
+    {
+      "room_id": "970811439448",
+      "href": "https://live.douyin.com/970811439448",
+      "text": "正在直播这么多人 @鸿元闲谈录 295",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/970811439448"
+    },
+    {
+      "room_id": "782837937233",
+      "href": "https://live.douyin.com/782837937233",
+      "text": "假摔晃人？周一阳包阴？看啥？ @财经小板总 3114",
+      "finance_keyword_hits": [
+        "财经"
+      ],
+      "finance_score": 1,
+      "normalized_url": "https://live.douyin.com/782837937233"
+    },
+    {
+      "room_id": "284494827811",
+      "href": "https://live.douyin.com/284494827811",
+      "text": "没服过. @小小梨✨ 155",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/284494827811"
+    },
+    {
+      "room_id": "5460354152",
+      "href": "https://live.douyin.com/5460354152",
+      "text": "只唱歌不说话不PK @若水🎤（经典老歌）仅此一个号 2047",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/5460354152"
+    },
+    {
+      "room_id": "563211805578",
+      "href": "https://live.douyin.com/563211805578",
+      "text": "哥哥心里的宝 @心宝1313 43",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/563211805578"
+    },
+    {
+      "room_id": "233947649372",
+      "href": "https://live.douyin.com/233947649372",
+      "text": "这儿媳妇太坏了 @闻歌聆听 3594",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/233947649372"
+    },
+    {
+      "room_id": "429969845828",
+      "href": "https://live.douyin.com/429969845828",
+      "text": "湖人球迷庆祝甩掉詹姆斯！ @鲲雲的名人堂 1175",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/429969845828"
+    },
+    {
+      "room_id": "54479983409",
+      "href": "https://live.douyin.com/54479983409",
+      "text": "《臻智故事会》正在直播 @《臻智故事FM》 1017",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/54479983409"
+    },
+    {
+      "room_id": "818147090359",
+      "href": "https://live.douyin.com/818147090359",
+      "text": "送外卖的象棋村冠军 开播第一天 @老炮象棋 3736",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/818147090359"
+    },
+    {
+      "room_id": "918837975032",
+      "href": "https://live.douyin.com/918837975032",
+      "text": "Asmr 来都来了，骂两句再走 @反常冰美式（助眠版） 467",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/918837975032"
+    },
+    {
+      "room_id": "978943261403",
+      "href": "https://live.douyin.com/978943261403",
+      "text": "听三分钟，让她主动回头 @中圳 179",
+      "finance_keyword_hits": [],
+      "finance_score": 0,
+      "normalized_url": "https://live.douyin.com/978943261403"
+    }
+  ],
+  "stderr": ""
+}

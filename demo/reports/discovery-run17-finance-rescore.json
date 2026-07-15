@@ -1,0 +1,19 @@
+{
+  "source_report": "demo/reports/discovery-run17-links.json",
+  "reason": "发现关键词规则漏掉“利好 / 市场主线 / 大A”这类财经直播标题，已补充规则并单独记录本轮候选。",
+  "finance_candidate_count": 1,
+  "finance_candidates": [
+    {
+      "room_id": "16743488023",
+      "normalized_url": "https://live.douyin.com/16743488023",
+      "text": "利好信号出现？市场主线看它！ @大A付老大-九点 1561",
+      "finance_keyword_hits": [
+        "利好",
+        "主线",
+        "市场主线",
+        "大A"
+      ],
+      "finance_score": 4
+    }
+  ]
+}

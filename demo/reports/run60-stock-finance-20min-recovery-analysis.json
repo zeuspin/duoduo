@@ -1,0 +1,22 @@
+{
+  "run_id": "run60",
+  "decision": "no-go",
+  "duration_seconds": 1200,
+  "completed_checkpoints": 10,
+  "requested_checkpoints": 10,
+  "initial_active_count": 3,
+  "recovery_event_count": 1,
+  "all_checkpoints_three_ok_after_recovery": false,
+  "failed_checkpoint": 10,
+  "failed_route": "C1",
+  "failed_room_id": "31544105137",
+  "failed_room_label": "先机财经",
+  "failure_reason": "video-not-ready-or-no-audio-track",
+  "recovery_strategy": "rebuild-same-room-no-standby",
+  "root_cause_hypothesis": "The playback containers remained isolated, but the stock/finance candidate pool had no standby room when C1 lost its audio track near the end of the 20-minute monitor.",
+  "required_before_next_20min_pass": [
+    "Prepare at least 4-5 currently capturable stock/finance candidates",
+    "Use 3 as active routes and keep at least 1-2 as standby",
+    "Treat no-standby recovery failure as candidate pool insufficiency rather than cross-container interference"
+  ]
+}

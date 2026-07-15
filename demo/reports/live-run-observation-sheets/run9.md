@@ -1,0 +1,67 @@
+# 三路直播稳定性观察表
+
+## Run 元数据
+
+| 项目 | 值 |
+| --- | --- |
+| run_id | `run9` |
+| manifest | `demo/reports/live-run-manifests/run9.json` |
+| dry_run | False |
+| started_at | 2026-07-09T04:01:57+08:00 |
+| eligible_for_timer | True |
+| current_status | ready_for_observation |
+
+## 启动动作
+
+| 路 | room_id | URL | profile | CDP port |
+| ---: | --- | --- | --- | ---: |
+| 1 | `782837937233` | https://live.douyin.com/782837937233 | `demo/runtime/chrome-profiles/run9-a` | 9241 |
+| 2 | `31544105137` | https://live.douyin.com/31544105137 | `demo/runtime/chrome-profiles/run9-b` | 9242 |
+| 3 | `414092641626` | https://live.douyin.com/414092641626 | `demo/runtime/chrome-profiles/run9-c` | 9243 |
+
+## 启动前检查
+
+| 项目 | 值 |
+| --- | --- |
+| guard_ok | True |
+| three_routes | True |
+| unique_urls_profiles_ports | True |
+| safari_playback_allowed | False |
+| normalized_urls_only | True |
+
+问题：
+- 无
+
+## 开始计时标准
+
+- 只使用未登录的独立 Chrome user-data-dir 播放直播。
+- 每轮最多 3 个测试 Chrome 实例。
+- 三路 URL 必须形如 https://live.douyin.com/{room_id}，不保留多余参数。
+- 三路页面均为目标直播间，且观察到正在播放音频，才可开始 2 小时计时。
+- 若为 dry-run，只能验证计划和参数，不能作为播放稳定性证据。
+
+## 观察 Checkpoint
+
+| Checkpoint | 目标时间 | 记录要求 | 路 1 | 路 2 | 路 3 |
+| --- | --- | --- | --- | --- | --- |
+| start | 2026-07-09T04:01:57+08:00 | 三路均显示目标直播页和正在播放音频，才可开始计时。 | 待记录 | 待记录 | 待记录 |
+| plus_10m | 2026-07-09T04:11:57+08:00 | 流程可行性 smoke checkpoint。 | 待记录 | 待记录 | 待记录 |
+| plus_30m | 2026-07-09T04:31:57+08:00 | 确认无登录弹窗、停流、页面异常。 | 待记录 | 待记录 | 待记录 |
+| plus_60m | 2026-07-09T05:01:57+08:00 | 确认三路仍独立播放。 | 待记录 | 待记录 | 待记录 |
+| plus_90m | 2026-07-09T05:31:57+08:00 | 确认无静音误判或页面刷新需求。 | 待记录 | 待记录 | 待记录 |
+| plus_120m | 2026-07-09T06:01:57+08:00 | 正式 2 小时稳定性 checkpoint。 | 待记录 | 待记录 | 待记录 |
+
+## 干扰测试
+
+| 测试 | 操作 | 通过标准 | 结果 |
+| --- | --- | --- | --- |
+| refresh_one_route | 刷新一路直播页面 | 被刷新一路可恢复播放，其他两路不停止、不刷新、不弹登录。 | 待记录 |
+| close_one_route | 关闭一路 Chrome 测试实例 | 关闭一路后，其他两路继续播放并保持独立音频状态。 | 待记录 |
+| abnormal_exit_one_route | 异常结束一路测试 Chrome 进程 | 其他两路不受影响；被结束一路在重新启动后仍使用独立 profile。 | 待记录 |
+
+## 验收标准
+
+- 至少一种方案满足 3 路直播连续播放 2 小时。
+- 任一路刷新、关闭、异常退出不导致其他直播停止。
+- 不要求、不输入、不保存任何抖音账号信息。
+- 重复 3 个交易日后，核心方案仍能稳定并行。
