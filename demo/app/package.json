@@ -1,6 +1,6 @@
 {
   "name": "duoduo-live",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": true,
   "description": "Cross-platform live room monitoring and realtime ASR client",
   "author": "Duoduo Live",
@@ -15,6 +15,10 @@
     "test:integration": "vitest run tests/integration",
     "test:electron-audio": "ELECTRON_DISABLE_SECURITY_WARNINGS=1 electron tests/electron/audio-isolation.cjs",
     "test:electron-crash": "ELECTRON_DISABLE_SECURITY_WARNINGS=1 electron tests/electron/renderer-crash.cjs",
+    "test:electron-verification-main-frame": "ELECTRON_DISABLE_SECURITY_WARNINGS=1 electron tests/electron/verification-main-frame.cjs",
+    "test:electron-verification-view": "ELECTRON_DISABLE_SECURITY_WARNINGS=1 electron tests/electron/embedded-verification-view.cjs",
+    "test:e2e-verification": "npm run build --silent && node tests/electron/verification-recovery-e2e.cjs",
+    "test:e2e-room-intelligence": "npm run build --silent && node tests/electron/room-intelligence-e2e.cjs",
     "test:e2e-fixture": "npm run build --silent && node tests/electron/app-fixture-e2e.cjs",
     "test:e2e-packaged-mac": "DUODUO_PACKAGED_E2E=1 node tests/electron/app-fixture-e2e.cjs",
     "test:e2e-player": "npm run build --silent && node tests/electron/player-e2e.cjs",

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { RoomManager, type MonitorSession } from "../../src/main/rooms/room-manager";
 
 class FakeSession implements MonitorSession {
@@ -9,6 +9,8 @@ class FakeSession implements MonitorSession {
   subscribeFailure(listener: (error: Error) => void) { this.failure = listener; return () => { this.failure = undefined; }; }
   fail(message = "session failed") { this.failure?.(new Error(message)); }
 }
+
+afterEach(() => vi.useRealTimers());
 
 describe("RoomManager", () => {
   it("starts each room once and stops it independently", async () => {
@@ -92,6 +94,39 @@ describe("RoomManager", () => {
     await manager.shutdown();
   });
 
+  it("identifies a user start and the later automatic offline retry", async () => {
+    const reasons: Array<string | undefined> = [];
+    let attempts = 0;
+    const manager = new RoomManager(async (_roomId, _signal, reason) => {
+      reasons.push(reason);
+      attempts += 1;
+      if (attempts === 1) throw new Error("ROOM_NOT_LIVE:offline");
+      return new FakeSession();
+    }, { offlineRetryDelayMs: 5 });
+
+    await manager.startMonitoring("a");
+    await vi.waitFor(() => expect(reasons).toEqual(["user_start", "offline_retry"]));
+    await manager.shutdown();
+  });
+
+  it("identifies technical recovery separately from an offline retry", async () => {
+    const reasons: Array<string | undefined> = [];
+    const sessions: FakeSession[] = [];
+    const manager = new RoomManager(async (_roomId, _signal, reason) => {
+      reasons.push(reason);
+      const session = new FakeSession();
+      sessions.push(session);
+      return session;
+    }, { retryDelayMs: 0, maxRetries: 1 });
+
+    await manager.startMonitoring("a");
+    sessions[0].fail("ROOM_RENDERER_GONE:crashed");
+    await vi.waitFor(() => expect(sessions).toHaveLength(2));
+
+    expect(reasons).toEqual(["user_start", "technical_retry"]);
+    await manager.shutdown();
+  });
+
   it("treats an ended live audio track as offline instead of a technical error", async () => {
     const sessions: FakeSession[] = [];
     const manager = new RoomManager(async () => {
@@ -121,6 +156,80 @@ describe("RoomManager", () => {
     await new Promise((resolve) => setTimeout(resolve, 30));
     expect(attempts).toBe(1);
     expect(manager.snapshot()[0].state).toBe("stopped");
+  });
+
+  it("does not loop offline retries while global access is verification paused", async () => {
+    vi.useFakeTimers();
+    let attempts = 0;
+    let accessPaused = true;
+    const manager = new RoomManager(async () => {
+      attempts += 1;
+      if (attempts === 1) throw new Error("ROOM_NOT_LIVE:offline");
+      if (accessPaused) throw new Error("ACCESS_VERIFICATION_PAUSED");
+      return new FakeSession();
+    }, { offlineRetryDelayMs: 5 });
+
+    await manager.startMonitoring("a");
+    await vi.advanceTimersByTimeAsync(5);
+    expect(attempts).toBe(2);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(attempts).toBe(2);
+    expect(manager.snapshot()[0]).toMatchObject({ state: "waiting_for_live", liveStatus: "offline" });
+    accessPaused = false;
+    manager.resumeAccessRetries();
+    await vi.advanceTimersByTimeAsync(5);
+    expect(attempts).toBe(3);
+    expect(manager.snapshot()[0]).toMatchObject({ state: "monitoring", liveStatus: "live" });
+    await manager.shutdown();
+  });
+
+  it("backs monitored offline rooms off for 30, 60, then 120 minutes", async () => {
+    vi.useFakeTimers();
+    let attempts = 0;
+    const manager = new RoomManager(async () => {
+      attempts += 1;
+      if (attempts < 4) throw new Error("ROOM_NOT_LIVE:offline");
+      return new FakeSession();
+    }, { offlineRetryBackoffMs: [30 * 60_000, 60 * 60_000, 120 * 60_000] });
+
+    await manager.startMonitoring("a");
+    await vi.advanceTimersByTimeAsync(30 * 60_000 - 1);
+    expect(attempts).toBe(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(attempts).toBe(2);
+    await vi.advanceTimersByTimeAsync(60 * 60_000);
+    expect(attempts).toBe(3);
+    await vi.advanceTimersByTimeAsync(120 * 60_000);
+    expect(attempts).toBe(4);
+    expect(manager.snapshot()[0]).toMatchObject({ state: "monitoring", liveStatus: "live" });
+    await manager.shutdown();
+  });
+
+  it("stops technical retry attempts while access is paused and resumes only after confirmation", async () => {
+    const sessions: FakeSession[] = [];
+    let accessPaused = false;
+    let attempts = 0;
+    const manager = new RoomManager(async () => {
+      attempts += 1;
+      if (accessPaused) throw new Error("ACCESS_VERIFICATION_PAUSED");
+      const session = new FakeSession();
+      sessions.push(session);
+      return session;
+    }, { retryDelayMs: 0, maxRetries: 3 });
+
+    await manager.startMonitoring("a");
+    accessPaused = true;
+    sessions[0].fail("ROOM_RENDERER_GONE:crashed");
+    await vi.waitFor(() => expect(attempts).toBe(2));
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    expect(attempts).toBe(2);
+    expect(manager.snapshot()[0]).toMatchObject({ state: "recovering", liveStatus: "verification_required" });
+
+    accessPaused = false;
+    manager.resumeAccessRetries();
+    await vi.waitFor(() => expect(attempts).toBe(3));
+    expect(manager.snapshot()[0]).toMatchObject({ state: "monitoring", liveStatus: "live" });
+    await manager.shutdown();
   });
 
   it("opens the circuit when nominally recovered sessions keep failing", async () => {

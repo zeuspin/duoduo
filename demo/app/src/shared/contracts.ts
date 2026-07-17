@@ -19,6 +19,7 @@ export const RoomSchema = z.object({
   schedule: ScheduleSchema.nullable(),
   probeIntervalMinutes: z.number().int().nullable().default(null),
   monitoring: z.boolean(),
+  autoMonitorOnLive: z.boolean().default(false),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -69,7 +70,35 @@ export const InsightNotificationSettingsSchema = z.object({
 
 export const MonitoringSettingsSchema = z.object({
   monitoredCheckSeconds: z.union([z.literal(15), z.literal(30), z.literal(60), z.literal(120)]),
-  preparedCheckMinutes: z.union([z.literal(1), z.literal(3), z.literal(5), z.literal(10), z.literal(15), z.literal(30)]),
+  preparedCheckMinutes: z.union([z.literal(1), z.literal(3), z.literal(5), z.literal(10), z.literal(15), z.literal(30)]).optional(),
+});
+
+export const DouyinTaskTypeSchema = z.enum(["verification_recovery_check", "user_play", "monitor_start", "manual_probe", "avatar_refresh", "monitor_reconnect", "startup_probe"]);
+export const DouyinAccessStateSchema = z.discriminatedUnion("mode", [
+  z.object({ mode: z.literal("normal") }),
+  z.object({ mode: z.literal("verification_paused"), roomId: z.string().min(1), taskType: DouyinTaskTypeSchema, triggeredAt: z.string().datetime(), reason: z.enum(["verification_required", "suspected_verification"]) }),
+  z.object({ mode: z.literal("recovery_checking"), roomId: z.string().min(1), taskType: DouyinTaskTypeSchema, triggeredAt: z.string().datetime() }),
+  z.object({ mode: z.literal("recovery_ready"), roomId: z.string().min(1), taskType: DouyinTaskTypeSchema, triggeredAt: z.string().datetime() }),
+]);
+
+export const PreparedProbeSourceSchema = z.enum(["startup", "scheduled", "manual", "initial", "manual_batch"]);
+export const ProbeRequestStateSchema = z.discriminatedUnion("phase", [
+  z.object({ roomId: z.string().min(1), requestType: z.enum(["manual", "initial"]), phase: z.enum(["queued", "running"]) }),
+  z.object({ roomId: z.string().min(1), requestType: z.literal("manual"), phase: z.literal("cooldown"), cooldownUntil: z.string().datetime() }),
+]);
+export const PreparedProbeStateSchema = z.object({
+  mode: z.enum(["idle", "running"]),
+  currentRoomId: z.string().min(1).optional(),
+  queuedRoomIds: z.array(z.string().min(1)),
+  batch: z.object({
+    source: z.enum(["startup", "manual_batch"]),
+    total: z.number().int().nonnegative(),
+    completed: z.number().int().nonnegative(),
+  }).optional(),
+  nextRunAt: z.string().datetime().optional(),
+  lastCompletedAt: z.string().datetime().optional(),
+  estimatedCompletionAt: z.string().datetime().optional(),
+  manualProbes: z.array(ProbeRequestStateSchema).default([]),
 });
 
 export const DataRetentionSettingsSchema = z.object({
@@ -153,14 +182,26 @@ export const ParserTestRunSchema = z.object({
 export const RoomRuntimeSchema = z.object({
   roomId: z.string(),
   state: z.enum(["idle", "starting", "monitoring", "waiting_for_live", "recovering", "stopped", "error"]),
-  liveStatus: z.enum(["checking", "live", "offline", "login_required", "timeout", "page_error"]),
+  liveStatus: z.enum(["checking", "live", "offline", "login_required", "verification_required", "timeout", "page_error"]),
   error: z.string().optional(),
   asr: z.array(AsrEventSchema),
 });
 
+export const MetricDatumSchema = z.object({
+  raw: z.string().min(1).max(160),
+  source: z.enum(["visible_text", "accessibility", "structured_data"]),
+});
+
+export const MetricEvidenceSchema = z.object({
+  viewerCount: MetricDatumSchema.optional(),
+  followerCount: MetricDatumSchema.optional(),
+  totalViewerCount: MetricDatumSchema.optional(),
+  likeCount: MetricDatumSchema.optional(),
+});
+
 export const RoomSnapshotSchema = z.object({
   roomId: z.string(),
-  status: z.enum(["checking", "live", "offline", "login_required", "timeout", "page_error"]),
+  status: z.enum(["checking", "live", "offline", "login_required", "verification_required", "timeout", "page_error"]),
   title: z.string().optional(),
   anchorName: z.string().optional(),
   coverPath: z.string().optional(),
@@ -170,9 +211,75 @@ export const RoomSnapshotSchema = z.object({
   totalViewerCount: z.number().int().nonnegative().optional(),
   likeCount: z.number().int().nonnegative().optional(),
   metricRaw: z.record(z.string(), z.string()).optional(),
+  metricEvidence: MetricEvidenceSchema.optional(),
   metricQuality: z.enum(["complete", "partial", "missing"]).optional(),
+  lastReliableStatus: z.enum(["live", "offline"]).optional(),
+  lastReliableStatusAt: z.string().datetime().optional(),
+  metricsObservedAt: z.string().datetime().optional(),
   checkedAt: z.string().datetime(),
   error: z.string().optional(),
+});
+
+export const TransparentLabelSchema = z.object({
+  kind: z.enum(["audience_scale", "recent_heat", "growth", "activity", "duration", "insufficient_data"]),
+  text: z.string().min(1).max(80),
+  explanation: z.string().min(1).max(500),
+  observedAt: z.string().datetime().optional(),
+  sampleCount: z.number().int().nonnegative(),
+  comparisonCount: z.number().int().nonnegative().optional(),
+});
+
+const CurrentRoomMetricsSchema = z.object({
+  viewerCount: z.number().int().nonnegative().optional(),
+  followerCount: z.number().int().nonnegative().optional(),
+  totalViewerCount: z.number().int().nonnegative().optional(),
+  likeCount: z.number().int().nonnegative().optional(),
+  observedAt: z.string().datetime().optional(),
+  quality: z.enum(["complete", "partial", "missing"]).optional(),
+  evidence: MetricEvidenceSchema.optional(),
+});
+
+const RoomMetricPointSchema = z.object({
+  at: z.string().datetime(),
+  viewerCount: z.number().int().nonnegative().optional(),
+  followerCount: z.number().int().nonnegative().optional(),
+  totalViewerCount: z.number().int().nonnegative().optional(),
+  likeCount: z.number().int().nonnegative().optional(),
+});
+
+export const RoomPeriodSummarySchema = z.object({
+  days: z.union([z.literal(7), z.literal(30)]),
+  sampleCount: z.number().int().nonnegative(),
+  sessionCount: z.number().int().nonnegative(),
+  averageViewerCount: z.number().nonnegative().optional(),
+  peakViewerCount: z.number().int().nonnegative().optional(),
+  points: z.array(RoomMetricPointSchema),
+});
+
+export const RoomSessionSummarySchema = z.object({
+  id: z.number().int().positive(),
+  status: z.enum(["live", "end_pending", "ended"]),
+  previousOfflineAt: z.string().datetime().optional(),
+  firstLiveAt: z.string().datetime(),
+  lastLiveAt: z.string().datetime(),
+  firstOfflineAt: z.string().datetime().optional(),
+  peakViewerCount: z.number().nonnegative().optional(),
+  averageViewerCount: z.number().nonnegative().optional(),
+  observedDurationMinutes: z.number().nonnegative().optional(),
+});
+
+export const RoomIntelligenceSummarySchema = z.object({
+  roomId: z.string().min(1),
+  generatedAt: z.string().datetime(),
+  currentMetrics: CurrentRoomMetricsSchema,
+  labels: z.array(TransparentLabelSchema).max(3),
+});
+
+export const RoomIntelligenceSchema = RoomIntelligenceSummarySchema.extend({
+  allLabels: z.array(TransparentLabelSchema),
+  sevenDay: RoomPeriodSummarySchema,
+  thirtyDay: RoomPeriodSummarySchema,
+  sessions: z.array(RoomSessionSummarySchema),
 });
 
 export type RoomInput = z.input<typeof RoomInputSchema>;
@@ -181,6 +288,11 @@ export type AsrProviderConfig = z.infer<typeof AsrProviderConfigSchema>;
 export type LlmProviderConfig = z.infer<typeof LlmProviderConfigSchema>;
 export type InsightNotificationSettings = z.infer<typeof InsightNotificationSettingsSchema>;
 export type MonitoringSettings = z.infer<typeof MonitoringSettingsSchema>;
+export type DouyinTaskType = z.infer<typeof DouyinTaskTypeSchema>;
+export type DouyinAccessState = z.infer<typeof DouyinAccessStateSchema>;
+export type PreparedProbeSource = z.infer<typeof PreparedProbeSourceSchema>;
+export type ProbeRequestState = z.infer<typeof ProbeRequestStateSchema>;
+export type PreparedProbeState = z.infer<typeof PreparedProbeStateSchema>;
 export type DataRetentionSettings = z.infer<typeof DataRetentionSettingsSchema>;
 export type CleanupRequest = z.infer<typeof CleanupRequestSchema>;
 export type CleanupPreview = z.infer<typeof CleanupPreviewSchema>;
@@ -188,6 +300,12 @@ export type StorageUsage = z.infer<typeof StorageUsageSchema>;
 export type AsrEvent = z.infer<typeof AsrEventSchema>;
 export type RoomRuntime = z.infer<typeof RoomRuntimeSchema>;
 export type RoomSnapshot = z.infer<typeof RoomSnapshotSchema>;
+export type TransparentLabel = z.infer<typeof TransparentLabelSchema>;
+export type RoomMetricPoint = z.infer<typeof RoomMetricPointSchema>;
+export type RoomPeriodSummary = z.infer<typeof RoomPeriodSummarySchema>;
+export type RoomSessionSummary = z.infer<typeof RoomSessionSummarySchema>;
+export type RoomIntelligenceSummary = z.infer<typeof RoomIntelligenceSummarySchema>;
+export type RoomIntelligence = z.infer<typeof RoomIntelligenceSchema>;
 export type ParserSpec = z.infer<typeof ParserSpecSchema>;
 export type ParserVersion = z.infer<typeof ParserVersionSchema>;
 export type ParserDefinition = z.infer<typeof ParserDefinitionSchema>;

@@ -1,4 +1,4 @@
-import { access, mkdir, rename, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 type Fetcher = (url: string) => Promise<Response>;
@@ -11,6 +11,12 @@ export class AvatarCache {
     const destination = this.path(roomId);
     try { await access(destination); return destination; }
     catch { return this.refresh(roomId, url); }
+  }
+
+  async existing(roomId: string): Promise<string | undefined> {
+    const destination = this.path(roomId);
+    try { return (await stat(destination)).size > 0 ? destination : undefined; }
+    catch { return undefined; }
   }
 
   async refresh(roomId: string, url: string): Promise<string> {

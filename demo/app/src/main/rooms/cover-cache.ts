@@ -21,7 +21,7 @@ export class CoverCache {
     return this.write(roomId, fallback);
   }
 
-  async updateForStatus(roomId: string, status: "live" | "offline" | "login_required" | "timeout" | "page_error", url: string | undefined, fallback: Buffer): Promise<string | undefined> {
+  async updateForStatus(roomId: string, status: "live" | "offline" | "login_required" | "verification_required" | "timeout" | "page_error", url: string | undefined, fallback: Buffer): Promise<string | undefined> {
     if (status !== "live") return undefined;
     return this.updateOrFallback(roomId, url, fallback);
   }

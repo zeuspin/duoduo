@@ -1,3 +1,7 @@
+import { extractRoomMetrics, parseCompactCount, type MetricCandidate, type MetricDatum } from "./metric-extractor";
+
+export { parseCompactCount } from "./metric-extractor";
+
 export interface ProbeEvidence {
   hasVideo: boolean;
   videoReadyState: number;
@@ -7,6 +11,7 @@ export interface ProbeEvidence {
   anchorName?: string;
   avatar?: string;
   metricRaw?: Record<string, string>;
+  metricCandidates?: MetricCandidate[];
   avatarCandidates?: Array<{ source: string; width: number; height: number; label: string }>;
 }
 
@@ -14,9 +19,15 @@ export interface CurrentRoomEvidence extends ProbeEvidence {
   currentTime: number;
   paused: boolean;
   audioTrackState?: string;
+  viewerCount?: number;
+  followerCount?: number;
+  totalViewerCount?: number;
+  likeCount?: number;
+  metricEvidence?: Partial<Record<"viewerCount" | "followerCount" | "totalViewerCount" | "likeCount", MetricDatum>>;
+  metricQuality?: "complete" | "partial" | "missing";
 }
 
-export type LiveStatus = "live" | "offline" | "login_required" | "timeout" | "page_error";
+export type LiveStatus = "live" | "offline" | "login_required" | "verification_required" | "timeout" | "page_error";
 
 export interface RoomProbeResult {
   status: LiveStatus;
@@ -29,15 +40,8 @@ export interface RoomProbeResult {
   totalViewerCount?: number;
   likeCount?: number;
   metricRaw?: Record<string, string>;
+  metricEvidence?: Partial<Record<"viewerCount" | "followerCount" | "totalViewerCount" | "likeCount", MetricDatum>>;
   metricQuality?: "complete" | "partial" | "missing";
-}
-
-export function parseCompactCount(value: string): number | undefined {
-  const match = value.replaceAll(",", "").match(/(\d+(?:\.\d+)?)\s*([万亿]?)/);
-  if (!match) return undefined;
-  const multiplier = match[2] === "亿" ? 100_000_000 : match[2] === "万" ? 10_000 : 1;
-  const parsed = Number(match[1]) * multiplier;
-  return Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed) : undefined;
 }
 
 export function selectAvatarCandidate(candidates: Array<{ source: string; width: number; height: number; label: string }>): string | undefined {
@@ -56,6 +60,7 @@ export function selectAvatarCandidate(candidates: Array<{ source: string; width:
 }
 
 export function classifyProbe(evidence: ProbeEvidence): LiveStatus {
+  if (/请完成下列验证后继续|安全验证|验证码/.test(evidence.text)) return "verification_required";
   if (/登录后|扫码登录|手机号登录/.test(evidence.text)) return "login_required";
   if (/直播已结束|暂未开播|休息中|已下播/.test(evidence.text)) return "offline";
   if (evidence.hasVideo && evidence.videoReadyState >= 2) return "live";
@@ -70,11 +75,17 @@ export function classifyCurrentHealth(evidence: CurrentRoomEvidence, previousTim
 }
 
 export async function inspectCurrentRoom(webContents: ProbeWebContents): Promise<CurrentRoomEvidence> {
-  return evaluateNow<CurrentRoomEvidence>(webContents, `(() => {
+  const evidence = await evaluateNow<CurrentRoomEvidence>(webContents, `(() => {
     const video = document.querySelector('video');
     const track = window.__duoduoCaptureStream?.getAudioTracks?.()[0];
-    return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, currentTime: video?.currentTime ?? 0, paused: video?.paused ?? true, audioTrackState: track?.readyState, text: document.body?.innerText?.slice(0, 20000) ?? '' };
+    const metricCandidates = Array.from(document.querySelectorAll('[aria-label],[title],[data-e2e*="fans" i],[data-e2e*="viewer" i],[data-e2e*="like" i]')).slice(0, 100).flatMap((item) => {
+      const values = [item.getAttribute('aria-label'), item.getAttribute('title'), item.textContent].filter((value) => typeof value === 'string' && value.trim()).map((value) => value.trim().slice(0, 160));
+      return [...new Set(values)].map((value) => ({ text: value, source: item.hasAttribute('aria-label') || item.hasAttribute('title') ? 'accessibility' : 'visible_text' }));
+    });
+    return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, currentTime: video?.currentTime ?? 0, paused: video?.paused ?? true, audioTrackState: track?.readyState, text: document.body?.innerText?.slice(0, 20000) ?? '', metricCandidates };
   })()`);
+  const metrics = extractRoomMetrics({ bodyText: evidence.text, candidates: evidence.metricCandidates ?? [] });
+  return { ...evidence, viewerCount: metrics.viewerCount, followerCount: metrics.followerCount, totalViewerCount: metrics.totalViewerCount, likeCount: metrics.likeCount, metricRaw: metrics.raw, metricEvidence: metrics.evidence, metricQuality: metrics.quality };
 }
 
 export interface ProbeWebContents {
@@ -117,29 +128,19 @@ export async function probeRoom(webContents: ProbeWebContents, url: string, time
         const image = document.querySelector('meta[property="og:image"]');
         const pageTitle = document.querySelector('meta[property="og:title"]')?.content || document.title;
         const text = document.body?.innerText?.slice(0, 20000) ?? '';
-        const pick = (patterns) => patterns.map((pattern) => text.match(pattern)?.[1]).find(Boolean);
         const avatar = document.querySelector('img[class*="avatar" i], img[class*="author" i], img[alt*="头像"], img[alt*="主播"]')?.src;
         const avatarCandidates = Array.from(document.images).map((item) => ({ source: item.currentSrc || item.src, width: item.naturalWidth || item.width, height: item.naturalHeight || item.height, label: [item.alt, item.className].filter((value) => typeof value === 'string').join(' ').slice(0, 160) })).filter((item) => item.source && item.width >= 24 && item.height >= 24).slice(0, 40);
-        const metricRaw = {
-          viewerCount: pick([/(?:在线|观看中)\s*([\d,.]+\s*[万亿]?)/, /([\d,.]+\s*[万亿]?)\s*(?:人在线|人观看)/]),
-          followerCount: pick([/(?:粉丝|关注者)\s*([\d,.]+\s*[万亿]?)/, /([\d,.]+\s*[万亿]?)\s*(?:粉丝|关注者)/]),
-          totalViewerCount: pick([/(?:累计观看|本场观看)\s*([\d,.]+\s*[万亿]?)/]),
-          likeCount: pick([/(?:点赞|获赞)\s*([\d,.]+\s*[万亿]?)/, /([\d,.]+\s*[万亿]?)\s*(?:点赞|获赞)/]),
-        };
-        return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, text, title: pageTitle, anchorName: pageTitle?.split(/[｜|-]/)[0]?.trim(), cover: image?.content, avatar, avatarCandidates, metricRaw };
+        const metricCandidates = Array.from(document.querySelectorAll('[aria-label],[title],[data-e2e*="fans" i],[data-e2e*="viewer" i],[data-e2e*="like" i]')).slice(0, 100).flatMap((item) => {
+          const values = [item.getAttribute('aria-label'), item.getAttribute('title'), item.textContent].filter((value) => typeof value === 'string' && value.trim()).map((value) => value.trim().slice(0, 160));
+          return [...new Set(values)].map((value) => ({ text: value, source: item.hasAttribute('aria-label') || item.hasAttribute('title') ? 'accessibility' : 'visible_text' }));
+        });
+        return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, text, title: pageTitle, anchorName: pageTitle?.split(/[｜|-]/)[0]?.trim(), cover: image?.content, avatar, avatarCandidates, metricCandidates };
       })()`);
       if (classifyProbe(evidence) !== "page_error") break;
     }
-    const raw = Object.fromEntries(Object.entries(evidence.metricRaw ?? {}).filter((entry): entry is [string, string] => typeof entry[1] === "string"));
-    const metrics = {
-      viewerCount: raw.viewerCount ? parseCompactCount(raw.viewerCount) : undefined,
-      followerCount: raw.followerCount ? parseCompactCount(raw.followerCount) : undefined,
-      totalViewerCount: raw.totalViewerCount ? parseCompactCount(raw.totalViewerCount) : undefined,
-      likeCount: raw.likeCount ? parseCompactCount(raw.likeCount) : undefined,
-    };
-    const available = Object.values(metrics).filter((value) => value !== undefined).length;
+    const metrics = extractRoomMetrics({ bodyText: evidence.text, candidates: evidence.metricCandidates ?? [] });
     const avatar = evidence.avatar && /^https?:\/\//.test(evidence.avatar) ? evidence.avatar : selectAvatarCandidate(evidence.avatarCandidates ?? []);
-    return { status: classifyProbe(evidence), title: evidence.title, anchorName: evidence.anchorName, cover: evidence.cover ? new URL(evidence.cover, url).toString() : undefined, avatar, ...metrics, metricRaw: raw, metricQuality: available === 4 ? "complete" : available > 0 ? "partial" : "missing" };
+    return { status: classifyProbe(evidence), title: evidence.title, anchorName: evidence.anchorName, cover: evidence.cover ? new URL(evidence.cover, url).toString() : undefined, avatar, viewerCount: metrics.viewerCount, followerCount: metrics.followerCount, totalViewerCount: metrics.totalViewerCount, likeCount: metrics.likeCount, metricRaw: metrics.raw, metricEvidence: metrics.evidence, metricQuality: metrics.quality };
   } catch (error) {
     if (error instanceof Error && error.message === "PROBE_TIMEOUT") { webContents.stop(); return { status: "timeout" }; }
     return { status: "page_error" };

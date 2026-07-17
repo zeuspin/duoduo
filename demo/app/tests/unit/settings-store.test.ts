@@ -54,10 +54,30 @@ describe("SettingsStore", () => {
     const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-"));
     const path = join(dir, "settings.json");
     const store = new SettingsStore(path, cipher);
-    expect(await store.getMonitoringSettings()).toEqual({ monitoredCheckSeconds: 30, preparedCheckMinutes: 5 });
-    await store.saveMonitoringSettings({ monitoredCheckSeconds: 15, preparedCheckMinutes: 10 });
-    expect(await new SettingsStore(path, cipher).getMonitoringSettings()).toEqual({ monitoredCheckSeconds: 15, preparedCheckMinutes: 10 });
-    await expect(store.saveMonitoringSettings({ monitoredCheckSeconds: 1, preparedCheckMinutes: 1 } as never)).rejects.toThrow();
+    expect(await store.getMonitoringSettings()).toEqual({ monitoredCheckSeconds: 30 });
+    await store.saveMonitoringSettings({ monitoredCheckSeconds: 15 });
+    expect(await new SettingsStore(path, cipher).getMonitoringSettings()).toEqual({ monitoredCheckSeconds: 15 });
+    await expect(store.saveMonitoringSettings({ monitoredCheckSeconds: 1 } as never)).rejects.toThrow();
+  });
+
+  it("persists verification pause and normalizes interrupted recovery after restart", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-"));
+    const path = join(dir, "settings.json");
+    const store = new SettingsStore(path, cipher);
+    const triggeredAt = "2026-07-15T10:00:00.000Z";
+    await store.saveDouyinAccessState({ mode: "recovery_ready", roomId: "123", taskType: "manual_probe", triggeredAt });
+    expect(await new SettingsStore(path, cipher).getDouyinAccessState()).toEqual({ mode: "verification_paused", roomId: "123", taskType: "manual_probe", triggeredAt, reason: "verification_required" });
+  });
+
+  it("serializes consecutive access-state file replacements", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-"));
+    const path = join(dir, "settings.json");
+    const store = new SettingsStore(path, cipher);
+    const triggeredAt = "2026-07-15T10:00:00.000Z";
+    await expect(Promise.all([
+      store.saveDouyinAccessState({ mode: "recovery_checking", roomId: "123", taskType: "manual_probe", triggeredAt }),
+      store.saveDouyinAccessState({ mode: "verification_paused", roomId: "123", taskType: "manual_probe", triggeredAt, reason: "verification_required" }),
+    ])).resolves.toHaveLength(2);
   });
 
   it("persists bounded data retention with safe defaults", async () => {

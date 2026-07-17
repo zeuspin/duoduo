@@ -10,9 +10,9 @@ import { SettingsStore } from "./storage/settings-store";
 import { createAsrProvider } from "./asr/provider-factory";
 import { CaptureRouter } from "./audio/capture-router";
 import { RoomManager } from "./rooms/room-manager";
-import { RoomSession } from "./rooms/room-session";
+import { RoomSession, type RoomNavigationGate } from "./rooms/room-session";
 import { BailianProvider } from "./asr/bailian-provider";
-import { ProbeScheduler } from "./rooms/probe-scheduler";
+import { ProbeScheduler, splitPreparedStartupRooms } from "./rooms/probe-scheduler";
 import { CoverCache } from "./rooms/cover-cache";
 import { AvatarCache } from "./rooms/avatar-cache";
 import { BackupService } from "./storage/backup-service";
@@ -23,7 +23,15 @@ import { createLlmProvider } from "./llm/provider-factory";
 import { InsightEngine } from "./insights/insight-engine";
 import { InsightCoordinator } from "./insights/insight-coordinator";
 import { createDiagnosticLog, createNetworkErrorSampler, decideRendererRecovery, monitoringFingerprint } from "./diagnostics";
-import { coverPartitionName, playerPartitionName, probePartitionName } from "./rooms/partitions";
+import { douyinPlatformPartitionName } from "./rooms/partitions";
+import { DouyinAccessCoordinator } from "./rooms/douyin-access-coordinator";
+import { acquireProcessLock, revealExistingWindow } from "./application-lifecycle";
+import { EmbeddedVerificationController } from "./rooms/embedded-verification-controller";
+import { inspectVerificationPage } from "./rooms/verification-page-inspector";
+import type { Room } from "../shared/contracts";
+import { isTrustedAvatarStatus, reconcileAvatarPaths } from "./rooms/avatar-reconciliation";
+import { RoomIntelligenceService, type StoredLiveSession } from "./rooms/room-intelligence";
+import { shouldAutoMonitor } from "./rooms/auto-monitor";
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 app.commandLine.appendSwitch("log-level", "3");
@@ -35,6 +43,11 @@ let mainWindow: BrowserWindow | undefined;
 let shutdown: (() => Promise<void>) | undefined;
 let persistentDiagnostic: ReturnType<typeof createDiagnosticLog> | undefined;
 let lastMainRendererCrashAt: number | undefined;
+const processLock = acquireProcessLock(join(app.getPath("userData"), "duoduo.pid"));
+const hasSingleInstanceLock = processLock.acquired && app.requestSingleInstanceLock();
+if (!hasSingleInstanceLock) { processLock.release(); app.quit(); }
+else app.on("second-instance", () => revealExistingWindow(mainWindow));
+app.on("will-quit", () => processLock.release());
 const diagnosticLog = process.env.DUODUO_E2E_LOG;
 function diagnostic(message: string, details: Record<string, unknown> = {}) {
   if (diagnosticLog) void appendFile(diagnosticLog, `${new Date().toISOString()} ${message} ${JSON.stringify(details)}\n`);
@@ -75,6 +88,7 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
+  if (!hasSingleInstanceLock) return;
   diagnostic("app-ready");
   const powerBlockerId = powerSaveBlocker.start("prevent-app-suspension");
   const userDataPath = app.getPath("userData");
@@ -87,6 +101,8 @@ app.whenReady().then(async () => {
   const rooms = database.rooms;
   const coverCache = new CoverCache(join(userDataPath, "covers"), (url) => net.fetch(url), (bytes) => nativeImage.createFromBuffer(bytes).toPNG());
   const avatarCache = new AvatarCache(join(userDataPath, "avatars"), (url) => net.fetch(url), (bytes) => nativeImage.createFromBuffer(bytes).toPNG());
+  const repairedAvatarRoomIds = await reconcileAvatarPaths((await rooms.list()).map((room) => room.roomId), avatarCache, database.snapshots);
+  if (repairedAvatarRoomIds.length) diagnostic("avatar_paths_reconciled", { roomIds: repairedAvatarRoomIds });
   const backupService = new BackupService(databasePath, join(userDataPath, "avatars"), join(userDataPath, "covers"));
   const settings = new SettingsStore(join(app.getPath("userData"), "settings.json"), {
     encryptString(value) {
@@ -96,6 +112,72 @@ app.whenReady().then(async () => {
     decryptString(value) { return safeStorage.decryptString(Buffer.from(value, "base64")); },
   });
   await settings.ensureDefaultBailianLlm();
+  const platformSession = session.fromPartition(douyinPlatformPartitionName, { cache: false });
+  platformSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
+  let roomIntelligenceRealRequestCount = 0;
+  if (process.env.DUODUO_E2E_ROOM_INTELLIGENCE_REPORT) {
+    platformSession.webRequest.onBeforeRequest({ urls: ["https://live.douyin.com/*"] }, (_details, callback) => {
+      roomIntelligenceRealRequestCount += 1;
+      callback({ cancel: true });
+    });
+  }
+  const storedAccessState = await settings.getDouyinAccessState();
+  const recentSnapshots = database.snapshots.list();
+  const existingVerification = recentSnapshots.find((item) => item.status === "verification_required");
+  const repeatedPageError = recentSnapshots.filter((item) => item.status === "page_error" && Date.now() - Date.parse(item.checkedAt) < 30 * 60_000).length >= 3 ? recentSnapshots.find((item) => item.status === "page_error") : undefined;
+  const blockedSnapshot = existingVerification ?? repeatedPageError;
+  const initialAccessState = storedAccessState.mode === "normal" && blockedSnapshot
+    ? { mode: "verification_paused" as const, roomId: blockedSnapshot.roomId, taskType: "startup_probe" as const, triggeredAt: blockedSnapshot.checkedAt, reason: existingVerification ? "verification_required" as const : "suspected_verification" as const }
+    : storedAccessState;
+  const coordinator = new DouyinAccessCoordinator({
+    initialState: initialAccessState,
+    minimumGapMs: process.env.DUODUO_FIXTURE_ORIGIN ? 0 : 60_000,
+    automaticBudgetPerHour: process.env.DUODUO_FIXTURE_ORIGIN ? Number.POSITIVE_INFINITY : 10,
+    persistState: (state) => settings.saveDouyinAccessState(state),
+  });
+  const restoredAccessState = coordinator.getState();
+  if (JSON.stringify(restoredAccessState) !== JSON.stringify(storedAccessState)) await settings.saveDouyinAccessState(restoredAccessState);
+  const broadcastAccessState = () => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("access:changed", coordinator.getState()); };
+  const unsubscribeAccess = coordinator.subscribe(() => broadcastAccessState());
+  const verificationController = new EmbeddedVerificationController(() => {
+    if (!mainWindow || mainWindow.isDestroyed()) throw new Error("MAIN_WINDOW_UNAVAILABLE");
+    const view = new WebContentsView({ webPreferences: { session: platformSession, contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false } });
+    view.setBackgroundColor("#ffffff");
+    view.setVisible(false);
+    view.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+    mainWindow.contentView.addChildView(view);
+    return {
+      async loadURL(url: string) {
+        try { await view.webContents.loadURL(url); }
+        catch (error) { if (view.webContents.isDestroyed()) throw error; }
+      },
+      setBounds(bounds: { x: number; y: number; width: number; height: number }) { view.setBounds(bounds); },
+      setVisible(visible: boolean) { view.setVisible(visible); },
+      currentUrl() { return view.webContents.getURL(); },
+      async inspectBlockedState() {
+        const startedAt = Date.now();
+        const host = (() => {
+          try { return new URL(view.webContents.getURL()).hostname; }
+          catch { return "unknown"; }
+        })();
+        const isLoading = view.webContents.isLoading();
+        diagnostic("verification_check_started", { host, isLoading });
+        try {
+          const result = await inspectVerificationPage(view.webContents.mainFrame);
+          diagnostic("verification_check_completed", { host, isLoading, durationMs: Date.now() - startedAt, result });
+          return result;
+        } catch (error) {
+          diagnostic("verification_check_failed", { host, isLoading, durationMs: Date.now() - startedAt, error: error instanceof Error ? error.message : String(error) });
+          throw error;
+        }
+      },
+      destroy() {
+        if (mainWindow && !mainWindow.isDestroyed()) mainWindow.contentView.removeChildView(view);
+        if (!view.webContents.isDestroyed()) view.webContents.close();
+      },
+      isDestroyed() { return view.webContents.isDestroyed(); },
+    };
+  });
   let monitoringSettings = await settings.getMonitoringSettings();
   const runRetention = async () => { const retention = await settings.getDataRetention(); const removed = database.maintenance.runAutomaticRetention(retention); await pruneDiagnosticLog(join(userDataPath, "diagnostics.log"), retention.logDays); return removed; };
   await runRetention();
@@ -122,10 +204,20 @@ app.whenReady().then(async () => {
   const persistProbeResult = async (roomId: string, result: RoomProbeResult, screenshot: Buffer) => {
     const existing = database.snapshots.list().find((item) => item.roomId === roomId);
     const coverPath = await coverCache.updateForStatus(roomId, result.status, result.cover, screenshot).catch(() => undefined);
-    const avatarPath = existing?.avatarPath ?? (result.avatar ? await avatarCache.ensure(roomId, result.avatar).catch(() => undefined) : undefined);
-    database.snapshots.record({ roomId, status: result.status, title: result.title, anchorName: result.anchorName, coverPath, avatarPath, viewerCount: result.viewerCount, followerCount: result.followerCount, totalViewerCount: result.totalViewerCount, likeCount: result.likeCount, metricRaw: result.metricRaw, metricQuality: result.metricQuality, checkedAt: new Date().toISOString(), ...(result.status === "page_error" || result.status === "timeout" ? { error: `PROBE_${result.status.toUpperCase()}` } : {}) });
+    let avatarPath = existing?.avatarPath;
+    if (!avatarPath && result.avatar && isTrustedAvatarStatus(result.status)) {
+      const cachedPath = await avatarCache.ensure(roomId, result.avatar).catch(() => undefined);
+      if (cachedPath) {
+        database.snapshots.setAvatarIfMissing(roomId, cachedPath);
+        avatarPath = cachedPath;
+      }
+    }
+    const metadata = result.status === "live" ? { title: result.title, anchorName: result.anchorName, coverPath, avatarPath, viewerCount: result.viewerCount, followerCount: result.followerCount, totalViewerCount: result.totalViewerCount, likeCount: result.likeCount, metricRaw: result.metricRaw, metricEvidence: result.metricEvidence, metricQuality: result.metricQuality } : {};
+    const failed = result.status === "page_error" || result.status === "timeout" || result.status === "verification_required";
+    database.snapshots.record({ roomId, status: result.status, ...metadata, checkedAt: new Date().toISOString(), ...(failed ? { error: `PROBE_${result.status.toUpperCase()}` } : {}) });
+    if (avatarPath && isTrustedAvatarStatus(result.status)) database.snapshots.setAvatarIfMissing(roomId, avatarPath);
   };
-  const manager = new RoomManager(async (roomId, signal) => {
+  const manager = new RoomManager(async (roomId, signal, reason) => {
     const room = (await rooms.list()).find((item) => item.roomId === roomId);
     if (!room) throw new Error("ROOM_NOT_FOUND");
     const smokeKey = process.env.DUODUO_REAL_SMOKE === "1" ? process.env.DUODUO_SMOKE_API_KEY : undefined;
@@ -135,6 +227,9 @@ app.whenReady().then(async () => {
     const provider = smokeKey ? new BailianProvider({ apiKey: smokeKey }) : createAsrProvider(config!, secret);
     const fixtureOrigin = process.env.DUODUO_FIXTURE_ORIGIN;
     const roomUrl = fixtureOrigin ? `${fixtureOrigin}/${roomId}` : room.canonicalUrl;
+    const taskType = reason === "user_start" ? "monitor_start" : "monitor_reconnect";
+    const traffic = reason === "user_start" ? "interactive" : "automatic";
+    const navigationGate: RoomNavigationGate = (run) => coordinator.submit({ roomId, type: taskType, traffic, run });
     return new RoomSession(
       roomId,
       roomUrl,
@@ -142,13 +237,37 @@ app.whenReady().then(async () => {
       captureRouter,
       (event) => manager.appendAsr(event),
       signal,
+      platformSession,
+      navigationGate,
       async (result, screenshot) => { await persistProbeResult(roomId, result, screenshot); await broadcastSnapshot(); },
+      async (result) => {
+        database.snapshots.record({
+          roomId,
+          status: "live",
+          viewerCount: result.viewerCount,
+          followerCount: result.followerCount,
+          totalViewerCount: result.totalViewerCount,
+          likeCount: result.likeCount,
+          metricRaw: result.metricRaw,
+          metricEvidence: result.metricEvidence,
+          metricQuality: result.metricQuality,
+          checkedAt: new Date().toISOString(),
+        });
+        await broadcastSnapshot();
+      },
       (event) => {
         if (networkErrorSampler.shouldLog(event)) diagnostic("room_network_error", { roomId, ...event });
       },
       monitoringSettings.monitoredCheckSeconds,
     );
-  }, { offlineRetryDelayMs: monitoringSettings.monitoredCheckSeconds * 1_000, persistFinalAsr: (event) => { const stored = database.asr.insert(event); if (stored) insightCoordinator.accept(stored); } });
+  }, { persistFinalAsr: (event) => { const stored = database.asr.insert(event); if (stored) insightCoordinator.accept(stored); } });
+
+  const roomIntelligence = new RoomIntelligenceService({
+    listRoomIds: async () => (await rooms.list()).map((room) => room.roomId),
+    listSnapshots: () => database.snapshots.list(),
+    listHistorySince: (roomId, since, limit) => database.snapshots.listHistorySince(roomId, since, limit),
+    listSessions: (roomId) => database.snapshots.listSessions(roomId) as unknown as StoredLiveSession[],
+  });
 
   const snapshot = async () => ({ rooms: await rooms.list(), runtimes: manager.snapshot(), snapshots: database.snapshots.list() });
   const broadcastSnapshot = async () => broadcastRooms(await snapshot());
@@ -170,8 +289,7 @@ app.whenReady().then(async () => {
   });
   const playback = new PlaybackController(async (roomId) => {
     if (!mainWindow || mainWindow.isDestroyed()) throw new Error("MAIN_WINDOW_UNAVAILABLE");
-    const isolatedSession = session.fromPartition(playerPartitionName(roomId), { cache: false });
-    const view = new WebContentsView({ webPreferences: { session: isolatedSession, contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false } });
+    const view = new WebContentsView({ webPreferences: { session: platformSession, contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false } });
     view.setBackgroundColor("#111111");
     view.setBounds({ x: 0, y: 0, width: 1, height: 1 });
     view.webContents.setAudioMuted(true);
@@ -188,33 +306,83 @@ app.whenReady().then(async () => {
             new Promise<never>((_resolve, reject) => { timer = setTimeout(() => reject(new Error("PLAYER_LOAD_TIMEOUT")), 15_000); }),
           ]);
         } finally { if (timer) clearTimeout(timer); }
+        const accessState = await inspectVerificationPage(view.webContents.mainFrame);
+        if (accessState === "verification_required") throw new Error("PLAYER_VERIFICATION_REQUIRED");
+        if (accessState === "login_required") throw new Error("PLAYER_LOGIN_REQUIRED");
         await view.webContents.executeJavaScript("(() => { const video=document.querySelector('video'); if(video){video.muted=false;video.volume=1;void video.play().catch(()=>undefined)} return true })()").catch(() => undefined);
       },
       setMuted(value: boolean) { if (!view.webContents.isDestroyed()) view.webContents.setAudioMuted(value); },
       setBounds(bounds: { x: number; y: number; width: number; height: number }) { view.setBounds(bounds); },
-      destroy() { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.contentView.removeChildView(view); if (!view.webContents.isDestroyed()) view.webContents.close(); void isolatedSession.clearStorageData().catch(() => undefined); },
+      destroy() { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.contentView.removeChildView(view); if (!view.webContents.isDestroyed()) view.webContents.close(); },
     };
   });
   playback.subscribe((state) => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("player:changed", state); });
-  const probeScheduler = new ProbeScheduler(async (roomId) => {
+  const executePreparedProbe = async (roomId: string) => {
     const room = (await rooms.list()).find((item) => item.roomId === roomId);
-    if (!room) return;
+    if (!room) throw new Error("ROOM_NOT_FOUND");
+    const previousStatus = database.snapshots.list().find((item) => item.roomId === roomId)?.status;
     database.snapshots.upsert({ roomId, status: "checking", checkedAt: new Date().toISOString() });
     await broadcastSnapshot();
-    const partition = session.fromPartition(probePartitionName(roomId), { cache: false });
-    const probeWindow = new BrowserWindow({ show: false, webPreferences: { session: partition, contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false } });
+    const probeWindow = new BrowserWindow({ show: false, webPreferences: { session: platformSession, contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false } });
     probeWindow.webContents.setAudioMuted(true);
     probeWindow.webContents.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36");
     try {
       const fixtureOrigin = process.env.DUODUO_FIXTURE_ORIGIN;
       const result = await probeRoom(probeWindow.webContents, fixtureOrigin ? `${fixtureOrigin}/${roomId}` : room.canonicalUrl);
-      await persistProbeResult(roomId, result, (await probeWindow.capturePage()).toPNG());
+      const verificationRequired = result.status === "verification_required";
+      await persistProbeResult(roomId, result, verificationRequired ? Buffer.alloc(0) : (await probeWindow.capturePage()).toPNG());
+      return { value: { probeResult: result, autoMonitor: shouldAutoMonitor(room, previousStatus, result.status) }, verificationRequired };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      database.snapshots.record({ roomId, status: "page_error", checkedAt: new Date().toISOString(), error: `PROBE_EXECUTION_FAILED:${message}` });
+      diagnostic("prepared_probe_failed", { roomId, error: message });
+      throw error;
     } finally {
       if (!probeWindow.isDestroyed()) probeWindow.destroy();
-      await partition.clearStorageData().catch(() => undefined);
       await broadcastSnapshot();
     }
-  }, { defaultIntervalMinutes: monitoringSettings.preparedCheckMinutes });
+  };
+  const probeScheduler = new ProbeScheduler(async (roomId, source) => {
+    const requested = source === "manual" || source === "initial";
+    const result = await coordinator.submit({
+      roomId,
+      type: requested ? "manual_probe" : "startup_probe",
+      traffic: requested ? "interactive" : "automatic",
+      run: () => executePreparedProbe(roomId),
+    });
+    if (result.autoMonitor) await startRoomMonitoring(roomId, false);
+    return result.probeResult;
+  }, {
+    defaultIntervalMinutes: monitoringSettings.preparedCheckMinutes ?? 5,
+    maxConcurrency: 1,
+    jitterRatio: 0.2,
+    manualCooldownMs: 60_000,
+  });
+  const schedulePreparedRoom = (room: Room) => {
+    if (room.monitoring) { void probeScheduler.cancel(room.roomId); return; }
+    probeScheduler.schedule(room.roomId, room);
+  };
+  async function startRoomMonitoring(roomId: string, waitForProbeCancellation = true) {
+    if (coordinator.getState().mode !== "normal") throw new Error("ACCESS_VERIFICATION_PAUSED");
+    await rooms.setMonitoring(roomId, true);
+    try {
+      const cancellation = probeScheduler.cancel(roomId);
+      if (waitForProbeCancellation) await cancellation;
+      await manager.startMonitoring(roomId);
+    } catch (error) {
+      await rooms.setMonitoring(roomId, false);
+      throw error;
+    }
+    await broadcastSnapshot();
+  }
+  const reschedulePreparedRooms = async () => {
+    probeScheduler.setDefaultIntervalMinutes(monitoringSettings.preparedCheckMinutes ?? 5);
+    for (const room of await rooms.list()) schedulePreparedRoom(room);
+  };
+  const broadcastProbeState = (state = probeScheduler.state()) => {
+    if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()) mainWindow.webContents.send("rooms:probe-state", state);
+  };
+  const unsubscribeProbeState = probeScheduler.subscribe(broadcastProbeState);
   protocol.handle("duoduo-cover", (request) => {
     if (closing) return new Response(null, { status: 410 });
     const roomId = new URL(request.url).hostname;
@@ -231,8 +399,12 @@ app.whenReady().then(async () => {
     closing = true;
     clearInterval(retentionTimer);
     unsubscribeManager();
+    unsubscribeAccess();
+    unsubscribeProbeState();
     playback.stop();
     await probeScheduler.stop();
+    await coordinator.stop();
+    verificationController.dispose();
     await insightCoordinator.shutdown();
     await manager.shutdown();
     await Promise.allSettled(pendingBroadcasts);
@@ -263,11 +435,31 @@ app.whenReady().then(async () => {
     monitoringSettings = MonitoringSettingsSchema.parse(value);
     await settings.saveMonitoringSettings(monitoringSettings);
     manager.updateMonitoringInterval(monitoringSettings.monitoredCheckSeconds);
-    probeScheduler.setDefaultIntervalMinutes(monitoringSettings.preparedCheckMinutes);
-    for (const room of (await rooms.list()).filter((item) => !item.monitoring)) probeScheduler.schedule(room.roomId, room);
+    await reschedulePreparedRooms();
     diagnostic("monitoring_settings_changed", monitoringSettings);
     return monitoringSettings;
   });
+  ipcMain.handle("access:get-state", () => coordinator.getState());
+  ipcMain.handle("access:show-verification", async () => {
+    const state = coordinator.getState();
+    if (state.mode === "normal") throw new Error("VERIFICATION_NOT_REQUIRED");
+    const target = (await database.rooms.list()).find((item) => item.roomId === state.roomId);
+    if (!target) throw new Error("ROOM_NOT_FOUND");
+    const fixtureOrigin = process.env.DUODUO_FIXTURE_ORIGIN;
+    await verificationController.show(fixtureOrigin ? `${fixtureOrigin}/${target.roomId}` : target.canonicalUrl);
+    return { url: verificationController.currentUrl() };
+  });
+  ipcMain.handle("access:hide-verification", () => { verificationController.hide(); return true; });
+  ipcMain.handle("access:set-verification-bounds", (_event, bounds) => {
+    const parsed = z.object({ x: z.number().int().nonnegative(), y: z.number().int().nonnegative(), width: z.number().int().positive(), height: z.number().int().positive() }).parse(bounds);
+    verificationController.setBounds(parsed);
+    return true;
+  });
+  ipcMain.handle("access:check-verification", async () => {
+    const clear = await coordinator.beginRecoveryCheck(async () => await verificationController.inspectBlockedState() === "clear");
+    return { clear, state: coordinator.getState() };
+  });
+  ipcMain.handle("access:confirm-recovery", () => { coordinator.confirmRecovery(); manager.resumeAccessRetries(); verificationController.hide(); return coordinator.getState(); });
   ipcMain.handle("llm:get", () => settings.getLlmConfig());
   ipcMain.handle("llm:save", async (_event, config, secret) => {
     await settings.saveLlm(LlmProviderConfigSchema.parse(config), typeof secret === "string" ? secret : undefined);
@@ -279,21 +471,31 @@ app.whenReady().then(async () => {
     return createLlmProvider(parsed, typeof secret === "string" && secret ? secret : stored).testConnection();
   });
   ipcMain.handle("rooms:list", snapshot);
-  ipcMain.handle("rooms:add", async (_event, input) => { const result = await rooms.add(RoomInputSchema.parse(input)); probeScheduler.schedule(result.roomId, result); void probeScheduler.runNow(result.roomId); await broadcastSnapshot(); return result; });
-  ipcMain.handle("rooms:update", async (_event, roomId, input) => { const result = await rooms.update(String(roomId), RoomInputSchema.parse(input)); if (!result.monitoring) { probeScheduler.schedule(result.roomId, result); void probeScheduler.runNow(result.roomId); } await broadcastSnapshot(); return result; });
-  ipcMain.handle("rooms:remove", async (_event, roomId) => { const id = String(roomId); probeScheduler.cancel(id); await manager.stopMonitoring(id); await rooms.remove(id); await broadcastSnapshot(); });
+  ipcMain.handle("rooms:list-intelligence", () => closing ? [] : roomIntelligence.listSummaries());
+  ipcMain.handle("rooms:get-intelligence", (_event, roomId) => {
+    if (closing) throw new Error("APP_CLOSING");
+    return roomIntelligence.getDetails(z.string().min(1).parse(roomId));
+  });
+  ipcMain.handle("rooms:add", async (_event, input) => { const result = await rooms.add(RoomInputSchema.parse(input)); schedulePreparedRoom(result); void probeScheduler.runNow(result.roomId, "initial").catch(() => undefined); await broadcastSnapshot(); return result; });
+  ipcMain.handle("rooms:update", async (_event, roomId, input) => { const result = await rooms.update(String(roomId), RoomInputSchema.parse(input)); schedulePreparedRoom(result); if (!result.monitoring) void probeScheduler.runNow(result.roomId).catch(() => undefined); await broadcastSnapshot(); return result; });
+  ipcMain.handle("rooms:remove", async (_event, roomId) => { const id = String(roomId); await probeScheduler.cancel(id); await manager.stopMonitoring(id); await rooms.remove(id); await broadcastSnapshot(); });
   ipcMain.handle("rooms:set-monitoring", async (_event, roomId, monitoring) => {
     const id = String(roomId); const enabled = Boolean(monitoring);
-    await rooms.setMonitoring(id, enabled);
-    try {
-      if (enabled) { probeScheduler.cancel(id); await manager.startMonitoring(id); }
-      else {
-        await manager.stopMonitoring(id);
-        const room = (await rooms.list()).find((item) => item.roomId === id);
-        if (room) { probeScheduler.schedule(id, room); void probeScheduler.runNow(id); }
-      }
+    if (enabled) await startRoomMonitoring(id);
+    else {
+      await rooms.setMonitoring(id, false);
+      await manager.stopMonitoring(id);
+      const room = (await rooms.list()).find((item) => item.roomId === id);
+      if (room) schedulePreparedRoom(room);
+      await broadcastSnapshot();
     }
-    catch (error) { await rooms.setMonitoring(id, false); throw error; }
+    return snapshot();
+  });
+  ipcMain.handle("rooms:set-auto-monitor-on-live", async (_event, roomId, enabled) => {
+    const id = z.string().min(1).parse(roomId);
+    const room = await rooms.setAutoMonitorOnLive(id, Boolean(enabled));
+    const latestStatus = database.snapshots.list().find((item) => item.roomId === id)?.status;
+    if (room.autoMonitorOnLive && latestStatus === "live" && !room.monitoring) await startRoomMonitoring(id);
     await broadcastSnapshot();
     return snapshot();
   });
@@ -336,6 +538,19 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle("insights:list", (_event, options) => database.insights.list(z.object({ roomId: z.string().min(1).optional(), limit: z.number().int().min(1).max(100), beforeId: z.number().int().positive().optional() }).parse(options)));
   ipcMain.handle("rooms:probe", async (_event, roomId) => { await probeScheduler.runNow(z.string().min(1).parse(roomId)); return snapshot(); });
+  ipcMain.handle("rooms:get-probe-state", () => probeScheduler.state());
+  ipcMain.handle("rooms:probe-all", async () => {
+    if (coordinator.getState().mode !== "normal") throw new Error("ACCESS_VERIFICATION_PAUSED");
+    const ids = (await rooms.list()).filter((room) => !room.monitoring).map((room) => room.roomId);
+    void probeScheduler.runBatch(ids, "manual_batch").catch((error) => {
+      diagnostic("prepared_probe_batch_failed", { error: error instanceof Error ? error.message : String(error) });
+    });
+    return probeScheduler.state();
+  });
+  ipcMain.handle("rooms:cancel-probe-batch", () => {
+    probeScheduler.cancelManualBatch();
+    return probeScheduler.state();
+  });
   ipcMain.handle("data:get-retention", () => settings.getDataRetention());
   ipcMain.handle("data:save-retention", async (_event, value) => { await settings.saveDataRetention(DataRetentionSettingsSchema.parse(value)); return settings.getDataRetention(); });
   ipcMain.handle("data:get-usage", async () => ({
@@ -363,23 +578,26 @@ app.whenReady().then(async () => {
     const roomId = z.string().min(1).parse(requestedRoomId);
     const room = (await rooms.list()).find((item) => item.roomId === roomId);
     if (!room) throw new Error("ROOM_NOT_FOUND");
-    const partition = session.fromPartition(coverPartitionName(roomId), { cache: false });
-    const coverWindow = new BrowserWindow({ show: false, webPreferences: { session: partition, contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false } });
+    return coordinator.submit({ roomId, type: "avatar_refresh", run: async () => {
+    const coverWindow = new BrowserWindow({ show: false, webPreferences: { session: platformSession, contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false } });
     coverWindow.webContents.setAudioMuted(true);
     coverWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
     try {
       const fixtureOrigin = process.env.DUODUO_FIXTURE_ORIGIN;
       const result = await probeRoom(coverWindow.webContents, fixtureOrigin ? `${fixtureOrigin}/${roomId}` : room.canonicalUrl);
+      if (result.status === "verification_required") return { value: await snapshot(), verificationRequired: true };
+      if (!isTrustedAvatarStatus(result.status)) throw new Error(`AVATAR_SOURCE_UNTRUSTED:${result.status}`);
       if (!result.avatar) throw new Error(`AVATAR_NOT_FOUND:${result.status}`);
       const avatarPath = await avatarCache.refresh(roomId, result.avatar);
       const existing = database.snapshots.list().find((item) => item.roomId === roomId);
-      database.snapshots.upsert({ roomId, status: existing?.status ?? result.status, title: existing?.title ?? result.title, anchorName: existing?.anchorName ?? result.anchorName, coverPath: existing?.coverPath, avatarPath, viewerCount: existing?.viewerCount, followerCount: existing?.followerCount, totalViewerCount: existing?.totalViewerCount, likeCount: existing?.likeCount, metricRaw: existing?.metricRaw, metricQuality: existing?.metricQuality, checkedAt: new Date().toISOString(), error: existing?.error });
+      database.snapshots.upsert({ roomId, status: result.status, title: result.title ?? existing?.title, anchorName: result.anchorName ?? existing?.anchorName, coverPath: existing?.coverPath, viewerCount: result.viewerCount ?? existing?.viewerCount, followerCount: result.followerCount ?? existing?.followerCount, totalViewerCount: result.totalViewerCount ?? existing?.totalViewerCount, likeCount: result.likeCount ?? existing?.likeCount, metricRaw: result.metricRaw ?? existing?.metricRaw, metricEvidence: result.metricEvidence ?? existing?.metricEvidence, metricQuality: result.metricQuality ?? existing?.metricQuality, checkedAt: new Date().toISOString() });
+      database.snapshots.replaceAvatar(roomId, avatarPath);
       await broadcastSnapshot();
-      return snapshot();
+      return { value: await snapshot() };
     } finally {
       if (!coverWindow.isDestroyed()) coverWindow.destroy();
-      await partition.clearStorageData().catch(() => undefined);
     }
+    } });
   });
   ipcMain.handle("player:get-state", () => playback.state());
   ipcMain.handle("player:play", async (_event, roomId) => {
@@ -387,7 +605,10 @@ app.whenReady().then(async () => {
     const room = (await rooms.list()).find((item) => item.roomId === id);
     if (!room) throw new Error("ROOM_NOT_FOUND");
     const fixtureOrigin = process.env.DUODUO_FIXTURE_ORIGIN;
-    return playback.play(id, fixtureOrigin ? `${fixtureOrigin}/${id}` : room.canonicalUrl);
+    return coordinator.submit({ roomId: id, type: "user_play", traffic: "interactive", run: async () => {
+      const value = await playback.play(id, fixtureOrigin ? `${fixtureOrigin}/${id}` : room.canonicalUrl);
+      return { value, verificationRequired: value.error === "PLAYER_VERIFICATION_REQUIRED" };
+    } });
   });
   ipcMain.handle("player:stop", () => playback.stop());
   ipcMain.handle("player:set-bounds", (_event, bounds) => {
@@ -402,10 +623,79 @@ app.whenReady().then(async () => {
     const parser = database.parsers.list()[0];
     if (parser?.publishedVersion) for (const room of await rooms.list()) database.parsers.bindRoom(room.roomId, parser.id, parser.publishedVersion.id);
   }
-  const restored = process.env.DUODUO_REPLAY_INSIGHT_REPORT ? [] : (await rooms.list()).filter((room) => room.monitoring);
-  void Promise.allSettled(restored.map((room) => manager.startMonitoring(room.roomId)));
-  for (const [index, room] of (await rooms.list()).filter((item) => !item.monitoring).entries()) {
-    probeScheduler.schedule(room.roomId, room, index * 500);
+  const restored = process.env.DUODUO_REPLAY_INSIGHT_REPORT || coordinator.getState().mode !== "normal" ? [] : (await rooms.list()).filter((room) => room.monitoring);
+  await Promise.allSettled(restored.map((room) => manager.startMonitoring(room.roomId)));
+  const preparedRooms = (await rooms.list()).filter((item) => !item.monitoring);
+  for (const room of preparedRooms) schedulePreparedRoom(room);
+  const preparedRoomIds = preparedRooms.map((room) => room.roomId);
+  const startupQueues = splitPreparedStartupRooms(preparedRoomIds, database.snapshots.list());
+  for (const roomId of startupQueues.initialRoomIds) void probeScheduler.runNow(roomId, "initial").catch((error) => diagnostic("initial_probe_failed", { roomId, error: error instanceof Error ? error.message : String(error) }));
+  void probeScheduler.runStartup(startupQueues.refreshRoomIds).catch((error) => diagnostic("startup_probe_failed", { error: error instanceof Error ? error.message : String(error) }));
+  if (process.env.DUODUO_E2E_ROOM_INTELLIGENCE_REPORT && mainWindow) {
+    const reportPath = process.env.DUODUO_E2E_ROOM_INTELLIGENCE_REPORT;
+    const screenshotPath = process.env.DUODUO_E2E_ROOM_INTELLIGENCE_SCREENSHOT;
+    void (async () => {
+      const deadline = Date.now() + 10_000;
+      while (Date.now() < deadline) {
+        const ready = await mainWindow!.webContents.executeJavaScript("Boolean(document.querySelector('.card .room-label'))");
+        if (ready) break;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      const beforeLocalReads = roomIntelligenceRealRequestCount;
+      const cardState = await mainWindow!.webContents.executeJavaScript(`(() => {
+        const cards=Array.from(document.querySelectorAll('.card'));
+        const top=cards.find((card)=>card.textContent.includes('https://live.douyin.com/100'));
+        const empty=cards.find((card)=>card.textContent.includes('https://live.douyin.com/600'));
+        const labels=top ? Array.from(top.querySelectorAll('.room-label')) : [];
+        const state={topFound:Boolean(top),avatarVisible:Boolean(top?.querySelector('.avatar')),labelCount:labels.length,labelTexts:labels.map((label)=>label.textContent),tooltip:String(labels[0]?.getAttribute('title')??''),emptyAccumulating:Boolean(empty?.textContent.includes('数据积累中'))};
+        labels[0]?.click();
+        return state;
+      })()`);
+      while (Date.now() < deadline) {
+        const ready = await mainWindow!.webContents.executeJavaScript("Boolean(document.querySelector('.intelligence-drawer'))");
+        if (ready) break;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      const detailsState = await mainWindow!.webContents.executeJavaScript(`(() => {
+        const drawer=document.querySelector('.intelligence-drawer');
+        const text=drawer?.textContent??'';
+        return {opened:Boolean(drawer),allLabelCount:drawer?.querySelectorAll('.intelligence-evidence article').length??0,hasTrend:text.includes('在线人数趋势'),hasStartEvidence:text.includes('开播证据：'),hasStopEvidence:text.includes('停播证据：'),hasObservedDisclaimer:text.includes('不等同于平台完整直播时长'),containsSyntheticZero:/在线人数\s*0(?:\D|$)/.test(text)};
+      })()`);
+      if (screenshotPath) await writeFile(screenshotPath, (await mainWindow!.webContents.capturePage()).toPNG());
+      const afterLocalReads = roomIntelligenceRealRequestCount;
+      await writeFile(reportPath, `${JSON.stringify({ version: app.getVersion(), beforeLocalReads, afterLocalReads, realDouyinRequests: roomIntelligenceRealRequestCount, cardState, detailsState }, null, 2)}\n`);
+      app.quit();
+    })().catch(async (error) => {
+      await writeFile(reportPath, `${JSON.stringify({ error: error instanceof Error ? error.message : String(error) }, null, 2)}\n`);
+      app.exit(2);
+    });
+  }
+  if (process.env.DUODUO_E2E_VERIFICATION_REPORT) {
+    const reportPath = process.env.DUODUO_E2E_VERIFICATION_REPORT;
+    void (async () => {
+      const deadline = Date.now() + 10_000;
+      while (coordinator.getState().mode === "normal" && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 50));
+      const initialPaused = coordinator.getState();
+      if (initialPaused.mode !== "verification_paused") throw new Error("VERIFICATION_E2E_PAUSE_TIMEOUT");
+      const fixtureOrigin = process.env.DUODUO_FIXTURE_ORIGIN;
+      if (!fixtureOrigin) throw new Error("VERIFICATION_E2E_FIXTURE_MISSING");
+      await verificationController.show(`${fixtureOrigin}/${initialPaused.roomId}`);
+      const blockedInspection = await verificationController.inspectBlockedState();
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      const cleared = await coordinator.beginRecoveryCheck(async () => await verificationController.inspectBlockedState() === "clear");
+      const beforeConfirmation = coordinator.getState();
+      coordinator.confirmRecovery();
+      manager.resumeAccessRetries();
+      verificationController.hide();
+      const afterConfirmation = coordinator.getState();
+      const roomSnapshot = database.snapshots.list().find((item) => item.roomId === initialPaused.roomId);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await writeFile(reportPath, `${JSON.stringify({ initialPaused, blockedInspection, cleared, beforeConfirmation, afterConfirmation, snapshot: roomSnapshot }, null, 2)}\n`);
+      app.quit();
+    })().catch(async (error) => {
+      await writeFile(reportPath, `${JSON.stringify({ error: error instanceof Error ? error.message : String(error) }, null, 2)}\n`);
+      app.exit(2);
+    });
   }
   if (process.env.DUODUO_REPLAY_INSIGHT_REPORT) {
     const replayReport = process.env.DUODUO_REPLAY_INSIGHT_REPORT;
@@ -455,7 +745,7 @@ app.whenReady().then(async () => {
     const screenshotPath = process.env.DUODUO_E2E_INSIGHT_SCREENSHOT;
     void (async () => {
       const room = (await rooms.list())[0]; if (!room) throw new Error("INSIGHT_E2E_ROOM_MISSING");
-      probeScheduler.cancel(room.roomId);
+      await probeScheduler.cancel(room.roomId);
       const parser = database.parsers.list()[0]; if (!parser.publishedVersion) throw new Error("INSIGHT_E2E_PARSER_MISSING");
       database.parsers.bindRoom(room.roomId, parser.id, parser.publishedVersion.id);
       const texts = ["今天指数虽然是红的，但是量没有明显放出来。", "现在市场情绪只能算修复，还不能说反转。", "大家点点赞，我们稍后继续看下午的量。"];

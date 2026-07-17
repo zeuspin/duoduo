@@ -46,6 +46,7 @@ export class DuoduoDatabase {
         schedule_json TEXT,
         probe_interval_minutes INTEGER,
         monitoring INTEGER NOT NULL DEFAULT 0,
+        auto_monitor_on_live INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       );
@@ -73,6 +74,7 @@ export class DuoduoDatabase {
         total_viewer_count INTEGER,
         like_count INTEGER,
         metric_raw_json TEXT,
+        metric_evidence_json TEXT,
         metric_quality TEXT,
         checked_at TEXT NOT NULL,
         error TEXT
@@ -86,6 +88,7 @@ export class DuoduoDatabase {
         total_viewer_count INTEGER,
         like_count INTEGER,
         metric_raw_json TEXT,
+        metric_evidence_json TEXT,
         metric_quality TEXT,
         checked_at TEXT NOT NULL,
         error TEXT
@@ -178,12 +181,22 @@ export class DuoduoDatabase {
     `);
     for (const column of [
       "avatar_path TEXT", "viewer_count INTEGER", "follower_count INTEGER", "total_viewer_count INTEGER",
-      "like_count INTEGER", "metric_raw_json TEXT", "metric_quality TEXT",
+      "like_count INTEGER", "metric_raw_json TEXT", "metric_evidence_json TEXT", "metric_quality TEXT",
+      "last_reliable_status TEXT", "last_reliable_status_at TEXT", "metrics_observed_at TEXT",
     ]) {
       try { this.database.exec(`ALTER TABLE room_snapshots ADD COLUMN ${column}`); } catch (error) {
         if (!(error instanceof Error) || !error.message.includes("duplicate column name")) throw error;
       }
     }
+    try { this.database.exec("ALTER TABLE rooms ADD COLUMN auto_monitor_on_live INTEGER NOT NULL DEFAULT 0"); } catch (error) {
+      if (!(error instanceof Error) || !error.message.includes("duplicate column name")) throw error;
+    }
+    try { this.database.exec("ALTER TABLE room_observations ADD COLUMN metric_evidence_json TEXT"); } catch (error) {
+      if (!(error instanceof Error) || !error.message.includes("duplicate column name")) throw error;
+    }
+    this.database.exec(`UPDATE room_snapshots SET metrics_observed_at=NULL,metric_raw_json=NULL
+      WHERE viewer_count IS NULL AND follower_count IS NULL AND total_viewer_count IS NULL AND like_count IS NULL
+      AND (metric_raw_json IS NULL OR metric_raw_json='{}')`);
     this.rooms = new SqliteRoomRepository(this.database);
     this.asr = new SqliteAsrRepository(this.database);
     this.snapshots = new SqliteSnapshotRepository(this.database);
@@ -213,11 +226,27 @@ export class DuoduoDatabase {
     this.database.prepare("ATTACH DATABASE ? AS imported").run(path);
     this.database.exec("BEGIN IMMEDIATE");
     try {
+      const tableColumns = (table: "rooms" | "room_snapshots" | "room_observations") => new Set(
+        (this.database.prepare(`PRAGMA imported.table_info(${table})`).all() as Array<Record<string, unknown>>).map((row) => String(row.name)),
+      );
+      const roomSource = tableColumns("rooms");
+      const snapshotSource = tableColumns("room_snapshots");
+      const observationSource = tableColumns("room_observations");
+      const source = (available: Set<string>, column: string) => available.has(column) ? `i.${column}` : "NULL";
+      const snapshotColumns = [
+        "room_id", "status", "title", "anchor_name", "cover_path", "avatar_path", "viewer_count", "follower_count", "total_viewer_count", "like_count",
+        "metric_raw_json", "metric_evidence_json", "metric_quality", "last_reliable_status", "last_reliable_status_at", "metrics_observed_at", "checked_at", "error",
+      ];
+      const observationColumns = ["room_id", "status", "viewer_count", "follower_count", "total_viewer_count", "like_count", "metric_raw_json", "metric_evidence_json", "metric_quality", "checked_at", "error"];
+      const roomColumns = ["room_id", "canonical_url", "schedule_json", "probe_interval_minutes", "monitoring", "auto_monitor_on_live", "created_at", "updated_at"];
+      const roomColumnSource = (column: string) => roomSource.has(column) ? `i.${column}` : column === "auto_monitor_on_live" ? "0" : "NULL";
       this.database.exec(`
-        INSERT OR IGNORE INTO rooms SELECT * FROM imported.rooms;
-        INSERT OR IGNORE INTO room_snapshots SELECT * FROM imported.room_snapshots;
-        INSERT INTO room_observations(room_id,status,viewer_count,follower_count,total_viewer_count,like_count,metric_raw_json,metric_quality,checked_at,error)
-          SELECT i.room_id,i.status,i.viewer_count,i.follower_count,i.total_viewer_count,i.like_count,i.metric_raw_json,i.metric_quality,i.checked_at,i.error FROM imported.room_observations i
+        INSERT OR IGNORE INTO rooms(${roomColumns.join(",")})
+          SELECT ${roomColumns.map(roomColumnSource).join(",")} FROM imported.rooms i;
+        INSERT OR IGNORE INTO room_snapshots(${snapshotColumns.join(",")})
+          SELECT ${snapshotColumns.map((column) => source(snapshotSource, column)).join(",")} FROM imported.room_snapshots i;
+        INSERT INTO room_observations(${observationColumns.join(",")})
+          SELECT ${observationColumns.map((column) => source(observationSource, column)).join(",")} FROM imported.room_observations i
           WHERE NOT EXISTS (SELECT 1 FROM room_observations x WHERE x.room_id=i.room_id AND x.checked_at=i.checked_at AND x.status=i.status);
         INSERT OR IGNORE INTO room_hourly_aggregates SELECT * FROM imported.room_hourly_aggregates;
         INSERT INTO live_sessions(room_id,status,previous_offline_at,first_live_at,last_live_at,first_offline_at,peak_viewer_count,average_viewer_count,unknown_since,unknown_count)
@@ -244,7 +273,7 @@ class SqliteRoomRepository {
     const normalized = normalizeDouyinUrl(parsed.url);
     if (this.database.prepare("SELECT 1 FROM rooms WHERE room_id = ?").get(normalized.roomId)) throw new Error("ROOM_EXISTS");
     const now = new Date().toISOString();
-    const room = RoomSchema.parse({ ...normalized, schedule: parsed.schedule, probeIntervalMinutes: parsed.probeIntervalMinutes, monitoring: false, createdAt: now, updatedAt: now });
+    const room = RoomSchema.parse({ ...normalized, schedule: parsed.schedule, probeIntervalMinutes: parsed.probeIntervalMinutes, monitoring: false, autoMonitorOnLive: false, createdAt: now, updatedAt: now });
     this.insertExisting(room);
     return room;
   }
@@ -272,8 +301,16 @@ class SqliteRoomRepository {
     return RoomSchema.parse({ ...rowToRoom(existing), monitoring, updatedAt });
   }
 
+  async setAutoMonitorOnLive(roomId: string, autoMonitorOnLive: boolean): Promise<Room> {
+    const existing = this.database.prepare("SELECT * FROM rooms WHERE room_id = ?").get(roomId) as Record<string, unknown> | undefined;
+    if (!existing) throw new Error("ROOM_NOT_FOUND");
+    const updatedAt = new Date().toISOString();
+    this.database.prepare("UPDATE rooms SET auto_monitor_on_live=?, updated_at=? WHERE room_id=?").run(autoMonitorOnLive ? 1 : 0, updatedAt, roomId);
+    return RoomSchema.parse({ ...rowToRoom(existing), autoMonitorOnLive, updatedAt });
+  }
+
   insertExisting(room: Room): void {
-    this.database.prepare("INSERT OR IGNORE INTO rooms(room_id,canonical_url,schedule_json,probe_interval_minutes,monitoring,created_at,updated_at) VALUES(?,?,?,?,?,?,?)").run(room.roomId, room.canonicalUrl, encodeSchedule(room.schedule), room.probeIntervalMinutes, room.monitoring ? 1 : 0, room.createdAt, room.updatedAt);
+    this.database.prepare("INSERT OR IGNORE INTO rooms(room_id,canonical_url,schedule_json,probe_interval_minutes,monitoring,auto_monitor_on_live,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)").run(room.roomId, room.canonicalUrl, encodeSchedule(room.schedule), room.probeIntervalMinutes, room.monitoring ? 1 : 0, room.autoMonitorOnLive ? 1 : 0, room.createdAt, room.updatedAt);
   }
 }
 
@@ -301,23 +338,41 @@ class SqliteAsrRepository {
 class SqliteSnapshotRepository {
   constructor(private readonly database: DatabaseSync) {}
 
+  setAvatarIfMissing(roomId: string, avatarPath: string): boolean {
+    const result = this.database.prepare("UPDATE room_snapshots SET avatar_path=? WHERE room_id=? AND avatar_path IS NULL").run(avatarPath, roomId);
+    return Number(result.changes) === 1;
+  }
+
+  replaceAvatar(roomId: string, avatarPath: string): void {
+    const result = this.database.prepare("UPDATE room_snapshots SET avatar_path=? WHERE room_id=?").run(avatarPath, roomId);
+    if (Number(result.changes) !== 1) throw new Error("ROOM_SNAPSHOT_NOT_FOUND");
+  }
+
   upsert(snapshot: RoomSnapshot): void {
     const parsed = RoomSnapshotSchema.parse(snapshot);
     const existing = this.database.prepare("SELECT * FROM room_snapshots WHERE room_id=?").get(parsed.roomId) as Record<string, unknown> | undefined;
-    this.database.prepare(`INSERT INTO room_snapshots(room_id,status,title,anchor_name,cover_path,avatar_path,viewer_count,follower_count,total_viewer_count,like_count,metric_raw_json,metric_quality,checked_at,error)
-      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(room_id) DO UPDATE SET status=excluded.status,title=excluded.title,anchor_name=excluded.anchor_name,cover_path=excluded.cover_path,avatar_path=excluded.avatar_path,viewer_count=excluded.viewer_count,follower_count=excluded.follower_count,total_viewer_count=excluded.total_viewer_count,like_count=excluded.like_count,metric_raw_json=excluded.metric_raw_json,metric_quality=excluded.metric_quality,checked_at=excluded.checked_at,error=excluded.error`).run(
+    const reliable = parsed.status === "live" || parsed.status === "offline";
+    const updateMetrics = parsed.status === "live";
+    const updateProfile = parsed.status === "live";
+    const observedMetrics = parsed.viewerCount !== undefined || parsed.followerCount !== undefined || parsed.totalViewerCount !== undefined || parsed.likeCount !== undefined;
+    this.database.prepare(`INSERT INTO room_snapshots(room_id,status,title,anchor_name,cover_path,avatar_path,viewer_count,follower_count,total_viewer_count,like_count,metric_raw_json,metric_evidence_json,metric_quality,last_reliable_status,last_reliable_status_at,metrics_observed_at,checked_at,error)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(room_id) DO UPDATE SET status=excluded.status,title=excluded.title,anchor_name=excluded.anchor_name,cover_path=excluded.cover_path,avatar_path=excluded.avatar_path,viewer_count=excluded.viewer_count,follower_count=excluded.follower_count,total_viewer_count=excluded.total_viewer_count,like_count=excluded.like_count,metric_raw_json=excluded.metric_raw_json,metric_evidence_json=excluded.metric_evidence_json,metric_quality=excluded.metric_quality,last_reliable_status=excluded.last_reliable_status,last_reliable_status_at=excluded.last_reliable_status_at,metrics_observed_at=excluded.metrics_observed_at,checked_at=excluded.checked_at,error=excluded.error`).run(
       parsed.roomId,
       parsed.status,
-      parsed.title ?? optionalString(existing?.title),
-      parsed.anchorName ?? optionalString(existing?.anchor_name),
-      parsed.coverPath ?? optionalString(existing?.cover_path),
-      parsed.avatarPath ?? optionalString(existing?.avatar_path),
-      parsed.viewerCount ?? null,
-      parsed.followerCount ?? null,
-      parsed.totalViewerCount ?? null,
-      parsed.likeCount ?? null,
-      parsed.metricRaw ? JSON.stringify(parsed.metricRaw) : null,
-      parsed.metricQuality ?? null,
+      updateProfile ? parsed.title ?? optionalString(existing?.title) : optionalString(existing?.title),
+      updateProfile ? parsed.anchorName ?? optionalString(existing?.anchor_name) : optionalString(existing?.anchor_name),
+      updateProfile ? parsed.coverPath ?? optionalString(existing?.cover_path) : optionalString(existing?.cover_path),
+      updateProfile ? parsed.avatarPath ?? optionalString(existing?.avatar_path) : optionalString(existing?.avatar_path),
+      updateMetrics ? parsed.viewerCount ?? optionalNumber(existing?.viewer_count) ?? null : optionalNumber(existing?.viewer_count) ?? null,
+      updateMetrics ? parsed.followerCount ?? optionalNumber(existing?.follower_count) ?? null : optionalNumber(existing?.follower_count) ?? null,
+      updateMetrics ? parsed.totalViewerCount ?? optionalNumber(existing?.total_viewer_count) ?? null : optionalNumber(existing?.total_viewer_count) ?? null,
+      updateMetrics ? parsed.likeCount ?? optionalNumber(existing?.like_count) ?? null : optionalNumber(existing?.like_count) ?? null,
+      updateMetrics && parsed.metricRaw ? JSON.stringify(parsed.metricRaw) : optionalString(existing?.metric_raw_json),
+      updateMetrics && parsed.metricEvidence ? JSON.stringify(parsed.metricEvidence) : optionalString(existing?.metric_evidence_json),
+      updateMetrics ? parsed.metricQuality ?? optionalString(existing?.metric_quality) : optionalString(existing?.metric_quality),
+      reliable ? parsed.status : optionalString(existing?.last_reliable_status),
+      reliable ? parsed.checkedAt : optionalString(existing?.last_reliable_status_at),
+      updateMetrics && observedMetrics ? parsed.checkedAt : optionalString(existing?.metrics_observed_at),
       parsed.checkedAt,
       parsed.error ?? null,
     );
@@ -333,8 +388,8 @@ class SqliteSnapshotRepository {
     this.database.exec("BEGIN IMMEDIATE");
     try {
       this.upsert(parsed);
-      this.database.prepare(`INSERT INTO room_observations(room_id,status,viewer_count,follower_count,total_viewer_count,like_count,metric_raw_json,metric_quality,checked_at,error) VALUES(?,?,?,?,?,?,?,?,?,?)`).run(
-        parsed.roomId, parsed.status, parsed.viewerCount ?? null, parsed.followerCount ?? null, parsed.totalViewerCount ?? null, parsed.likeCount ?? null, parsed.metricRaw ? JSON.stringify(parsed.metricRaw) : null, parsed.metricQuality ?? null, parsed.checkedAt, parsed.error ?? null,
+      this.database.prepare(`INSERT INTO room_observations(room_id,status,viewer_count,follower_count,total_viewer_count,like_count,metric_raw_json,metric_evidence_json,metric_quality,checked_at,error) VALUES(?,?,?,?,?,?,?,?,?,?,?)`).run(
+        parsed.roomId, parsed.status, parsed.viewerCount ?? null, parsed.followerCount ?? null, parsed.totalViewerCount ?? null, parsed.likeCount ?? null, parsed.metricRaw ? JSON.stringify(parsed.metricRaw) : null, parsed.metricEvidence ? JSON.stringify(parsed.metricEvidence) : null, parsed.metricQuality ?? null, parsed.checkedAt, parsed.error ?? null,
       );
       this.updateSession(parsed);
       this.database.exec("COMMIT");
@@ -343,6 +398,13 @@ class SqliteSnapshotRepository {
 
   listHistory(roomId: string, limit: number): RoomSnapshot[] {
     const rows = this.database.prepare("SELECT * FROM room_observations WHERE room_id=? ORDER BY checked_at LIMIT ?").all(roomId, Math.max(1, Math.min(limit, 1000))) as Record<string, unknown>[];
+    return rows.map(rowToObservation);
+  }
+
+  listHistorySince(roomId: string, since: string, limit: number): RoomSnapshot[] {
+    const rows = this.database.prepare("SELECT * FROM room_observations WHERE room_id=? AND checked_at>=? ORDER BY checked_at DESC LIMIT ?")
+      .all(roomId, since, Math.max(1, Math.min(limit, 5_000))) as Record<string, unknown>[];
+    rows.reverse();
     return rows.map(rowToObservation);
   }
 
@@ -369,10 +431,7 @@ class SqliteSnapshotRepository {
       this.database.prepare("UPDATE live_sessions SET status='ended',first_offline_at=?,unknown_since=NULL,unknown_count=0 WHERE id=?").run(snapshot.checkedAt, Number(active.id));
       return;
     }
-    const count = Number(active.unknown_count ?? 0) + 1;
-    const since = optionalString(active.unknown_since) ?? snapshot.checkedAt;
-    const elapsed = Date.parse(snapshot.checkedAt) - Date.parse(since);
-    this.database.prepare("UPDATE live_sessions SET status=?,unknown_since=?,unknown_count=? WHERE id=?").run(count >= 3 && elapsed >= 600_000 ? "end_pending" : String(active.status), since, count, Number(active.id));
+    return;
   }
 }
 
@@ -523,7 +582,8 @@ function rowToSnapshot(row: Record<string, unknown>): RoomSnapshot {
     roomId: row.room_id, status: row.status, title: row.title ?? undefined, anchorName: row.anchor_name ?? undefined,
     coverPath: row.cover_path ?? undefined, avatarPath: row.avatar_path ?? undefined,
     viewerCount: optionalNumber(row.viewer_count), followerCount: optionalNumber(row.follower_count), totalViewerCount: optionalNumber(row.total_viewer_count), likeCount: optionalNumber(row.like_count),
-    metricRaw: row.metric_raw_json ? JSON.parse(String(row.metric_raw_json)) : undefined, metricQuality: row.metric_quality ?? undefined,
+    metricRaw: row.metric_raw_json ? JSON.parse(String(row.metric_raw_json)) : undefined, metricEvidence: row.metric_evidence_json ? JSON.parse(String(row.metric_evidence_json)) : undefined, metricQuality: row.metric_quality ?? undefined,
+    lastReliableStatus: row.last_reliable_status ?? undefined, lastReliableStatusAt: row.last_reliable_status_at ?? undefined, metricsObservedAt: row.metrics_observed_at ?? undefined,
     checkedAt: row.checked_at, error: row.error ?? undefined,
   });
 }
@@ -532,7 +592,7 @@ function rowToObservation(row: Record<string, unknown>): RoomSnapshot {
   return RoomSnapshotSchema.parse({
     roomId: row.room_id, status: row.status, viewerCount: optionalNumber(row.viewer_count), followerCount: optionalNumber(row.follower_count),
     totalViewerCount: optionalNumber(row.total_viewer_count), likeCount: optionalNumber(row.like_count),
-    metricRaw: row.metric_raw_json ? JSON.parse(String(row.metric_raw_json)) : undefined, metricQuality: row.metric_quality ?? undefined,
+    metricRaw: row.metric_raw_json ? JSON.parse(String(row.metric_raw_json)) : undefined, metricEvidence: row.metric_evidence_json ? JSON.parse(String(row.metric_evidence_json)) : undefined, metricQuality: row.metric_quality ?? undefined,
     checkedAt: row.checked_at, error: row.error ?? undefined,
   });
 }
@@ -542,7 +602,7 @@ function encodeSchedule(schedule: Room["schedule"]): string | null {
 }
 
 function rowToRoom(row: Record<string, unknown>): Room {
-  return RoomSchema.parse({ roomId: row.room_id, canonicalUrl: row.canonical_url, schedule: row.schedule_json ? JSON.parse(String(row.schedule_json)) : null, probeIntervalMinutes: row.probe_interval_minutes === null ? null : Number(row.probe_interval_minutes), monitoring: Boolean(row.monitoring), createdAt: row.created_at, updatedAt: row.updated_at });
+  return RoomSchema.parse({ roomId: row.room_id, canonicalUrl: row.canonical_url, schedule: row.schedule_json ? JSON.parse(String(row.schedule_json)) : null, probeIntervalMinutes: row.probe_interval_minutes === null ? null : Number(row.probe_interval_minutes), monitoring: Boolean(row.monitoring), autoMonitorOnLive: Boolean(row.auto_monitor_on_live), createdAt: row.created_at, updatedAt: row.updated_at });
 }
 
 function rowToAsr(row: Record<string, unknown>): StoredAsrEvent {

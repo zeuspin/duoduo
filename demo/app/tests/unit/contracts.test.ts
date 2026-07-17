@@ -6,12 +6,31 @@ import {
   InsightNotificationSettingsSchema,
   MarketInsightSchema,
   ParserTestRunSchema,
+  PreparedProbeStateSchema,
   RoomInputSchema,
   DataRetentionSettingsSchema,
+  DouyinAccessStateSchema,
+  MonitoringSettingsSchema,
+  RoomSchema,
+  RoomSnapshotSchema,
+  RoomIntelligenceSchema,
   normalizeDouyinUrl,
 } from "../../src/shared/contracts";
 
 describe("room contracts", () => {
+  it("defaults legacy rooms to manual monitoring", () => {
+    const parsed = RoomSchema.parse({
+      roomId: "123",
+      canonicalUrl: "https://live.douyin.com/123",
+      schedule: null,
+      probeIntervalMinutes: null,
+      monitoring: false,
+      createdAt: "2026-07-17T00:00:00.000Z",
+      updatedAt: "2026-07-17T00:00:00.000Z",
+    });
+    expect(parsed.autoMonitorOnLive).toBe(false);
+  });
+
   it("validates bounded retention settings", () => {
     expect(DataRetentionSettingsSchema.parse({ observationDays: 30, aggregateDays: 365, asrDays: 90, logDays: 30 }).aggregateDays).toBe(365);
     expect(() => DataRetentionSettingsSchema.parse({ observationDays: -1, aggregateDays: 365, asrDays: 90, logDays: 30 })).toThrow();
@@ -47,6 +66,73 @@ describe("room contracts", () => {
       schedule: null,
     });
     expect(parsed.schedule).toBeNull();
+  });
+
+  it("separates access protection from reliable room data", () => {
+    const checkedAt = "2026-07-15T10:00:00.000Z";
+    const observedAt = "2026-07-15T09:55:00.000Z";
+    expect(DouyinAccessStateSchema.parse({ mode: "verification_paused", roomId: "123", taskType: "manual_probe", triggeredAt: checkedAt, reason: "verification_required" })).toMatchObject({ mode: "verification_paused", roomId: "123" });
+    expect(RoomSnapshotSchema.parse({ roomId: "123", status: "timeout", checkedAt, lastReliableStatus: "live", lastReliableStatusAt: observedAt, metricsObservedAt: observedAt, viewerCount: 42 })).toMatchObject({ viewerCount: 42, metricsObservedAt: observedAt });
+  });
+
+  it("distinguishes user monitoring starts from automatic reconnects", () => {
+    const parsed = DouyinAccessStateSchema.parse({ mode: "verification_paused", roomId: "123", taskType: "monitor_start", triggeredAt: "2026-07-17T06:00:00.000Z", reason: "verification_required" });
+    expect(parsed).toMatchObject({ mode: "verification_paused", taskType: "monitor_start" });
+  });
+
+  it("keeps monitoring settings limited to in-page health checks", () => {
+    expect(MonitoringSettingsSchema.parse({ monitoredCheckSeconds: 30 })).toEqual({ monitoredCheckSeconds: 30 });
+  });
+
+  it("validates bounded metric evidence without page data", () => {
+    const parsed = RoomSnapshotSchema.parse({
+      roomId: "123",
+      status: "live",
+      viewerCount: 23_000,
+      metricEvidence: { viewerCount: { raw: "2.3万", source: "accessibility" } },
+      checkedAt: "2026-07-17T06:00:00.000Z",
+    });
+    expect(parsed.metricEvidence).toEqual({ viewerCount: { raw: "2.3万", source: "accessibility" } });
+  });
+
+  it("validates transparent local intelligence with evidence-based sessions", () => {
+    const parsed = RoomIntelligenceSchema.parse({
+      roomId: "123",
+      generatedAt: "2026-07-17T06:00:00.000Z",
+      currentMetrics: { followerCount: 1_264_000, observedAt: "2026-07-17T05:55:00.000Z" },
+      labels: [{ kind: "audience_scale", text: "百万级粉丝", explanation: "最近可信粉丝数为 126.4 万", observedAt: "2026-07-17T05:55:00.000Z", sampleCount: 1 }],
+      allLabels: [{ kind: "audience_scale", text: "百万级粉丝", explanation: "最近可信粉丝数为 126.4 万", observedAt: "2026-07-17T05:55:00.000Z", sampleCount: 1 }],
+      sevenDay: { days: 7, sampleCount: 2, sessionCount: 1, points: [{ at: "2026-07-17T05:00:00.000Z", viewerCount: 23_000 }] },
+      thirtyDay: { days: 30, sampleCount: 2, sessionCount: 1, points: [{ at: "2026-07-17T05:00:00.000Z", viewerCount: 23_000 }] },
+      sessions: [{ id: 1, status: "ended", firstLiveAt: "2026-07-17T03:00:00.000Z", lastLiveAt: "2026-07-17T04:59:00.000Z", firstOfflineAt: "2026-07-17T05:00:00.000Z", observedDurationMinutes: 120 }],
+    });
+    expect(parsed.labels[0].text).toBe("百万级粉丝");
+    expect(parsed.sessions[0].observedDurationMinutes).toBe(120);
+  });
+
+  it("validates prepared-room probe progress", () => {
+    expect(PreparedProbeStateSchema.parse({
+      mode: "running",
+      currentRoomId: "123",
+      queuedRoomIds: ["456"],
+      batch: { source: "manual_batch", total: 2, completed: 0 },
+    })).toMatchObject({ mode: "running", currentRoomId: "123" });
+  });
+
+  it("validates observable manual and initial probe request states", () => {
+    const base = { mode: "running" as const, queuedRoomIds: [] as string[] };
+    expect(PreparedProbeStateSchema.parse({
+      ...base,
+      manualProbes: [
+        { roomId: "a", requestType: "initial", phase: "queued" },
+        { roomId: "b", requestType: "manual", phase: "running" },
+        { roomId: "c", requestType: "manual", phase: "cooldown", cooldownUntil: "2026-07-18T12:00:00.000Z" },
+      ],
+    }).manualProbes).toHaveLength(3);
+    expect(() => PreparedProbeStateSchema.parse({
+      ...base,
+      manualProbes: [{ roomId: "a", requestType: "initial", phase: "cooldown", cooldownUntil: "2026-07-18T12:00:00.000Z" }],
+    })).toThrow();
   });
 });
 

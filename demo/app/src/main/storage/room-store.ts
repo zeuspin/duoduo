@@ -30,6 +30,7 @@ export class RoomStore {
         schedule: parsed.schedule,
         probeIntervalMinutes: parsed.probeIntervalMinutes,
         monitoring: false,
+        autoMonitorOnLive: false,
         createdAt: now,
         updatedAt: now,
       };
@@ -66,6 +67,18 @@ export class RoomStore {
       const index = rooms.findIndex((room) => room.roomId === roomId);
       if (index < 0) throw new Error("ROOM_NOT_FOUND");
       const updated = { ...rooms[index], monitoring, updatedAt: new Date().toISOString() };
+      rooms[index] = updated;
+      await this.write(rooms);
+      return updated;
+    });
+  }
+
+  setAutoMonitorOnLive(roomId: string, autoMonitorOnLive: boolean): Promise<Room> {
+    return this.serialize(async () => {
+      const rooms = await this.list();
+      const index = rooms.findIndex((room) => room.roomId === roomId);
+      if (index < 0) throw new Error("ROOM_NOT_FOUND");
+      const updated = { ...rooms[index], autoMonitorOnLive, updatedAt: new Date().toISOString() };
       rooms[index] = updated;
       await this.write(rooms);
       return updated;

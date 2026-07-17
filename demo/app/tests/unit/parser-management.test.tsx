@@ -10,14 +10,14 @@ afterEach(cleanup);
 
 describe("ParserManagement", () => {
   it("shows the built-in parser and creates a safe draft before editing", async () => {
-    render(<ParserManagement rooms={[{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null, monitoring: true, createdAt: "2026-07-13T00:00:00.000Z", updatedAt: "2026-07-13T00:00:00.000Z" }]} snapshots={[]} />);
+    render(<ParserManagement rooms={[{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null, monitoring: true, autoMonitorOnLive: false, createdAt: "2026-07-13T00:00:00.000Z", updatedAt: "2026-07-13T00:00:00.000Z" }]} snapshots={[]} />);
     expect(await screen.findByText("市场观点与情绪提炼")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "编辑" }));
     expect(window.duoduo.parsers.createDraft).toHaveBeenCalledWith("market-insight");
   });
 
   it("can leave a room on ASR only", async () => {
-    render(<ParserManagement rooms={[{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null, monitoring: true, createdAt: "2026-07-13T00:00:00.000Z", updatedAt: "2026-07-13T00:00:00.000Z" }]} snapshots={[]} />);
+    render(<ParserManagement rooms={[{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null, monitoring: true, autoMonitorOnLive: false, createdAt: "2026-07-13T00:00:00.000Z", updatedAt: "2026-07-13T00:00:00.000Z" }]} snapshots={[]} />);
     const select = await screen.findByLabelText("直播间 123 的解析器");
     fireEvent.change(select, { target: { value: "none" } });
     expect(window.duoduo.parsers.bindRoom).toHaveBeenCalledWith("123", null, null);

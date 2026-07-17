@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { classifyCurrentHealth, classifyProbe, parseCompactCount, selectAvatarCandidate } from "../../src/main/rooms/live-probe";
+import { describe, expect, it, vi } from "vitest";
+import { classifyCurrentHealth, classifyProbe, inspectCurrentRoom, parseCompactCount, probeRoom, selectAvatarCandidate } from "../../src/main/rooms/live-probe";
 
 describe("parseCompactCount", () => {
   it.each([
@@ -34,6 +34,8 @@ describe("classifyProbe", () => {
     [{ hasVideo: true, videoReadyState: 3, text: "正在直播" }, "live"],
     [{ hasVideo: false, videoReadyState: 0, text: "直播已结束" }, "offline"],
     [{ hasVideo: false, videoReadyState: 0, text: "登录后观看" }, "login_required"],
+    [{ hasVideo: false, videoReadyState: 0, text: "请完成下列验证后继续\n安全验证" }, "verification_required"],
+    [{ hasVideo: true, videoReadyState: 4, text: "请完成下列验证后继续\n直播已结束" }, "verification_required"],
     [{ hasVideo: false, videoReadyState: 0, text: "主播暂未开播" }, "offline"],
   ] as const)("classifies page evidence", (evidence, expected) => {
     expect(classifyProbe(evidence)).toBe(expected);
@@ -51,5 +53,60 @@ describe("classifyCurrentHealth", () => {
 
   it("keeps an ambiguous stalled page unknown instead of reporting a false stop", () => {
     expect(classifyCurrentHealth({ hasVideo: true, videoReadyState: 4, text: "", currentTime: 100, paused: false, audioTrackState: "live" }, 100)).toBe("unknown");
+  });
+});
+
+describe("probeRoom metrics", () => {
+  it("extracts metrics from an already open monitoring page without navigation", async () => {
+    const webContents = {
+      executeJavaScript: vi.fn(async () => ({
+        hasVideo: true,
+        videoReadyState: 4,
+        currentTime: 10,
+        paused: false,
+        audioTrackState: "live",
+        text: "1.8万人在线",
+        metricCandidates: [{ text: "粉丝 88.8万", source: "accessibility" }],
+      })),
+    };
+
+    const result = await inspectCurrentRoom(webContents as never);
+
+    expect(result).toMatchObject({ viewerCount: 18_000, followerCount: 888_000, metricQuality: "partial" });
+    expect(webContents.executeJavaScript).toHaveBeenCalledTimes(1);
+  });
+
+  it("parses bounded page candidates in the main process", async () => {
+    vi.useFakeTimers();
+    const webContents = {
+      once: (_event: "dom-ready", listener: () => void) => listener(),
+      loadURL: vi.fn(async () => undefined),
+      stop: vi.fn(),
+      executeJavaScript: vi.fn(async () => ({
+        hasVideo: true,
+        videoReadyState: 4,
+        text: "2.3万人在线 本场观看 18.6万",
+        title: "测试主播 - 抖音直播",
+        metricCandidates: [
+          { text: "粉丝 126.4万", source: "accessibility" },
+          { text: "获赞 8.1万", source: "visible_text" },
+        ],
+      })),
+    };
+
+    const pending = probeRoom(webContents as never, "https://live.douyin.com/123", 5_000);
+    await vi.advanceTimersByTimeAsync(1_000);
+    const result = await pending;
+    vi.useRealTimers();
+
+    expect(result).toMatchObject({
+      status: "live",
+      viewerCount: 23_000,
+      followerCount: 1_264_000,
+      totalViewerCount: 186_000,
+      likeCount: 81_000,
+      metricQuality: "complete",
+      metricEvidence: expect.objectContaining({ followerCount: { raw: "126.4万", source: "accessibility" } }),
+    });
   });
 });

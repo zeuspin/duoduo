@@ -7,7 +7,8 @@ export interface MonitorSession {
   updateHealthCheckInterval?(seconds: number): void;
 }
 
-type SessionFactory = (roomId: string, signal: AbortSignal) => Promise<MonitorSession>;
+export type SessionStartReason = "user_start" | "offline_retry" | "technical_retry";
+type SessionFactory = (roomId: string, signal: AbortSignal, reason: SessionStartReason) => Promise<MonitorSession>;
 type Listener = (rooms: RoomRuntime[]) => void;
 
 interface Entry {
@@ -19,12 +20,15 @@ interface Entry {
   offlineRetryTimer?: NodeJS.Timeout;
   technicalFailures?: number[];
   unsubscribeFailure?: () => void;
+  offlineRetryStage?: number;
+  accessPausedRetry?: "offline" | "technical";
 }
 
 interface RoomManagerOptions {
   maxRetries?: number;
   retryDelayMs?: number;
   offlineRetryDelayMs?: number;
+  offlineRetryBackoffMs?: readonly [number, number, number];
   maxHotAsr?: number;
   maxFailureCycles?: number;
   stabilityWindowMs?: number;
@@ -37,7 +41,7 @@ export class RoomManager {
 
   private readonly maxRetries: number;
   private readonly retryDelayMs: number;
-  private offlineRetryDelayMs: number;
+  private readonly offlineRetryBackoffMs: readonly [number, number, number];
   private readonly maxHotAsr: number;
   private readonly maxFailureCycles: number;
   private readonly stabilityWindowMs: number;
@@ -46,7 +50,10 @@ export class RoomManager {
   constructor(private readonly createSession: SessionFactory, options: RoomManagerOptions = {}) {
     this.maxRetries = options.maxRetries ?? 3;
     this.retryDelayMs = options.retryDelayMs ?? 1_000;
-    this.offlineRetryDelayMs = options.offlineRetryDelayMs ?? 60_000;
+    const fixedOfflineDelay = options.offlineRetryDelayMs;
+    this.offlineRetryBackoffMs = options.offlineRetryBackoffMs ?? (fixedOfflineDelay === undefined
+      ? [30 * 60_000, 60 * 60_000, 120 * 60_000]
+      : [fixedOfflineDelay, fixedOfflineDelay, fixedOfflineDelay]);
     this.maxHotAsr = options.maxHotAsr ?? 100;
     this.maxFailureCycles = options.maxFailureCycles ?? 3;
     this.stabilityWindowMs = options.stabilityWindowMs ?? 5 * 60_000;
@@ -61,16 +68,19 @@ export class RoomManager {
     const entry = existing ?? { runtime: { roomId, state: "idle", liveStatus: "checking", asr: [] } };
     const controller = new AbortController();
     entry.controller = controller;
+    entry.offlineRetryStage = 0;
+    entry.accessPausedRetry = undefined;
     entry.runtime = { ...entry.runtime, state: "starting", liveStatus: "checking", error: undefined, asr: [] };
     this.entries.set(roomId, entry);
     this.emit();
 
     entry.starting = (async () => {
       try {
-        const session = await this.createSession(roomId, controller.signal);
+        const session = await this.createSession(roomId, controller.signal, "user_start");
         if (controller.signal.aborted) { await session.close(); return; }
         entry.session = session;
         await session.start();
+        entry.offlineRetryStage = 0;
         this.bindFailure(entry, session);
         entry.runtime = { ...entry.runtime, state: "monitoring", liveStatus: "live" };
       } catch (error) {
@@ -95,6 +105,7 @@ export class RoomManager {
     entry.controller?.abort();
     if (entry.offlineRetryTimer) clearTimeout(entry.offlineRetryTimer);
     entry.offlineRetryTimer = undefined;
+    entry.accessPausedRetry = undefined;
     entry.unsubscribeFailure?.();
     entry.unsubscribeFailure = undefined;
     if (entry.session) await entry.session.close();
@@ -122,13 +133,19 @@ export class RoomManager {
   snapshot(): RoomRuntime[] { return [...this.entries.values()].map((entry) => structuredClone(entry.runtime)); }
 
   updateMonitoringInterval(seconds: number): void {
-    this.offlineRetryDelayMs = seconds * 1_000;
     for (const entry of this.entries.values()) {
       entry.session?.updateHealthCheckInterval?.(seconds);
-      if (entry.runtime.state === "waiting_for_live") {
-        if (entry.offlineRetryTimer) clearTimeout(entry.offlineRetryTimer);
-        entry.offlineRetryTimer = undefined;
+    }
+  }
+
+  resumeAccessRetries(): void {
+    for (const entry of this.entries.values()) {
+      if (entry.accessPausedRetry === "offline") {
+        entry.accessPausedRetry = undefined;
         this.scheduleOfflineRetry(entry);
+      } else if (entry.accessPausedRetry === "technical") {
+        entry.accessPausedRetry = undefined;
+        entry.recovering = this.recover(entry, new Error("ACCESS_RECOVERY_RESUMED"));
       }
     }
   }
@@ -182,32 +199,43 @@ export class RoomManager {
     entry.session = undefined;
     if (entry.controller?.signal.aborted) return;
     entry.runtime = { ...entry.runtime, state: "waiting_for_live", liveStatus: "offline", error: undefined };
+    entry.offlineRetryStage = 0;
     this.emit();
     this.scheduleOfflineRetry(entry);
   }
 
   private scheduleOfflineRetry(entry: Entry): void {
     if (entry.offlineRetryTimer || entry.controller?.signal.aborted) return;
+    const stage = Math.min(entry.offlineRetryStage ?? 0, this.offlineRetryBackoffMs.length - 1);
     entry.offlineRetryTimer = setTimeout(() => {
       entry.offlineRetryTimer = undefined;
+      entry.offlineRetryStage = Math.min(stage + 1, this.offlineRetryBackoffMs.length - 1);
       void this.retryOfflineRoom(entry);
-    }, this.offlineRetryDelayMs);
+    }, this.offlineRetryBackoffMs[stage]);
   }
 
   private async retryOfflineRoom(entry: Entry): Promise<void> {
     if (entry.controller?.signal.aborted || entry.runtime.state !== "waiting_for_live") return;
     let session: MonitorSession | undefined;
     try {
-      session = await this.createSession(entry.runtime.roomId, entry.controller!.signal);
+      session = await this.createSession(entry.runtime.roomId, entry.controller!.signal, "offline_retry");
       if (entry.controller?.signal.aborted) { await session.close(); return; }
       await session.start();
       entry.session = session;
+      entry.offlineRetryStage = 0;
+      entry.accessPausedRetry = undefined;
       this.bindFailure(entry, session);
       entry.runtime = { ...entry.runtime, state: "monitoring", liveStatus: "live", error: undefined };
       this.emit();
     } catch (error) {
       await session?.close().catch(() => undefined);
       if (entry.controller?.signal.aborted) return;
+      if (this.isAccessPaused(error)) {
+        entry.accessPausedRetry = "offline";
+        entry.runtime = { ...entry.runtime, state: "waiting_for_live", liveStatus: "offline", error: undefined };
+        this.emit();
+        return;
+      }
       entry.runtime = { ...entry.runtime, state: "waiting_for_live", liveStatus: "offline", error: this.isOfflineFailure(error) ? undefined : error instanceof Error ? error.message : String(error) };
       this.emit();
       this.scheduleOfflineRetry(entry);
@@ -225,7 +253,7 @@ export class RoomManager {
       if (entry.controller?.signal.aborted) break;
       if (this.retryDelayMs > 0) await new Promise((resolve) => setTimeout(resolve, this.retryDelayMs * attempt));
       try {
-        const session = await this.createSession(entry.runtime.roomId, entry.controller!.signal);
+        const session = await this.createSession(entry.runtime.roomId, entry.controller!.signal, "technical_retry");
         if (entry.controller?.signal.aborted) { await session.close(); break; }
         await session.start();
         entry.session = session;
@@ -235,6 +263,13 @@ export class RoomManager {
         this.emit();
         return;
       } catch (error) {
+        if (this.isAccessPaused(error)) {
+          entry.accessPausedRetry = "technical";
+          entry.runtime = { ...entry.runtime, state: "recovering", liveStatus: "verification_required", error: undefined };
+          entry.recovering = undefined;
+          this.emit();
+          return;
+        }
         entry.runtime = { ...entry.runtime, state: "recovering", error: error instanceof Error ? error.message : String(error) };
         this.emit();
       }
@@ -242,5 +277,10 @@ export class RoomManager {
     if (!entry.controller?.signal.aborted) entry.runtime = { ...entry.runtime, state: "error", liveStatus: "page_error" };
     entry.recovering = undefined;
     this.emit();
+  }
+
+  private isAccessPaused(error: unknown): boolean {
+    const message = error instanceof Error ? error.message : String(error);
+    return message === "ACCESS_VERIFICATION_PAUSED" || message === "ACCESS_CANCELED_BY_VERIFICATION";
   }
 }

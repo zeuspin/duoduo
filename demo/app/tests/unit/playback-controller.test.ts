@@ -47,4 +47,14 @@ describe("PlaybackController", () => {
     expect(controller.state().activeRoomId).toBe("b");
     expect(controller.resourceCount()).toBe(1);
   });
+
+  it("surfaces a verification result and releases the blocked player view", async () => {
+    class BlockedPlayer extends FakePlayer { override async load() { throw new Error("PLAYER_VERIFICATION_REQUIRED"); } }
+    const player = new BlockedPlayer("a");
+    const controller = new PlaybackController(async () => player);
+
+    await expect(controller.play("a", "https://live.douyin.com/a")).resolves.toMatchObject({ status: "error", error: "PLAYER_VERIFICATION_REQUIRED" });
+    expect(player.destroyed).toBe(true);
+    expect(controller.resourceCount()).toBe(0);
+  });
 });

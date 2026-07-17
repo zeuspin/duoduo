@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coverPartitionName, probePartitionName, roomPartitionName } from "../../src/main/rooms/partitions";
+import { coverPartitionName, douyinPlatformPartitionName, probePartitionName, roomPartitionName } from "../../src/main/rooms/partitions";
 
 describe("room partitions", () => {
   it("keeps stable per-room identities without creating random partitions", () => {
@@ -7,5 +7,6 @@ describe("room partitions", () => {
     expect(roomPartitionName("123")).toBe(roomPartitionName("123"));
     expect(probePartitionName("123")).toBe("duoduo-probe:123");
     expect(coverPartitionName("123")).toBe("duoduo-cover:123");
+    expect(douyinPlatformPartitionName).toBe("persist:duoduo-douyin");
   });
 });

@@ -1,0 +1,27 @@
+{
+  "version": "0.6.0",
+  "beforeLocalReads": 0,
+  "afterLocalReads": 0,
+  "realDouyinRequests": 0,
+  "cardState": {
+    "topFound": true,
+    "avatarVisible": true,
+    "labelCount": 3,
+    "labelTexts": [
+      "百万级粉丝",
+      "近期在线靠前",
+      "近期升温 +67%"
+    ],
+    "tooltip": "最近一次采集到 1,200,000 名关注者；标签仅按公开阈值划分。（1 个样本）",
+    "emptyAccumulating": true
+  },
+  "detailsState": {
+    "opened": true,
+    "allLabelCount": 5,
+    "hasTrend": true,
+    "hasStartEvidence": true,
+    "hasStopEvidence": true,
+    "hasObservedDisclaimer": true,
+    "containsSyntheticZero": false
+  }
+}

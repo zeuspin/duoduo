@@ -293,3 +293,98 @@
 2026-07-13T07:20:42.852Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"monitoring","liveStatus":"live"}]}
 2026-07-13T07:20:42.859Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"stopped","liveStatus":"offline"},{"roomId":"880","state":"monitoring","liveStatus":"live"}]}
 2026-07-13T07:20:42.861Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"stopped","liveStatus":"offline"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T07:24:13.832Z main-loaded {}
+2026-07-17T07:24:13.904Z app-ready {}
+2026-07-17T07:24:13.911Z diagnostics_ready {}
+2026-07-17T07:24:13.947Z before-window {}
+2026-07-17T07:24:14.196Z window-loaded {}
+2026-07-17T07:24:14.196Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:24:14.206Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:24:14.206Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:24:15.486Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"starting","liveStatus":"checking"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:24:16.617Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:24:17.743Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"monitoring","liveStatus":"live"}]}
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-17T07:24:22.086Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T07:24:22.089Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T07:24:22.091Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"stopped","liveStatus":"offline"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T07:28:45.917Z main-loaded {}
+2026-07-17T07:28:45.990Z app-ready {}
+2026-07-17T07:28:45.996Z diagnostics_ready {}
+2026-07-17T07:28:46.043Z before-window {}
+2026-07-17T07:28:46.320Z window-loaded {}
+2026-07-17T07:28:46.321Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:28:46.331Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:28:46.331Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:28:47.585Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:28:48.722Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T07:28:49.841Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"monitoring","liveStatus":"live"}]}
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-17T07:28:54.166Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T07:28:54.175Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T07:28:54.183Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"stopped","liveStatus":"offline"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T16:09:17.640Z main-loaded {}
+2026-07-17T16:09:17.763Z app-ready {}
+2026-07-17T16:09:17.768Z diagnostics_ready {}
+2026-07-17T16:09:17.806Z before-window {}
+2026-07-17T16:09:18.079Z window-loaded {}
+2026-07-17T16:09:18.079Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:09:18.089Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:09:18.090Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:09:19.343Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:09:20.482Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:09:21.595Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"monitoring","liveStatus":"live"}]}
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-17T16:09:25.905Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"monitoring","liveStatus":"live"}]}
+2026-07-17T16:09:25.915Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T16:09:25.918Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"stopped","liveStatus":"offline"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T16:12:03.137Z main-loaded {}
+2026-07-17T16:12:03.216Z app-ready {}
+2026-07-17T16:12:03.220Z diagnostics_ready {}
+2026-07-17T16:12:03.258Z before-window {}
+2026-07-17T16:12:03.500Z window-loaded {}
+2026-07-17T16:12:03.501Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:12:03.511Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:12:03.511Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:12:04.765Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"starting","liveStatus":"checking"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:12:05.906Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T16:12:07.033Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"monitoring","liveStatus":"live"}]}
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-17T16:12:11.361Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T16:12:11.376Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"stopped","liveStatus":"offline"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T16:12:11.374Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"stopped","liveStatus":"offline"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T17:08:44.000Z main-loaded {}
+2026-07-17T17:08:44.141Z app-ready {}
+2026-07-17T17:08:44.163Z diagnostics_ready {}
+2026-07-17T17:08:44.215Z before-window {}
+2026-07-17T17:08:44.580Z window-loaded {}
+2026-07-17T17:08:44.580Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"}]}
+2026-07-17T17:08:44.594Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"}]}
+2026-07-17T17:08:44.594Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"starting","liveStatus":"checking"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T17:08:45.956Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"starting","liveStatus":"checking"}]}
+2026-07-17T17:08:47.092Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"starting","liveStatus":"checking"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"monitoring","liveStatus":"live"}]}
+2026-07-17T17:08:48.222Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"monitoring","liveStatus":"live"}]}
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+[{"roomId":"440","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"660","state":"monitoring","liveStatus":"live","asr":1},{"roomId":"880","state":"monitoring","liveStatus":"live","asr":1}]
+2026-07-17T17:08:52.811Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"monitoring","liveStatus":"live"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T17:08:52.819Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"monitoring","liveStatus":"live"},{"roomId":"660","state":"stopped","liveStatus":"offline"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
+2026-07-17T17:08:52.821Z monitoring_snapshot {"rooms":[{"roomId":"440","state":"stopped","liveStatus":"offline"},{"roomId":"660","state":"stopped","liveStatus":"offline"},{"roomId":"880","state":"stopped","liveStatus":"offline"}]}
