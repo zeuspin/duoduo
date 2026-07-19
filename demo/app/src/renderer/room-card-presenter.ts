@@ -11,7 +11,7 @@ export function probeDetail(snapshot: RoomSnapshot | undefined): string | undefi
   if (snapshot.status === "verification_required") return "安全验证已暂停更新";
   if (snapshot.status === "login_required") return "需要登录抖音";
   if (snapshot.status === "timeout") return "页面响应超时";
-  if (snapshot.status === "page_error") return "页面解析失败";
+  if (snapshot.status === "page_error") return "暂时无法读取直播间";
   return undefined;
 }
 

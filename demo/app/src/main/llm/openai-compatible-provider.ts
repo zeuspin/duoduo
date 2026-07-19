@@ -1,4 +1,5 @@
-import type { LlmProvider, LlmRequest } from "./types";
+import type { LlmCompletion, LlmProvider, LlmRequest } from "./types";
+import { z } from "zod";
 
 export interface OpenAiCompatibleOptions {
   endpoint: string;
@@ -9,11 +10,16 @@ export interface OpenAiCompatibleOptions {
 }
 
 type Fetcher = (input: string, init: RequestInit) => Promise<Response>;
+const CompletionResponseSchema = z.object({
+  id: z.string().min(1), model: z.string().min(1),
+  choices: z.array(z.object({ message: z.object({ content: z.string() }) })).min(1),
+  usage: z.object({ prompt_tokens: z.number().int().nonnegative(), completion_tokens: z.number().int().nonnegative(), total_tokens: z.number().int().nonnegative() }),
+});
 
 export class OpenAiCompatibleProvider implements LlmProvider {
   constructor(private readonly options: OpenAiCompatibleOptions, private readonly fetcher: Fetcher = fetch) {}
 
-  async complete(request: LlmRequest): Promise<unknown> {
+  async complete(request: LlmRequest): Promise<LlmCompletion> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.options.timeoutMs ?? 30_000);
     try {
@@ -22,13 +28,15 @@ export class OpenAiCompatibleProvider implements LlmProvider {
       if (this.options.auth === "x-api-key" && this.options.secret) headers["X-API-Key"] = this.options.secret;
       const response = await this.fetcher(this.options.endpoint, {
         method: "POST", headers, signal: controller.signal,
-        body: JSON.stringify({ model: this.options.model, temperature: request.temperature ?? 0.1, response_format: { type: "json_object" }, messages: [{ role: "system", content: request.system }, { role: "user", content: request.user }] }),
+        body: JSON.stringify({ model: this.options.model, temperature: request.temperature ?? 0.1, enable_thinking: false, response_format: { type: "json_object" }, messages: [{ role: "system", content: request.system }, { role: "user", content: request.user }] }),
       });
       if (!response.ok) throw new Error(`LLM_HTTP_${response.status}`);
-      const payload = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
-      const content = payload.choices?.[0]?.message?.content;
+      const parsed = CompletionResponseSchema.safeParse(await response.json());
+      if (!parsed.success) throw new Error("LLM_USAGE_INVALID");
+      const payload = parsed.data;
+      const content = payload.choices[0].message.content;
       if (!content) throw new Error("LLM_EMPTY_RESPONSE");
-      try { return JSON.parse(stripFence(content)); }
+      try { return { output: JSON.parse(stripFence(content)), metering: { responseId: payload.id, returnedModel: payload.model, promptTokens: payload.usage.prompt_tokens, completionTokens: payload.usage.completion_tokens, totalTokens: payload.usage.total_tokens } }; }
       catch { throw new Error("LLM_INVALID_JSON"); }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

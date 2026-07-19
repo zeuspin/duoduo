@@ -1,4 +1,4 @@
-import type { AsrProviderConfig, CleanupRequest, DataRetentionSettings, InsightNotificationSettings, LlmProviderConfig, MonitoringSettings, ParserSpec, RoomInput } from "../shared/contracts";
+import type { AiUsageQuery, AsrProviderConfig, CleanupRequest, DataRetentionSettings, InsightNotificationSettings, LlmProviderConfig, MonitoringSettings, ParserSpec, RoomInput } from "../shared/contracts";
 
 type Invoke = (channel: string, ...args: unknown[]) => Promise<unknown>;
 type Subscribe = (channel: string, listener: (...args: unknown[]) => void) => () => void;
@@ -52,6 +52,9 @@ export function createRendererApi(invoke: Invoke, subscribe: Subscribe) {
       compact: () => invoke("data:compact"),
       exportBackup: () => invoke("data:export-backup"),
       importBackup: (mode: "replace" | "merge") => invoke("data:import-backup", mode),
+    },
+    aiUsage: {
+      getDashboard: (query: AiUsageQuery) => invoke("ai-usage:get-dashboard", query),
     },
     asr: {
       listBefore: (roomId: string, options: { limit: number; beforeId?: number }) => invoke("asr:list-before", roomId, options),

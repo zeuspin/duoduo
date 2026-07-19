@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 import { randomUUID } from "node:crypto";
 import { appendFile, copyFile, mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { z } from "zod";
-import { AsrProviderConfigSchema, CleanupRequestSchema, DataRetentionSettingsSchema, InsightNotificationSettingsSchema, LlmProviderConfigSchema, MonitoringSettingsSchema, ParserSpecSchema, RoomInputSchema } from "../shared/contracts";
+import { AiUsageQuerySchema, AsrProviderConfigSchema, CleanupRequestSchema, DataRetentionSettingsSchema, InsightNotificationSettingsSchema, LlmProviderConfigSchema, MonitoringSettingsSchema, ParserSpecSchema, RoomInputSchema } from "../shared/contracts";
 import { DuoduoDatabase } from "./storage/database";
 import { SettingsStore } from "./storage/settings-store";
 import { createAsrProvider } from "./asr/provider-factory";
@@ -32,6 +32,8 @@ import type { Room } from "../shared/contracts";
 import { isTrustedAvatarStatus, reconcileAvatarPaths } from "./rooms/avatar-reconciliation";
 import { RoomIntelligenceService, type StoredLiveSession } from "./rooms/room-intelligence";
 import { shouldAutoMonitor } from "./rooms/auto-monitor";
+import { PreparedPageLeasePool } from "./rooms/prepared-page-lease";
+import { AiUsageGateway } from "./usage/usage-gateway";
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 app.commandLine.appendSwitch("log-level", "3");
@@ -97,6 +99,7 @@ app.whenReady().then(async () => {
   diagnostic("diagnostics_ready");
   const databasePath = join(userDataPath, "duoduo.sqlite");
   const database = new DuoduoDatabase(databasePath);
+  const aiUsageGateway = new AiUsageGateway(database.aiUsage);
   await database.migrateLegacyRooms(join(userDataPath, "rooms.json"));
   const rooms = database.rooms;
   const coverCache = new CoverCache(join(userDataPath, "covers"), (url) => net.fetch(url), (bytes) => nativeImage.createFromBuffer(bytes).toPNG());
@@ -183,6 +186,7 @@ app.whenReady().then(async () => {
   await runRetention();
   const retentionTimer = setInterval(() => { void runRetention(); }, 86_400_000);
   const captureRouter = new CaptureRouter();
+  const preparedPageLeases = new PreparedPageLeasePool();
   const networkErrorSampler = createNetworkErrorSampler(60_000);
   const broadcastInsights = () => {
     if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("insights:changed", database.insights.list({ limit: 50 }));
@@ -197,7 +201,7 @@ app.whenReady().then(async () => {
       if (!config) throw new Error("LLM_NOT_CONFIGURED");
       const smokeSecret = process.env.DUODUO_REAL_SMOKE === "1" ? process.env.DUODUO_SMOKE_API_KEY : undefined;
       const secret = smokeSecret ?? (config.secretId ? await settings.getSecret(config.secretId) : undefined);
-      return new InsightEngine(createLlmProvider({ ...config, model: version.spec.model }, secret)).analyze(roomId, version, events);
+      return new InsightEngine(createLlmProvider({ ...config, model: version.spec.model }, secret, aiUsageGateway, { featureKey: "live_insight", usageKind: "production", apiKind: "chat_completions", requestedModel: version.spec.model, region: "cn-beijing", thinkingEnabled: false, roomId, parserId: version.parserId, parserVersionId: version.id })).analyze(roomId, version, events);
     },
     persist: (insight) => { if (!database.insights.hasDuplicate(insight)) { database.insights.insert(insight); broadcastInsights(); } },
   });
@@ -212,7 +216,7 @@ app.whenReady().then(async () => {
         avatarPath = cachedPath;
       }
     }
-    const metadata = result.status === "live" ? { title: result.title, anchorName: result.anchorName, coverPath, avatarPath, viewerCount: result.viewerCount, followerCount: result.followerCount, totalViewerCount: result.totalViewerCount, likeCount: result.likeCount, metricRaw: result.metricRaw, metricEvidence: result.metricEvidence, metricQuality: result.metricQuality } : {};
+    const metadata = result.status === "live" ? { title: result.title, anchorName: result.anchorName, coverPath, avatarPath, liveDescription: result.liveDescription, viewerCount: result.viewerCount, followerCount: result.followerCount, totalViewerCount: result.totalViewerCount, likeCount: result.likeCount, metricRaw: result.metricRaw, metricEvidence: result.metricEvidence, metricQuality: result.metricQuality } : {};
     const failed = result.status === "page_error" || result.status === "timeout" || result.status === "verification_required";
     database.snapshots.record({ roomId, status: result.status, ...metadata, checkedAt: new Date().toISOString(), ...(failed ? { error: `PROBE_${result.status.toUpperCase()}` } : {}) });
     if (avatarPath && isTrustedAvatarStatus(result.status)) database.snapshots.setAvatarIfMissing(roomId, avatarPath);
@@ -224,12 +228,14 @@ app.whenReady().then(async () => {
     const config = smokeKey ? undefined : await settings.getConfig();
     if (!smokeKey && !config) throw new Error("ASR_NOT_CONFIGURED");
     const secret = config?.secretId ? await settings.getSecret(config.secretId) : undefined;
-    const provider = smokeKey ? new BailianProvider({ apiKey: smokeKey }) : createAsrProvider(config!, secret);
+    const asrUsageContext = { featureKey: "live_asr", usageKind: "production" as const, apiKind: "paraformer_realtime" as const, requestedModel: "paraformer-realtime-v2", region: "cn-beijing" as const, roomId };
+    const provider = smokeKey ? new BailianProvider({ apiKey: smokeKey, meter: (meterRoomId, taskId) => aiUsageGateway.createAsrMeter(asrUsageContext, meterRoomId, taskId) }) : createAsrProvider(config!, secret, aiUsageGateway, asrUsageContext);
     const fixtureOrigin = process.env.DUODUO_FIXTURE_ORIGIN;
     const roomUrl = fixtureOrigin ? `${fixtureOrigin}/${roomId}` : room.canonicalUrl;
     const taskType = reason === "user_start" ? "monitor_start" : "monitor_reconnect";
     const traffic = reason === "user_start" ? "interactive" : "automatic";
     const navigationGate: RoomNavigationGate = (run) => coordinator.submit({ roomId, type: taskType, traffic, run });
+    const preparedPage = reason === "user_start" ? preparedPageLeases.take(roomId) : undefined;
     return new RoomSession(
       roomId,
       roomUrl,
@@ -251,6 +257,7 @@ app.whenReady().then(async () => {
           metricRaw: result.metricRaw,
           metricEvidence: result.metricEvidence,
           metricQuality: result.metricQuality,
+          liveDescription: result.liveDescription,
           checkedAt: new Date().toISOString(),
         });
         await broadcastSnapshot();
@@ -259,6 +266,9 @@ app.whenReady().then(async () => {
         if (networkErrorSampler.shouldLog(event)) diagnostic("room_network_error", { roomId, ...event });
       },
       monitoringSettings.monitoredCheckSeconds,
+      300_000,
+      Date.now,
+      preparedPage,
     );
   }, { persistFinalAsr: (event) => { const stored = database.asr.insert(event); if (stored) insightCoordinator.accept(stored); } });
 
@@ -323,7 +333,20 @@ app.whenReady().then(async () => {
     const previousStatus = database.snapshots.list().find((item) => item.roomId === roomId)?.status;
     database.snapshots.upsert({ roomId, status: "checking", checkedAt: new Date().toISOString() });
     await broadcastSnapshot();
-    const probeWindow = new BrowserWindow({ show: false, webPreferences: { session: platformSession, contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false } });
+    const captureToken = randomUUID();
+    const probeWindow = new BrowserWindow({
+      show: false,
+      webPreferences: {
+        session: platformSession,
+        preload: join(__dirname, "room-capture.js"),
+        additionalArguments: [`--duoduo-capture-token=${captureToken}`],
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: true,
+        backgroundThrottling: false,
+      },
+    });
+    let retainedForMonitoring = false;
     probeWindow.webContents.setAudioMuted(true);
     probeWindow.webContents.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36");
     try {
@@ -331,6 +354,10 @@ app.whenReady().then(async () => {
       const result = await probeRoom(probeWindow.webContents, fixtureOrigin ? `${fixtureOrigin}/${roomId}` : room.canonicalUrl);
       const verificationRequired = result.status === "verification_required";
       await persistProbeResult(roomId, result, verificationRequired ? Buffer.alloc(0) : (await probeWindow.capturePage()).toPNG());
+      if (result.status === "live") {
+        preparedPageLeases.put(roomId, { roomId, window: probeWindow, captureToken, probe: { ...result, status: "live" } });
+        retainedForMonitoring = true;
+      }
       return { value: { probeResult: result, autoMonitor: shouldAutoMonitor(room, previousStatus, result.status) }, verificationRequired };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -338,7 +365,7 @@ app.whenReady().then(async () => {
       diagnostic("prepared_probe_failed", { roomId, error: message });
       throw error;
     } finally {
-      if (!probeWindow.isDestroyed()) probeWindow.destroy();
+      if (!retainedForMonitoring && !probeWindow.isDestroyed()) probeWindow.destroy();
       await broadcastSnapshot();
     }
   };
@@ -403,6 +430,7 @@ app.whenReady().then(async () => {
     unsubscribeProbeState();
     playback.stop();
     await probeScheduler.stop();
+    preparedPageLeases.dispose();
     await coordinator.stop();
     verificationController.dispose();
     await insightCoordinator.shutdown();
@@ -423,7 +451,7 @@ app.whenReady().then(async () => {
   ipcMain.handle("settings:test-asr-provider", async (_event, config, secret) => {
     const parsed = AsrProviderConfigSchema.parse(config);
     const storedSecret = parsed.secretId ? await settings.getSecret(parsed.secretId) : undefined;
-    return createAsrProvider(parsed, typeof secret === "string" && secret ? secret : storedSecret).testConnection();
+    return createAsrProvider(parsed, typeof secret === "string" && secret ? secret : storedSecret, aiUsageGateway, { featureKey: "connection_test", usageKind: "test", apiKind: "paraformer_realtime", requestedModel: parsed.type === "bailian" ? parsed.model : "generic-asr", region: "cn-beijing" }).testConnection();
   });
   ipcMain.handle("settings:get-insight-notifications", () => settings.getInsightNotifications());
   ipcMain.handle("settings:save-insight-notifications", async (_event, value) => {
@@ -468,7 +496,7 @@ app.whenReady().then(async () => {
   ipcMain.handle("llm:test", async (_event, config, secret) => {
     const parsed = LlmProviderConfigSchema.parse(config);
     const stored = parsed.secretId ? await settings.getSecret(parsed.secretId) : undefined;
-    return createLlmProvider(parsed, typeof secret === "string" && secret ? secret : stored).testConnection();
+    return createLlmProvider(parsed, typeof secret === "string" && secret ? secret : stored, aiUsageGateway, { featureKey: "connection_test", usageKind: "test", apiKind: "chat_completions", requestedModel: parsed.model, region: "cn-beijing", thinkingEnabled: false }).testConnection();
   });
   ipcMain.handle("rooms:list", snapshot);
   ipcMain.handle("rooms:list-intelligence", () => closing ? [] : roomIntelligence.listSummaries());
@@ -478,7 +506,7 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle("rooms:add", async (_event, input) => { const result = await rooms.add(RoomInputSchema.parse(input)); schedulePreparedRoom(result); void probeScheduler.runNow(result.roomId, "initial").catch(() => undefined); await broadcastSnapshot(); return result; });
   ipcMain.handle("rooms:update", async (_event, roomId, input) => { const result = await rooms.update(String(roomId), RoomInputSchema.parse(input)); schedulePreparedRoom(result); if (!result.monitoring) void probeScheduler.runNow(result.roomId).catch(() => undefined); await broadcastSnapshot(); return result; });
-  ipcMain.handle("rooms:remove", async (_event, roomId) => { const id = String(roomId); await probeScheduler.cancel(id); await manager.stopMonitoring(id); await rooms.remove(id); await broadcastSnapshot(); });
+  ipcMain.handle("rooms:remove", async (_event, roomId) => { const id = String(roomId); await probeScheduler.cancel(id); preparedPageLeases.remove(id); await manager.stopMonitoring(id); await rooms.remove(id); await broadcastSnapshot(); });
   ipcMain.handle("rooms:set-monitoring", async (_event, roomId, monitoring) => {
     const id = String(roomId); const enabled = Boolean(monitoring);
     if (enabled) await startRoomMonitoring(id);
@@ -527,17 +555,25 @@ app.whenReady().then(async () => {
     const runId = randomUUID();
     const base = { id: runId, parserId: id, publishedVersionId: parser.publishedVersion.id, draftVersionId: parser.draftVersion.id, roomId: room, sampleAsrIds: samples.map((item) => item.id), status: "running" as const, publishedResults: [], draftResults: [], createdAt: new Date().toISOString() };
     database.parserTests.insert(base);
+    database.aiUsage.startRun({ id: runId, featureKey: "parser_test", usageKind: "test", roomId: room, parserId: id });
     try {
-      const publishedEngine = new InsightEngine(createLlmProvider({ ...config, model: parser.publishedVersion.spec.model }, secret));
-      const draftEngine = new InsightEngine(createLlmProvider({ ...config, model: parser.draftVersion.spec.model }, secret));
+      const publishedEngine = new InsightEngine(createLlmProvider({ ...config, model: parser.publishedVersion.spec.model }, secret, aiUsageGateway, { featureKey: "parser_test", usageKind: "test", apiKind: "chat_completions", requestedModel: parser.publishedVersion.spec.model, region: "cn-beijing", thinkingEnabled: false, runId, roomId: room, parserId: id, parserVersionId: parser.publishedVersion.id }));
+      const draftEngine = new InsightEngine(createLlmProvider({ ...config, model: parser.draftVersion.spec.model }, secret, aiUsageGateway, { featureKey: "parser_test", usageKind: "test", apiKind: "chat_completions", requestedModel: parser.draftVersion.spec.model, region: "cn-beijing", thinkingEnabled: false, runId, roomId: room, parserId: id, parserVersionId: parser.draftVersion.id }));
       const [published, draft] = await Promise.all([publishedEngine.analyze(room, parser.publishedVersion, samples), draftEngine.analyze(room, parser.draftVersion, samples)]);
       const toCandidate = ({ roomId: _roomId, parserId: _parserId, parserVersionId: _version, sourceAsrIds: _sourceIds, startedAt: _start, endedAt: _end, createdAt: _created, ...candidate }: typeof published[number]) => candidate;
       database.parserTests.update({ ...base, status: "completed", publishedResults: published.map(toCandidate), draftResults: draft.map(toCandidate), completedAt: new Date().toISOString() });
-    } catch (error) { database.parserTests.update({ ...base, status: "failed", error: error instanceof Error ? error.message : String(error), completedAt: new Date().toISOString() }); }
+      database.aiUsage.finishRun(runId, "succeeded");
+    } catch (error) { database.parserTests.update({ ...base, status: "failed", error: error instanceof Error ? error.message : String(error), completedAt: new Date().toISOString() }); database.aiUsage.finishRun(runId, "failed"); }
     return parserSnapshot();
   });
   ipcMain.handle("insights:list", (_event, options) => database.insights.list(z.object({ roomId: z.string().min(1).optional(), limit: z.number().int().min(1).max(100), beforeId: z.number().int().positive().optional() }).parse(options)));
-  ipcMain.handle("rooms:probe", async (_event, roomId) => { await probeScheduler.runNow(z.string().min(1).parse(roomId)); return snapshot(); });
+  ipcMain.handle("rooms:probe", (_event, requestedRoomId) => {
+    const roomId = z.string().min(1).parse(requestedRoomId);
+    void probeScheduler.runNow(roomId, "manual").catch((error) => {
+      diagnostic("manual_probe_failed", { roomId, error: error instanceof Error ? error.message : String(error) });
+    });
+    return probeScheduler.state();
+  });
   ipcMain.handle("rooms:get-probe-state", () => probeScheduler.state());
   ipcMain.handle("rooms:probe-all", async () => {
     if (coordinator.getState().mode !== "normal") throw new Error("ACCESS_VERIFICATION_PAUSED");
@@ -552,6 +588,7 @@ app.whenReady().then(async () => {
     return probeScheduler.state();
   });
   ipcMain.handle("data:get-retention", () => settings.getDataRetention());
+  ipcMain.handle("ai-usage:get-dashboard", (_event, query) => database.aiUsage.getDashboard(AiUsageQuerySchema.parse(query)));
   ipcMain.handle("data:save-retention", async (_event, value) => { await settings.saveDataRetention(DataRetentionSettingsSchema.parse(value)); return settings.getDataRetention(); });
   ipcMain.handle("data:get-usage", async () => ({
     databaseBytes: await fileSize(databasePath), walBytes: await fileSize(`${databasePath}-wal`), avatarBytes: await directorySize(join(userDataPath, "avatars")), coverBytes: await directorySize(join(userDataPath, "covers")), logBytes: await fileSize(join(userDataPath, "diagnostics.log")), categories: database.maintenance.getCategoryUsage(),
@@ -590,7 +627,7 @@ app.whenReady().then(async () => {
       if (!result.avatar) throw new Error(`AVATAR_NOT_FOUND:${result.status}`);
       const avatarPath = await avatarCache.refresh(roomId, result.avatar);
       const existing = database.snapshots.list().find((item) => item.roomId === roomId);
-      database.snapshots.upsert({ roomId, status: result.status, title: result.title ?? existing?.title, anchorName: result.anchorName ?? existing?.anchorName, coverPath: existing?.coverPath, viewerCount: result.viewerCount ?? existing?.viewerCount, followerCount: result.followerCount ?? existing?.followerCount, totalViewerCount: result.totalViewerCount ?? existing?.totalViewerCount, likeCount: result.likeCount ?? existing?.likeCount, metricRaw: result.metricRaw ?? existing?.metricRaw, metricEvidence: result.metricEvidence ?? existing?.metricEvidence, metricQuality: result.metricQuality ?? existing?.metricQuality, checkedAt: new Date().toISOString() });
+      database.snapshots.upsert({ roomId, status: result.status, title: result.title ?? existing?.title, anchorName: result.anchorName ?? existing?.anchorName, coverPath: existing?.coverPath, liveDescription: result.liveDescription ?? existing?.liveDescription, viewerCount: result.viewerCount ?? existing?.viewerCount, followerCount: result.followerCount ?? existing?.followerCount, totalViewerCount: result.totalViewerCount ?? existing?.totalViewerCount, likeCount: result.likeCount ?? existing?.likeCount, metricRaw: result.metricRaw ?? existing?.metricRaw, metricEvidence: result.metricEvidence ?? existing?.metricEvidence, metricQuality: result.metricQuality ?? existing?.metricQuality, checkedAt: new Date().toISOString() });
       database.snapshots.replaceAvatar(roomId, avatarPath);
       await broadcastSnapshot();
       return { value: await snapshot() };

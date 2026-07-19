@@ -8,7 +8,7 @@ describe("AsrFeed", () => {
   it("does not present persisted history as the current live session", async () => {
     const listBefore = vi.fn().mockResolvedValue({ items: [{ id: 1, roomId: "123", sessionId: "old", segmentId: "old", startMs: 0, endMs: 1, text: "上一场内容", isFinal: true, occurredAt: "2026-07-12T00:34:22.000Z" }] });
     render(<AsrFeed roomId="123" liveEvents={[]} listBefore={listBefore} />);
-    expect(screen.getByText("正在建立该直播间的独立音频与识别会话...")).toBeTruthy();
+    expect(screen.getByText("正在等待主播说话…")).toBeTruthy();
     expect(screen.queryByText("上一场内容")).toBeNull();
     expect(listBefore).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "查看历史记录" }));

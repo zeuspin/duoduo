@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { BrowserWindow } from "electron";
+import type { PreparedRoomPage } from "../../src/main/rooms/prepared-page-lease";
 
 const harness = vi.hoisted(() => ({
   events: [] as string[],
@@ -78,6 +80,50 @@ describe("RoomSession", () => {
     await session.start();
 
     expect(harness.events.slice(0, 5)).toEqual(["gate:start", "window:create", "probe", "gate:end", "asr:open"]);
+    expect(provider.open).toHaveBeenCalledTimes(1);
+    await session.close();
+  });
+
+  it("adopts a prepared live page and starts ASR without navigation or another probe", async () => {
+    const adoptedWindow = new BrowserWindow({ webPreferences: { session: {} as never } }) as never;
+    harness.events.length = 0;
+    const provider = {
+      testConnection: vi.fn(),
+      open: vi.fn(async () => {
+        harness.events.push("asr:open");
+        return { write: vi.fn(), close: vi.fn(), subscribe: vi.fn(() => () => undefined) };
+      }),
+    };
+    const gate: RoomNavigationGate = vi.fn(async (run) => (await run()).value);
+    const preparedPage: PreparedRoomPage = {
+      roomId: "123",
+      window: adoptedWindow,
+      captureToken: "prepared-token",
+      probe: { status: "live", viewerCount: 321 },
+    };
+    const session = new RoomSession(
+      "123",
+      "https://live.douyin.com/123",
+      provider,
+      { register: vi.fn(() => () => undefined) } as never,
+      vi.fn(),
+      new AbortController().signal,
+      {} as never,
+      gate,
+      undefined,
+      undefined,
+      undefined,
+      30,
+      300_000,
+      Date.now,
+      preparedPage,
+    );
+
+    await session.start();
+
+    expect(gate).not.toHaveBeenCalled();
+    expect(harness.probeRoom).not.toHaveBeenCalled();
+    expect(harness.events).toEqual(["asr:open"]);
     expect(provider.open).toHaveBeenCalledTimes(1);
     await session.close();
   });

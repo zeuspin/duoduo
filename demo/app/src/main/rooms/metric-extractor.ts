@@ -27,7 +27,7 @@ interface MetricInput {
 }
 
 const patterns: Record<MetricField, RegExp[]> = {
-  viewerCount: [/(?:在线|观看中)\s*([\d,.]+\s*[万亿]?)/, /([\d,.]+\s*[万亿]?)\s*人(?:在线|观看)/],
+  viewerCount: [/(?:在线观众\s*[·・]?|在线|观看中)\s*([\d,.]+\s*[万亿]?)/, /([\d,.]+\s*[万亿]?)\s*人(?:在线|观看)/],
   followerCount: [/(?:粉丝|关注者)\s*([\d,.]+\s*[万亿]?)/, /([\d,.]+\s*[万亿]?)\s*(?:粉丝|关注者)/],
   totalViewerCount: [/(?:累计观看|本场观看)\s*([\d,.]+\s*[万亿]?)/],
   likeCount: [/(?:点赞|获赞)\s*([\d,.]+\s*[万亿]?)/, /([\d,.]+\s*[万亿]?)\s*(?:点赞|获赞)/],

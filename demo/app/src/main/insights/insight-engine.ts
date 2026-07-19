@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { MarketInsightCandidateSchema, type MarketInsight, type ParserVersion } from "../../shared/contracts";
-import type { LlmProvider } from "../llm/types";
+import type { LlmRequest } from "../llm/types";
 import type { StoredAsrEvent } from "../storage/database";
 import { buildMarketSystemPrompt } from "./market-prompt";
 
@@ -11,15 +11,17 @@ const CompatibleCandidateSchema = MarketInsightCandidateSchema.extend({
 const InsightOutputSchema = z.object({ insights: z.array(CompatibleCandidateSchema).max(30) });
 
 export class InsightEngine {
-  constructor(private readonly provider: LlmProvider) {}
+  constructor(private readonly provider: { complete(request: LlmRequest): Promise<unknown> }) {}
 
   async analyze(roomId: string, version: ParserVersion, events: StoredAsrEvent[]): Promise<Array<Omit<MarketInsight, "id">>> {
     if (!events.length) return [];
     const user = events.map((event) => `[ASR:${event.id}][${event.occurredAt}] ${event.text}`).join("\n");
-    const raw = await this.provider.complete({ system: buildMarketSystemPrompt(version.spec), user, temperature: 0.1 });
+    const completion = await this.provider.complete({ system: buildMarketSystemPrompt(version.spec), user, temperature: 0.1 });
+    const raw = completion && typeof completion === "object" && "output" in completion ? completion.output : completion;
     let output: z.infer<typeof InsightOutputSchema>;
     try { output = InsightOutputSchema.parse(raw); }
     catch (error) {
+      if (completion && typeof completion === "object" && "metering" in completion) (completion.metering as { markBusinessOutputInvalid?: () => void })?.markBusinessOutputInvalid?.();
       if (error instanceof z.ZodError) throw new Error(`INSIGHT_OUTPUT_INVALID:${error.issues.slice(0, 4).map((issue) => `${issue.path.join(".")}:${issue.message}`).join("|")}`);
       throw new Error("INSIGHT_OUTPUT_INVALID");
     }

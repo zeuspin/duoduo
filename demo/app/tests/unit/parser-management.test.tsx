@@ -16,9 +16,9 @@ describe("ParserManagement", () => {
     expect(window.duoduo.parsers.createDraft).toHaveBeenCalledWith("market-insight");
   });
 
-  it("can leave a room on ASR only", async () => {
+  it("can save only the live transcript for a room", async () => {
     render(<ParserManagement rooms={[{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null, monitoring: true, autoMonitorOnLive: false, createdAt: "2026-07-13T00:00:00.000Z", updatedAt: "2026-07-13T00:00:00.000Z" }]} snapshots={[]} />);
-    const select = await screen.findByLabelText("直播间 123 的解析器");
+    const select = await screen.findByLabelText("直播间 123 的分析规则");
     fireEvent.change(select, { target: { value: "none" } });
     expect(window.duoduo.parsers.bindRoom).toHaveBeenCalledWith("123", null, null);
   });

@@ -64,6 +64,16 @@ describe("DuoduoDatabase", () => {
     expect(database.snapshots.list()).toEqual([expect.objectContaining({ roomId: "123", status: "timeout", title: "第一次", anchorName: "主播", coverPath: "/covers/123.jpg", viewerCount: 1200, followerCount: 9000, lastReliableStatus: "live", lastReliableStatusAt: "2026-07-12T01:00:00.000Z", metricsObservedAt: "2026-07-12T01:00:00.000Z", checkedAt: "2026-07-12T01:05:00.000Z", error: "PROBE_TIMEOUT" })]);
   });
 
+  it("persists the last non-empty live description", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
+    const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
+    databases.push(database);
+    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    database.snapshots.upsert({ roomId: "123", status: "live", liveDescription: "每周日 18:00", checkedAt: "2026-07-18T01:00:00.000Z" });
+    database.snapshots.upsert({ roomId: "123", status: "live", checkedAt: "2026-07-18T01:05:00.000Z" });
+    expect(database.snapshots.list()[0].liveDescription).toBe("每周日 18:00");
+  });
+
   it("preserves valid room metadata when a verification page is recorded", async () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));

@@ -76,6 +76,19 @@ describe("probeRoom metrics", () => {
     expect(webContents.executeJavaScript).toHaveBeenCalledTimes(1);
   });
 
+  it("enriches an already open monitoring page from its profile card", async () => {
+    const webContents = {
+      executeJavaScript: vi.fn()
+        .mockResolvedValueOnce({ hasVideo: true, videoReadyState: 4, currentTime: 10, paused: false, audioTrackState: "live", text: "在线观众·88", metricCandidates: [], profileTrigger: true })
+        .mockResolvedValueOnce({ text: "4 关注 · 1.2万 粉丝直播介绍：每周日18:00", liveDescription: "每周日18:00" }),
+    };
+
+    const result = await inspectCurrentRoom(webContents as never);
+
+    expect(result).toMatchObject({ viewerCount: 88, followerCount: 12_000, liveDescription: "每周日18:00" });
+    expect(webContents.executeJavaScript).toHaveBeenCalledTimes(2);
+  });
+
   it("parses bounded page candidates in the main process", async () => {
     vi.useFakeTimers();
     const webContents = {
@@ -107,6 +120,46 @@ describe("probeRoom metrics", () => {
       likeCount: 81_000,
       metricQuality: "complete",
       metricEvidence: expect.objectContaining({ followerCount: { raw: "126.4万", source: "accessibility" } }),
+    });
+  });
+
+  it("enriches a live probe from the host profile card without navigating again", async () => {
+    vi.useFakeTimers();
+    const webContents = {
+      once: (_event: "dom-ready", listener: () => void) => listener(),
+      loadURL: vi.fn(async () => undefined),
+      stop: vi.fn(),
+      executeJavaScript: vi.fn()
+        .mockResolvedValueOnce({
+          hasVideo: true,
+          videoReadyState: 4,
+          text: "在线观众·145",
+          title: "周伯通财道的抖音直播间 - 抖音直播",
+          anchorName: "周伯通财道",
+          avatar: "https://example.com/header-avatar.jpg",
+          metricCandidates: [{ text: "在线 145", source: "accessibility" }],
+          profileTrigger: true,
+        })
+        .mockResolvedValueOnce({
+          text: "4 关注 · 1.2万 粉丝直播介绍：每周日一二三四六18:00粉丝团团成员：604",
+          avatar: "https://example.com/card-avatar.jpg",
+          liveDescription: "每周日一二三四六18:00",
+        }),
+    };
+
+    const pending = probeRoom(webContents as never, "https://live.douyin.com/666914142539", 5_000);
+    await vi.advanceTimersByTimeAsync(1_000);
+    const result = await pending;
+    vi.useRealTimers();
+
+    expect(webContents.loadURL).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({
+      status: "live",
+      anchorName: "周伯通财道",
+      avatar: "https://example.com/card-avatar.jpg",
+      viewerCount: 145,
+      followerCount: 12_000,
+      liveDescription: "每周日一二三四六18:00",
     });
   });
 });

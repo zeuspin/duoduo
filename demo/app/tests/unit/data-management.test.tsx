@@ -13,7 +13,10 @@ afterEach(cleanup);
 describe("DataManagement", () => {
   it("shows usage and requires preview before cleanup", async () => {
     render(<DataManagement />);
-    expect(await screen.findByText("42 条")).toBeTruthy();
+    expect(await screen.findByText("分钟记录")).toBeTruthy();
+    expect(screen.getByText("小时汇总")).toBeTruthy();
+    expect(screen.getByText("直播文字记录")).toBeTruthy();
+    expect(screen.getByText("42 条")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "预览清理" }));
     expect(await screen.findByText("将清理 12 条数据")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "确认清理" }));

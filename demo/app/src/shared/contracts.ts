@@ -108,6 +108,15 @@ export const DataRetentionSettingsSchema = z.object({
   logDays: z.number().int().min(1).max(3650),
 });
 
+export const AiUsageQuerySchema = z.object({
+  from: z.string().datetime(),
+  to: z.string().datetime(),
+  usageKind: z.enum(["production", "test"]).optional(),
+  apiKind: z.enum(["chat_completions", "paraformer_realtime"]).optional(),
+  roomId: z.string().min(1).optional(),
+  model: z.string().min(1).optional(),
+}).refine((value) => value.from < value.to, { message: "AI_USAGE_INVALID_RANGE" });
+
 export const DataCategorySchema = z.enum(["observations", "aggregates", "asr", "insights", "sessions"]);
 export const CleanupRequestSchema = z.object({ category: DataCategorySchema, before: z.string().datetime(), roomId: z.string().min(1).optional() });
 export const CleanupPreviewSchema = z.object({ token: z.string().min(1), category: DataCategorySchema, count: z.number().int().nonnegative(), before: z.string().datetime(), roomId: z.string().optional() });
@@ -206,6 +215,7 @@ export const RoomSnapshotSchema = z.object({
   anchorName: z.string().optional(),
   coverPath: z.string().optional(),
   avatarPath: z.string().optional(),
+  liveDescription: z.string().trim().min(1).max(500).optional(),
   viewerCount: z.number().int().nonnegative().optional(),
   followerCount: z.number().int().nonnegative().optional(),
   totalViewerCount: z.number().int().nonnegative().optional(),
@@ -294,6 +304,7 @@ export type PreparedProbeSource = z.infer<typeof PreparedProbeSourceSchema>;
 export type ProbeRequestState = z.infer<typeof ProbeRequestStateSchema>;
 export type PreparedProbeState = z.infer<typeof PreparedProbeStateSchema>;
 export type DataRetentionSettings = z.infer<typeof DataRetentionSettingsSchema>;
+export type AiUsageQuery = z.infer<typeof AiUsageQuerySchema>;
 export type CleanupRequest = z.infer<typeof CleanupRequestSchema>;
 export type CleanupPreview = z.infer<typeof CleanupPreviewSchema>;
 export type StorageUsage = z.infer<typeof StorageUsageSchema>;

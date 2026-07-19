@@ -12,7 +12,8 @@ interface SocketLike {
   close(): void;
 }
 
-interface Options { apiKey: string; endpoint?: string }
+export interface AsrUsageMeter { duration(seconds: number): void; succeed(): void; fail(status: "provider_failed" | "timed_out" | "interrupted", errorCode?: string): void }
+interface Options { apiKey: string; endpoint?: string; meter?: (roomId: string, taskId: string) => AsrUsageMeter }
 type SocketFactory = (endpoint: string, headers: Record<string, string>) => SocketLike;
 
 function defaultSocketFactory(endpoint: string, headers: Record<string, string>): SocketLike {
@@ -38,13 +39,14 @@ export class BailianProvider implements AsrProvider {
         if (!settled) reject(redact(error, this.options.apiKey));
       });
       socket.on("open", () => socket.send(JSON.stringify(runTask(taskId))));
-      const session = new BailianSession(roomId, taskId, socket);
+      const session = new BailianSession(roomId, taskId, socket, this.options.meter?.(roomId, taskId));
       socket.on("message", (data: Buffer | string) => {
         const message = parseMessage(data);
         if (!message || message.header?.task_id !== taskId) return;
         if (message.header.event === "task-started" && !settled) { settled = true; resolve(session); }
         if (message.header.event === "task-failed" && !settled) {
           settled = true;
+          session.recordFailure(String(message.header.error_code ?? "BAILIAN_TASK_FAILED"));
           reject(new Error(`BAILIAN_TASK_FAILED: ${String(message.header.error_message ?? "unknown")}`));
         }
       });
@@ -57,8 +59,10 @@ class BailianSession implements AsrSession {
   private readonly failureListeners = new Set<(error: Error) => void>();
   private readonly finalSegments = new Set<string>();
   private closed = false;
+  private finishResolve?: () => void;
+  private finishReject?: (error: Error) => void;
 
-  constructor(private readonly roomId: string, private readonly taskId: string, private readonly socket: SocketLike) {
+  constructor(private readonly roomId: string, private readonly taskId: string, private readonly socket: SocketLike, private readonly meter?: AsrUsageMeter) {
     socket.on("message", (data: Buffer | string) => this.handle(data));
     socket.on("error", (error: unknown) => this.fail(error instanceof Error ? error : new Error(String(error))));
     socket.on("close", () => { if (!this.closed) this.fail(new Error("BAILIAN_SOCKET_CLOSED")); });
@@ -72,11 +76,15 @@ class BailianSession implements AsrSession {
 
   async close(): Promise<void> {
     if (this.closed) return;
-    this.closed = true;
-    if (this.socket.readyState === 1) this.socket.send(JSON.stringify(finishTask(this.taskId)));
-    this.socket.close();
-    this.listeners.clear();
-    this.failureListeners.clear();
+    if (this.socket.readyState !== 1) { this.closed = true; this.meter?.fail("interrupted", "BAILIAN_SOCKET_NOT_OPEN"); return; }
+    this.socket.send(JSON.stringify(finishTask(this.taskId)));
+    const finished = new Promise<void>((resolve, reject) => { this.finishResolve = resolve; this.finishReject = reject; });
+    const timer = setTimeout(() => { const error = new Error("BAILIAN_FINISH_TIMEOUT"); this.meter?.fail("timed_out", "BAILIAN_FINISH_TIMEOUT"); this.finishReject?.(error); }, 5_000);
+    timer.unref?.();
+    try { await finished; }
+    finally {
+      clearTimeout(timer); this.closed = true; this.socket.close(); this.listeners.clear(); this.failureListeners.clear(); this.finishResolve = undefined; this.finishReject = undefined;
+    }
   }
 
   subscribe(listener: (event: AsrEvent) => void): () => void {
@@ -91,13 +99,20 @@ class BailianSession implements AsrSession {
 
   private fail(error: Error): void { for (const listener of this.failureListeners) listener(error); }
 
+  recordFailure(errorCode: string): void { this.meter?.fail("provider_failed", errorCode); }
+
   private handle(data: Buffer | string): void {
     const message = parseMessage(data);
-    if (!message || message.header?.event !== "result-generated" || message.header.task_id !== this.taskId) return;
+    if (!message || message.header?.task_id !== this.taskId) return;
+    if (message.header.event === "task-finished") { this.meter?.succeed(); this.finishResolve?.(); return; }
+    if (message.header.event === "task-failed") { const code = String(message.header.error_code ?? "BAILIAN_TASK_FAILED"); this.meter?.fail("provider_failed", code); this.finishReject?.(new Error(code)); return; }
+    if (message.header.event !== "result-generated") return;
     const sentence = message.payload?.output?.sentence;
     if (!sentence || sentence.heartbeat || typeof sentence.text !== "string" || !sentence.text.trim()) return;
     const segmentId = `${this.taskId}:${Number(sentence.begin_time ?? 0)}`;
     const isFinal = sentence.sentence_end === true;
+    const duration = message.payload?.usage?.duration;
+    if (isFinal && Number.isSafeInteger(duration) && duration >= 0) this.meter?.duration(duration);
     if (isFinal && this.finalSegments.has(segmentId)) return;
     if (isFinal) this.finalSegments.add(segmentId);
     try {

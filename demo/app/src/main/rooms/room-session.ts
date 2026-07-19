@@ -8,6 +8,7 @@ import { classifyCurrentHealth, evaluateNow, inspectCurrentRoom, probeRoom, type
 import type { MonitorSession } from "./room-manager";
 import { disposeRoomResources } from "./room-session-resources";
 import { RoomMetricSampler } from "./metric-sampler";
+import type { PreparedRoomPage } from "./prepared-page-lease";
 
 export type RoomNavigationGate = (
   run: () => Promise<{ value: RoomProbeResult; verificationRequired?: boolean }>,
@@ -40,13 +41,15 @@ export class RoomSession implements MonitorSession {
     private healthCheckSeconds = 30,
     metricSampleIntervalMs = 300_000,
     now: () => number = Date.now,
+    private preparedPage?: PreparedRoomPage,
   ) {
     this.metricSampler = new RoomMetricSampler({ intervalMs: metricSampleIntervalMs, now });
   }
 
   async start(): Promise<void> {
     try {
-      const probe = await this.navigationGate(async () => {
+      const prepared = this.takePreparedPage();
+      const probe = prepared ?? await this.navigationGate(async () => {
         const value = await this.startPage();
         return { value, ...(value.status === "verification_required" ? { verificationRequired: true } : {}) };
       });
@@ -77,16 +80,31 @@ export class RoomSession implements MonitorSession {
     this.window.webContents.setAudioMuted(true);
     this.window.webContents.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36");
     this.window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
-    this.window.webContents.on("render-process-gone", (_event, details) => this.fail(new Error(`ROOM_RENDERER_GONE:${details.reason}`)));
-    this.window.webContents.on("did-fail-load", (_event, _errorCode, errorDescription, validatedURL, isMainFrame) => {
-      if (isMainFrame) this.onNetworkError?.({ url: validatedURL, error: errorDescription, resourceType: "mainFrame" });
-    });
+    this.attachWindowEvents(this.window);
     const probe = await probeRoom(this.window.webContents, this.roomUrl);
     const screenshot = probe.status === "verification_required" ? Buffer.alloc(0) : (await this.window.capturePage()).toPNG();
     await this.onProbe?.(probe, screenshot);
     this.metricSampler.seed(probe);
     this.captureToken = token;
     return probe;
+  }
+
+  private takePreparedPage(): RoomProbeResult | undefined {
+    const page = this.preparedPage;
+    this.preparedPage = undefined;
+    if (!page || page.roomId !== this.roomId || page.window.isDestroyed()) return undefined;
+    this.window = page.window;
+    this.captureToken = page.captureToken;
+    this.attachWindowEvents(page.window);
+    this.metricSampler.seed(page.probe);
+    return page.probe;
+  }
+
+  private attachWindowEvents(window: BrowserWindow): void {
+    window.webContents.on("render-process-gone", (_event, details) => this.fail(new Error(`ROOM_RENDERER_GONE:${details.reason}`)));
+    window.webContents.on("did-fail-load", (_event, _errorCode, errorDescription, validatedURL, isMainFrame) => {
+      if (isMainFrame) this.onNetworkError?.({ url: validatedURL, error: errorDescription, resourceType: "mainFrame" });
+    });
   }
 
   private captureToken: string | undefined;
@@ -130,6 +148,7 @@ export class RoomSession implements MonitorSession {
           metricRaw: evidence.metricRaw,
           metricEvidence: evidence.metricEvidence,
           metricQuality: evidence.metricQuality,
+          liveDescription: evidence.liveDescription,
         });
       }
       this.consecutiveOfflineSignals = status === "offline" ? this.consecutiveOfflineSignals + 1 : 0;

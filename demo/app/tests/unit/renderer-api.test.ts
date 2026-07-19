@@ -5,9 +5,11 @@ describe("renderer API", () => {
   it("exposes only settings and rooms namespaces", async () => {
     const invoke = vi.fn().mockResolvedValue(undefined);
     const api = createRendererApi(invoke, vi.fn());
-    expect(Object.keys(api)).toEqual(["app", "settings", "access", "rooms", "data", "asr", "player", "llm", "parsers", "insights"]);
+    expect(Object.keys(api)).toEqual(["app", "settings", "access", "rooms", "data", "aiUsage", "asr", "player", "llm", "parsers", "insights"]);
     expect(Object.keys(api.app)).toEqual(["getVersion"]);
     await expect(api.app.getVersion()).resolves.toBeUndefined();
+    await api.aiUsage.getDashboard({ from: "2026-01-01T00:00:00.000Z", to: "2026-02-01T00:00:00.000Z" });
+    expect(invoke).toHaveBeenCalledWith("ai-usage:get-dashboard", { from: "2026-01-01T00:00:00.000Z", to: "2026-02-01T00:00:00.000Z" });
     expect(invoke).toHaveBeenCalledWith("app:get-version");
     expect(Object.keys(api.settings)).toEqual(["getAsrProvider", "saveAsrProvider", "testAsrProvider", "getInsightNotifications", "saveInsightNotifications", "getMonitoring", "saveMonitoring"]);
     expect(Object.keys(api.access)).toEqual(["getState", "showVerification", "hideVerification", "setVerificationBounds", "checkVerification", "confirmRecovery", "subscribe"]);

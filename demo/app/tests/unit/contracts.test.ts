@@ -95,6 +95,11 @@ describe("room contracts", () => {
     expect(parsed.metricEvidence).toEqual({ viewerCount: { raw: "2.3万", source: "accessibility" } });
   });
 
+  it("accepts an optional live profile description", () => {
+    const parsed = RoomSnapshotSchema.parse({ roomId: "123", status: "live", liveDescription: "每周日 18:00", checkedAt: "2026-07-18T06:00:00.000Z" });
+    expect(parsed.liveDescription).toBe("每周日 18:00");
+  });
+
   it("validates transparent local intelligence with evidence-based sessions", () => {
     const parsed = RoomIntelligenceSchema.parse({
       roomId: "123",

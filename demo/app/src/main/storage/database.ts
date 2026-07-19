@@ -2,6 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { readFile } from "node:fs/promises";
 import { MarketInsightSchema, ParserDefinitionSchema, ParserSpecSchema, ParserTestRunSchema, ParserVersionSchema, RoomInputSchema, RoomParserBindingSchema, RoomSchema, RoomSnapshotSchema, normalizeDouyinUrl, type AsrEvent, type MarketInsight, type ParserDefinition, type ParserSpec, type ParserTestRun, type ParserVersion, type Room, type RoomInput, type RoomParserBinding, type RoomSnapshot } from "../../shared/contracts";
 import { DataMaintenance } from "./data-maintenance";
+import { AiUsageRepository } from "../usage/usage-repository";
 
 export interface StoredAsrEvent extends AsrEvent {
   occurredAt: string;
@@ -33,6 +34,7 @@ export class DuoduoDatabase {
   readonly insights: SqliteInsightRepository;
   readonly parserTests: SqliteParserTestRepository;
   readonly maintenance: DataMaintenance;
+  readonly aiUsage: AiUsageRepository;
 
   private readonly database: DatabaseSync;
 
@@ -69,6 +71,7 @@ export class DuoduoDatabase {
         anchor_name TEXT,
         cover_path TEXT,
         avatar_path TEXT,
+        live_description TEXT,
         viewer_count INTEGER,
         follower_count INTEGER,
         total_viewer_count INTEGER,
@@ -178,11 +181,65 @@ export class DuoduoDatabase {
         created_at TEXT NOT NULL,
         completed_at TEXT
       );
+      CREATE TABLE IF NOT EXISTS ai_runs (
+        id TEXT PRIMARY KEY,
+        feature_key TEXT NOT NULL,
+        usage_kind TEXT NOT NULL CHECK(usage_kind IN ('production','test')),
+        room_id TEXT,
+        parser_id TEXT,
+        parser_version_id INTEGER,
+        status TEXT NOT NULL,
+        started_at TEXT NOT NULL,
+        completed_at TEXT
+      );
+      CREATE TABLE IF NOT EXISTS ai_calls (
+        id TEXT PRIMARY KEY,
+        run_id TEXT REFERENCES ai_runs(id),
+        provider TEXT NOT NULL,
+        feature_key TEXT NOT NULL,
+        usage_kind TEXT NOT NULL CHECK(usage_kind IN ('production','test')),
+        room_id TEXT,
+        parser_id TEXT,
+        parser_version_id INTEGER,
+        api_kind TEXT NOT NULL,
+        requested_model TEXT NOT NULL,
+        returned_model TEXT,
+        region TEXT NOT NULL,
+        provider_request_id TEXT,
+        thinking_enabled INTEGER,
+        status TEXT NOT NULL,
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        latency_ms INTEGER,
+        error_code TEXT,
+        retry_of_call_id TEXT REFERENCES ai_calls(id)
+      );
+      CREATE INDEX IF NOT EXISTS ai_calls_started_index ON ai_calls(started_at DESC);
+      CREATE INDEX IF NOT EXISTS ai_calls_feature_index ON ai_calls(feature_key,started_at DESC);
+      CREATE INDEX IF NOT EXISTS ai_calls_room_index ON ai_calls(room_id,started_at DESC);
+      CREATE INDEX IF NOT EXISTS ai_calls_model_index ON ai_calls(requested_model,started_at DESC);
+      CREATE TABLE IF NOT EXISTS ai_call_usage (
+        call_id TEXT NOT NULL REFERENCES ai_calls(id) ON DELETE CASCADE,
+        metric TEXT NOT NULL,
+        value INTEGER NOT NULL,
+        unit TEXT NOT NULL,
+        PRIMARY KEY(call_id,metric)
+      );
+      CREATE TABLE IF NOT EXISTS ai_call_costs (
+        call_id TEXT PRIMARY KEY REFERENCES ai_calls(id) ON DELETE CASCADE,
+        pricing_rule_key TEXT,
+        input_cost_micros INTEGER,
+        output_cost_micros INTEGER,
+        total_cost_micros INTEGER,
+        status TEXT NOT NULL CHECK(status IN ('calculated','usage_missing','price_missing')),
+        currency TEXT NOT NULL,
+        calculated_at TEXT NOT NULL
+      );
     `);
     for (const column of [
       "avatar_path TEXT", "viewer_count INTEGER", "follower_count INTEGER", "total_viewer_count INTEGER",
       "like_count INTEGER", "metric_raw_json TEXT", "metric_evidence_json TEXT", "metric_quality TEXT",
-      "last_reliable_status TEXT", "last_reliable_status_at TEXT", "metrics_observed_at TEXT",
+      "last_reliable_status TEXT", "last_reliable_status_at TEXT", "metrics_observed_at TEXT", "live_description TEXT",
     ]) {
       try { this.database.exec(`ALTER TABLE room_snapshots ADD COLUMN ${column}`); } catch (error) {
         if (!(error instanceof Error) || !error.message.includes("duplicate column name")) throw error;
@@ -204,6 +261,8 @@ export class DuoduoDatabase {
     this.insights = new SqliteInsightRepository(this.database);
     this.parserTests = new SqliteParserTestRepository(this.database);
     this.maintenance = new DataMaintenance(this.database);
+    this.aiUsage = new AiUsageRepository(this.database);
+    this.aiUsage.markRunningInterrupted();
     this.parsers.ensureBuiltIn();
   }
 
@@ -234,7 +293,7 @@ export class DuoduoDatabase {
       const observationSource = tableColumns("room_observations");
       const source = (available: Set<string>, column: string) => available.has(column) ? `i.${column}` : "NULL";
       const snapshotColumns = [
-        "room_id", "status", "title", "anchor_name", "cover_path", "avatar_path", "viewer_count", "follower_count", "total_viewer_count", "like_count",
+        "room_id", "status", "title", "anchor_name", "cover_path", "avatar_path", "live_description", "viewer_count", "follower_count", "total_viewer_count", "like_count",
         "metric_raw_json", "metric_evidence_json", "metric_quality", "last_reliable_status", "last_reliable_status_at", "metrics_observed_at", "checked_at", "error",
       ];
       const observationColumns = ["room_id", "status", "viewer_count", "follower_count", "total_viewer_count", "like_count", "metric_raw_json", "metric_evidence_json", "metric_quality", "checked_at", "error"];
@@ -355,14 +414,15 @@ class SqliteSnapshotRepository {
     const updateMetrics = parsed.status === "live";
     const updateProfile = parsed.status === "live";
     const observedMetrics = parsed.viewerCount !== undefined || parsed.followerCount !== undefined || parsed.totalViewerCount !== undefined || parsed.likeCount !== undefined;
-    this.database.prepare(`INSERT INTO room_snapshots(room_id,status,title,anchor_name,cover_path,avatar_path,viewer_count,follower_count,total_viewer_count,like_count,metric_raw_json,metric_evidence_json,metric_quality,last_reliable_status,last_reliable_status_at,metrics_observed_at,checked_at,error)
-      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(room_id) DO UPDATE SET status=excluded.status,title=excluded.title,anchor_name=excluded.anchor_name,cover_path=excluded.cover_path,avatar_path=excluded.avatar_path,viewer_count=excluded.viewer_count,follower_count=excluded.follower_count,total_viewer_count=excluded.total_viewer_count,like_count=excluded.like_count,metric_raw_json=excluded.metric_raw_json,metric_evidence_json=excluded.metric_evidence_json,metric_quality=excluded.metric_quality,last_reliable_status=excluded.last_reliable_status,last_reliable_status_at=excluded.last_reliable_status_at,metrics_observed_at=excluded.metrics_observed_at,checked_at=excluded.checked_at,error=excluded.error`).run(
+    this.database.prepare(`INSERT INTO room_snapshots(room_id,status,title,anchor_name,cover_path,avatar_path,live_description,viewer_count,follower_count,total_viewer_count,like_count,metric_raw_json,metric_evidence_json,metric_quality,last_reliable_status,last_reliable_status_at,metrics_observed_at,checked_at,error)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(room_id) DO UPDATE SET status=excluded.status,title=excluded.title,anchor_name=excluded.anchor_name,cover_path=excluded.cover_path,avatar_path=excluded.avatar_path,live_description=excluded.live_description,viewer_count=excluded.viewer_count,follower_count=excluded.follower_count,total_viewer_count=excluded.total_viewer_count,like_count=excluded.like_count,metric_raw_json=excluded.metric_raw_json,metric_evidence_json=excluded.metric_evidence_json,metric_quality=excluded.metric_quality,last_reliable_status=excluded.last_reliable_status,last_reliable_status_at=excluded.last_reliable_status_at,metrics_observed_at=excluded.metrics_observed_at,checked_at=excluded.checked_at,error=excluded.error`).run(
       parsed.roomId,
       parsed.status,
       updateProfile ? parsed.title ?? optionalString(existing?.title) : optionalString(existing?.title),
       updateProfile ? parsed.anchorName ?? optionalString(existing?.anchor_name) : optionalString(existing?.anchor_name),
       updateProfile ? parsed.coverPath ?? optionalString(existing?.cover_path) : optionalString(existing?.cover_path),
       updateProfile ? parsed.avatarPath ?? optionalString(existing?.avatar_path) : optionalString(existing?.avatar_path),
+      updateProfile ? parsed.liveDescription ?? optionalString(existing?.live_description) : optionalString(existing?.live_description),
       updateMetrics ? parsed.viewerCount ?? optionalNumber(existing?.viewer_count) ?? null : optionalNumber(existing?.viewer_count) ?? null,
       updateMetrics ? parsed.followerCount ?? optionalNumber(existing?.follower_count) ?? null : optionalNumber(existing?.follower_count) ?? null,
       updateMetrics ? parsed.totalViewerCount ?? optionalNumber(existing?.total_viewer_count) ?? null : optionalNumber(existing?.total_viewer_count) ?? null,
@@ -580,7 +640,7 @@ function optionalNumber(value: unknown): number | undefined {
 function rowToSnapshot(row: Record<string, unknown>): RoomSnapshot {
   return RoomSnapshotSchema.parse({
     roomId: row.room_id, status: row.status, title: row.title ?? undefined, anchorName: row.anchor_name ?? undefined,
-    coverPath: row.cover_path ?? undefined, avatarPath: row.avatar_path ?? undefined,
+    coverPath: row.cover_path ?? undefined, avatarPath: row.avatar_path ?? undefined, liveDescription: row.live_description ?? undefined,
     viewerCount: optionalNumber(row.viewer_count), followerCount: optionalNumber(row.follower_count), totalViewerCount: optionalNumber(row.total_viewer_count), likeCount: optionalNumber(row.like_count),
     metricRaw: row.metric_raw_json ? JSON.parse(String(row.metric_raw_json)) : undefined, metricEvidence: row.metric_evidence_json ? JSON.parse(String(row.metric_evidence_json)) : undefined, metricQuality: row.metric_quality ?? undefined,
     lastReliableStatus: row.last_reliable_status ?? undefined, lastReliableStatusAt: row.last_reliable_status_at ?? undefined, metricsObservedAt: row.metrics_observed_at ?? undefined,

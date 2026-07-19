@@ -92,6 +92,7 @@ em { width:7px; height:7px; border-radius:50%; background:#ef5965; box-shadow:0 
 .body .probe-detail { color:#a14b54; }
 .room-follower { display:flex; align-items:baseline; gap:7px; margin:12px 0; color:#607087!important; }
 .room-follower b { color:#27364a; font-size:14px; font-variant-numeric:tabular-nums; }
+.live-description { display:-webkit-box; margin:0; overflow:hidden; color:#66758a; font-size:12px; line-height:1.55; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
 .monitor-controls { margin-top:14px; display:flex!important; align-items:center!important; gap:10px!important; }
 .join-monitoring { min-height:38px; flex:1; border:1px solid #cbd5e1; border-radius:4px; background:#f8fafc; color:#53657d; font-weight:600; }
 .join-monitoring.live { border-color:var(--blue); background:var(--blue); color:#fff; box-shadow:0 3px 10px #4f7df344; }

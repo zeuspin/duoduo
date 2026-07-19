@@ -83,15 +83,33 @@ describe("ProbeScheduler", () => {
     const automatic = scheduler.runNow("b", "scheduled");
     const requested = scheduler.runNow("c", "manual");
 
-    expect(order).toEqual(["a"]);
-    expect(scheduler.state().manualProbes).toContainEqual({ roomId: "c", requestType: "manual", phase: "queued" });
+    expect(order).toEqual(["a", "c"]);
+    expect(scheduler.state().manualProbes).toContainEqual({ roomId: "c", requestType: "manual", phase: "running" });
     releases.shift()!();
     await active;
-    await vi.waitFor(() => expect(order).toEqual(["a", "c"]));
     releases.shift()!();
     await requested;
     await vi.waitFor(() => expect(order).toEqual(["a", "c", "b"]));
     releases.shift()!();
+    await automatic;
+  });
+
+  it("lets an initial probe bypass an automatic task that is waiting upstream", async () => {
+    const releases = new Map<string, () => void>();
+    const started: string[] = [];
+    const scheduler = new ProbeScheduler((roomId) => new Promise((resolve) => {
+      started.push(roomId);
+      releases.set(roomId, () => resolve({ status: "offline" }));
+    }), { maxConcurrency: 1 });
+    const automatic = scheduler.runNow("automatic", "scheduled");
+
+    const initial = scheduler.runNow("new-room", "initial");
+
+    expect(started).toEqual(["automatic", "new-room"]);
+    expect(scheduler.state().manualProbes).toContainEqual({ roomId: "new-room", requestType: "initial", phase: "running" });
+    releases.get("new-room")!();
+    await initial;
+    releases.get("automatic")!();
     await automatic;
   });
 

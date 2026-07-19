@@ -15,6 +15,9 @@ describe("parseCompactCount", () => {
 });
 
 describe("extractRoomMetrics", () => {
+  it("extracts the current audience from Douyin's online audience label", () => {
+    expect(extractRoomMetrics({ bodyText: "在线观众 · 162", candidates: [] }).viewerCount).toBe(162);
+  });
   it("extracts semantic metrics and records their sources", () => {
     expect(extractRoomMetrics({
       bodyText: "2.3万人在线 本场观看 18.6万",

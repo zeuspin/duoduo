@@ -32,14 +32,14 @@ export function LiveInsightPanel({ roomId, enabled, llmConfigured, focusInsightI
   }
 
   return <div className="live-insight-feed" ref={feedRef} onScroll={(event) => { const feed = event.currentTarget; followingRef.current = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 32; if (feed.scrollTop <= 8) void loadOlder(); }}>
-    <div className={`live-parser-state ${enabled && llmConfigured ? "enabled" : "disabled"}`}>{!enabled ? "未启用解析器，ASR 仍正常运行；已有观点继续保留" : !llmConfigured ? "模型服务未配置，ASR 正常运行但暂不产生观点" : "正在提炼后续 ASR：静默 8 秒或最长等待 60 秒"}</div>
+    <div className={`live-parser-state ${enabled && llmConfigured ? "enabled" : "disabled"}`}>{!enabled ? "未启用内容分析，直播文字仍会正常保存；已有观点继续保留" : !llmConfigured ? "内容分析服务未设置，直播文字仍会保存，但暂不产生观点" : "正在分析直播内容，主播说完后会生成观点"}</div>
     {loading && <div className="live-insight-loading">正在加载更早观点...</div>}
     {items.length === 0 ? <div className="live-insight-empty">尚未产生观点</div> : items.map((item) => <article id={`room-insight-${item.id}`} className={`live-insight-item ${focusInsightId === item.id ? "focused" : ""}`} key={item.id}>
       <div className="live-insight-meta"><time>{formatTime(item.startedAt)}</time><span className={item.alertLevel}>{item.alertLevel === "important" ? "重点关注" : "普通关注"} · {natureLabels[item.nature]}</span></div>
       <h3>{item.summary}</h3>
       {item.conditions.length > 0 && <p className="live-insight-conditions">成立条件：{item.conditions.join("；")}</p>}
       <blockquote>证据：“{item.evidence.join("；")}”</blockquote>
-      <small>置信度 {Math.round(item.confidence * 100)}% · 解析器版本记录 #{item.parserVersionId}</small>
+      <small>可信程度 {Math.round(item.confidence * 100)}% · 分析规则版本 #{item.parserVersionId}</small>
     </article>)}
   </div>;
 }

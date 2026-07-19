@@ -61,12 +61,13 @@ describe("room form", () => {
     vi.mocked(window.duoduo.rooms.list).mockResolvedValue({
       rooms: [{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null, monitoring: false, autoMonitorOnLive: false, createdAt: "2026-07-12T00:00:00.000Z", updatedAt: "2026-07-12T00:00:00.000Z" }],
       runtimes: [],
-      snapshots: [{ roomId: "123", status: "live", anchorName: "测试主播", followerCount: 1_264_000, checkedAt: "2026-07-17T11:59:00.000Z" }],
+      snapshots: [{ roomId: "123", status: "live", anchorName: "测试主播", followerCount: 1_264_000, liveDescription: "每周日一二三四六18:00", checkedAt: "2026-07-17T11:59:00.000Z" }],
     });
     render(<App />);
     const join = await screen.findByRole("button", { name: "加入实时监看" });
     expect(join.className).toContain("live");
     expect(screen.getByText("主播粉丝").parentElement?.textContent).toContain("126.4 万");
+    expect(screen.getByText("直播介绍：每周日一二三四六18:00").getAttribute("title")).toBe("每周日一二三四六18:00");
   });
 
   it("starts one serial update-all batch from the prepared room header", async () => {
@@ -165,14 +166,30 @@ describe("room form", () => {
     vi.mocked(window.duoduo.rooms.list).mockResolvedValue({
       rooms: [{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null, monitoring: true, autoMonitorOnLive: false, createdAt: "2026-07-12T00:00:00.000Z", updatedAt: "2026-07-12T00:00:00.000Z" }],
       runtimes: [{ roomId: "123", state: "monitoring", liveStatus: "live", asr: [] }],
-      snapshots: [{ roomId: "123", status: "live", anchorName: longName, followerCount: 1_264_000, viewerCount: 1_234, checkedAt: "2026-07-18T12:00:00.000Z" }],
+      snapshots: [{ roomId: "123", status: "live", anchorName: longName, followerCount: 1_264_000, viewerCount: 1_234, liveDescription: "每周日一二三四六18:00", checkedAt: "2026-07-18T12:00:00.000Z" }],
     });
     render(<App />);
     const monitor = (await screen.findByText(longName)).closest<HTMLElement>(".room-info")!;
     expect(within(monitor).getByText("主播粉丝").parentElement?.textContent).toContain("126.4 万");
     expect(within(monitor).getByText("直播间人数").parentElement?.textContent).toContain("1,234");
+    expect(within(monitor).getByText("直播介绍：每周日一二三四六18:00")).toBeTruthy();
     expect(within(monitor).getByRole("button", { name: "退出实时监看" })).toBeTruthy();
-    expect(screen.getAllByText("实时 ASR").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("直播文字").length).toBeGreaterThan(0);
+  });
+
+  it("keeps a trusted live status while the monitoring ASR connection starts", async () => {
+    vi.mocked(window.duoduo.rooms.list).mockResolvedValue({
+      rooms: [{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null, monitoring: true, autoMonitorOnLive: false, createdAt: "2026-07-12T00:00:00.000Z", updatedAt: "2026-07-12T00:00:00.000Z" }],
+      runtimes: [{ roomId: "123", state: "starting", liveStatus: "checking", asr: [] }],
+      snapshots: [{ roomId: "123", status: "live", anchorName: "正在直播的主播", followerCount: 88_000, viewerCount: 321, checkedAt: "2026-07-18T12:00:00.000Z" }],
+    });
+
+    render(<App />);
+
+    const monitor = (await screen.findByText("正在直播的主播")).closest<HTMLElement>(".monitor")!;
+    expect(within(monitor).getByText("直播中")).toBeTruthy();
+    expect(within(monitor).queryByText("检测中")).toBeNull();
+    expect(within(monitor).getByText("正在准备文字记录")).toBeTruthy();
   });
 
   it("keeps monitored metrics stable while offline or unavailable", async () => {
@@ -222,7 +239,7 @@ describe("room form", () => {
     render(<App />);
     fireEvent.click(screen.getByText("添加直播间"));
     expect((screen.getByLabelText("直播时间") as HTMLSelectElement).value).toBe("uncertain");
-    expect((screen.getByLabelText("状态检测频次") as HTMLSelectElement).value).toBe("default");
+    expect((screen.getByLabelText("检查开播状态频率") as HTMLSelectElement).value).toBe("default");
   });
 
   it("opens an existing room for editing", async () => {
@@ -249,8 +266,8 @@ describe("room form", () => {
   it("saves monitored and prepared room intervals from monitoring settings", async () => {
     render(<App />);
     fireEvent.click(screen.getByText("监看设置"));
-    fireEvent.change(await screen.findByLabelText("实时监看状态延迟"), { target: { value: "15" } });
-    fireEvent.change(screen.getByLabelText("预备直播间检测频率"), { target: { value: "10" } });
+    fireEvent.change(await screen.findByLabelText("直播状态更新速度"), { target: { value: "15" } });
+    fireEvent.change(screen.getByLabelText("未监看直播间检查频率"), { target: { value: "10" } });
     fireEvent.click(screen.getByRole("button", { name: "保存监看设置" }));
     await waitFor(() => expect(window.duoduo.settings.saveMonitoring).toHaveBeenCalledWith({ monitoredCheckSeconds: 15, preparedCheckMinutes: 10 }));
   });
@@ -258,18 +275,29 @@ describe("room form", () => {
   it("uses main-process progress and starts cooldown only after completion", async () => {
     let publishProbeState!: (value: unknown) => void;
     vi.mocked(window.duoduo.rooms.subscribeProbeState).mockImplementation((listener) => { publishProbeState = listener; return () => undefined; });
-    let finishProbe!: (value: unknown) => void;
-    vi.mocked(window.duoduo.rooms.probe).mockImplementation(() => new Promise((resolve) => { finishProbe = resolve; }));
+    vi.mocked(window.duoduo.rooms.probe).mockResolvedValue({ mode: "running", currentRoomId: "123", queuedRoomIds: [], manualProbes: [{ roomId: "123", requestType: "manual", phase: "running" }] });
     render(<App />);
     const probe = await screen.findByRole("button", { name: "立即检测直播状态" });
     fireEvent.click(probe);
     expect(screen.queryByRole("button", { name: "60 秒后可再次检测" })).toBeNull();
-    publishProbeState({ mode: "running", currentRoomId: "123", queuedRoomIds: [], manualProbes: [{ roomId: "123", requestType: "manual", phase: "running" }] });
     expect((await screen.findByRole("button", { name: "正在检测" }) as HTMLButtonElement).disabled).toBe(true);
-    finishProbe({ rooms: [{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null, monitoring: false, autoMonitorOnLive: false, createdAt: "2026-07-12T00:00:00.000Z", updatedAt: "2026-07-12T00:00:00.000Z" }], runtimes: [], snapshots: [] });
     publishProbeState({ mode: "idle", queuedRoomIds: [], manualProbes: [{ roomId: "123", requestType: "manual", phase: "cooldown", cooldownUntil: new Date(Date.now() + 60_000).toISOString() }] });
     expect((await screen.findByRole("button", { name: "60 秒后可再次检测" }) as HTMLButtonElement).disabled).toBe(true);
     expect(window.duoduo.rooms.probe).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows manual detection feedback from the immediate IPC response", async () => {
+    vi.mocked(window.duoduo.rooms.probe).mockResolvedValue({
+      mode: "running",
+      queuedRoomIds: ["123"],
+      manualProbes: [{ roomId: "123", requestType: "manual", phase: "queued" }],
+    });
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "立即检测直播状态" }));
+
+    expect(await screen.findByRole("button", { name: "等待检测" })).toBeTruthy();
+    expect(screen.getByText("直播间 123")).toBeTruthy();
   });
 
   it("shows a dedicated verification status", async () => {

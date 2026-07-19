@@ -200,8 +200,12 @@ export class ProbeScheduler {
   }
 
   private drain(): void {
-    while (!this.stopped && this.activeCount < this.maxConcurrency && this.pending.length) {
-      const next = this.pending.shift()!;
+    while (!this.stopped && this.pending.length) {
+      const next = this.pending[0];
+      const hasCapacity = this.activeCount < this.maxConcurrency;
+      const requestedCanBypassAutomaticWait = Boolean(next.requestType) && ![...this.active].some((item) => item.requestType);
+      if (!hasCapacity && !requestedCanBypassAutomaticWait) break;
+      this.pending.shift();
       this.activeCount += 1;
       this.active.add(next);
       this.emit();

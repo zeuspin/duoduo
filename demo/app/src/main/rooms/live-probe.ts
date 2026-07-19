@@ -13,6 +13,13 @@ export interface ProbeEvidence {
   metricRaw?: Record<string, string>;
   metricCandidates?: MetricCandidate[];
   avatarCandidates?: Array<{ source: string; width: number; height: number; label: string }>;
+  profileTrigger?: boolean;
+}
+
+interface ProfileCardEvidence {
+  text: string;
+  avatar?: string;
+  liveDescription?: string;
 }
 
 export interface CurrentRoomEvidence extends ProbeEvidence {
@@ -25,6 +32,7 @@ export interface CurrentRoomEvidence extends ProbeEvidence {
   likeCount?: number;
   metricEvidence?: Partial<Record<"viewerCount" | "followerCount" | "totalViewerCount" | "likeCount", MetricDatum>>;
   metricQuality?: "complete" | "partial" | "missing";
+  liveDescription?: string;
 }
 
 export type LiveStatus = "live" | "offline" | "login_required" | "verification_required" | "timeout" | "page_error";
@@ -42,6 +50,35 @@ export interface RoomProbeResult {
   metricRaw?: Record<string, string>;
   metricEvidence?: Partial<Record<"viewerCount" | "followerCount" | "totalViewerCount" | "likeCount", MetricDatum>>;
   metricQuality?: "complete" | "partial" | "missing";
+  liveDescription?: string;
+}
+
+async function inspectProfileCard(webContents: ProbeWebContents): Promise<ProfileCardEvidence | undefined> {
+  try {
+    return await evaluateNow<ProfileCardEvidence | undefined>(webContents, `(async () => {
+      const trigger = document.querySelector('[data-e2e="rooom-info-bar-anchor"]');
+      if (!trigger) return undefined;
+      const readProfile = () => {
+        const popupId = trigger.getAttribute('aria-describedby');
+        const popup = popupId ? document.getElementById(popupId) : null;
+        const text = popup?.textContent?.trim() ?? '';
+        if (!popup || !text) return undefined;
+        const description = text.match(/直播介绍[：:]\s*(.*?)(?=粉丝团|$)/)?.[1]?.trim();
+        return { text, avatar: popup.querySelector('.avatar img')?.src, liveDescription: description || undefined };
+      };
+      const existing = readProfile();
+      if (existing) return existing;
+      trigger.click();
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        const profile = readProfile();
+        if (profile) return profile;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      return undefined;
+    })()`);
+  } catch {
+    return undefined;
+  }
 }
 
 export function selectAvatarCandidate(candidates: Array<{ source: string; width: number; height: number; label: string }>): string | undefined {
@@ -78,14 +115,17 @@ export async function inspectCurrentRoom(webContents: ProbeWebContents): Promise
   const evidence = await evaluateNow<CurrentRoomEvidence>(webContents, `(() => {
     const video = document.querySelector('video');
     const track = window.__duoduoCaptureStream?.getAudioTracks?.()[0];
-    const metricCandidates = Array.from(document.querySelectorAll('[aria-label],[title],[data-e2e*="fans" i],[data-e2e*="viewer" i],[data-e2e*="like" i]')).slice(0, 100).flatMap((item) => {
+    const metricCandidates = Array.from(document.querySelectorAll('[aria-label],[title],[data-e2e="live-room-audience"],[data-e2e*="fans" i],[data-e2e*="viewer" i],[data-e2e*="like" i]')).slice(0, 100).flatMap((item) => {
       const values = [item.getAttribute('aria-label'), item.getAttribute('title'), item.textContent].filter((value) => typeof value === 'string' && value.trim()).map((value) => value.trim().slice(0, 160));
       return [...new Set(values)].map((value) => ({ text: value, source: item.hasAttribute('aria-label') || item.hasAttribute('title') ? 'accessibility' : 'visible_text' }));
     });
-    return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, currentTime: video?.currentTime ?? 0, paused: video?.paused ?? true, audioTrackState: track?.readyState, text: document.body?.innerText?.slice(0, 20000) ?? '', metricCandidates };
+    const audience = document.querySelector('[data-e2e="live-room-audience"]')?.textContent?.trim();
+    if (audience) metricCandidates.push({ text: '在线 ' + audience, source: 'accessibility' });
+    return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, currentTime: video?.currentTime ?? 0, paused: video?.paused ?? true, audioTrackState: track?.readyState, text: document.body?.innerText?.slice(0, 20000) ?? '', metricCandidates, profileTrigger: Boolean(document.querySelector('[data-e2e="rooom-info-bar-anchor"]')) };
   })()`);
-  const metrics = extractRoomMetrics({ bodyText: evidence.text, candidates: evidence.metricCandidates ?? [] });
-  return { ...evidence, viewerCount: metrics.viewerCount, followerCount: metrics.followerCount, totalViewerCount: metrics.totalViewerCount, likeCount: metrics.likeCount, metricRaw: metrics.raw, metricEvidence: metrics.evidence, metricQuality: metrics.quality };
+  const profile = evidence.profileTrigger ? await inspectProfileCard(webContents) : undefined;
+  const metrics = extractRoomMetrics({ bodyText: [evidence.text, profile?.text].filter(Boolean).join("\n"), candidates: evidence.metricCandidates ?? [] });
+  return { ...evidence, viewerCount: metrics.viewerCount, followerCount: metrics.followerCount, totalViewerCount: metrics.totalViewerCount, likeCount: metrics.likeCount, metricRaw: metrics.raw, metricEvidence: metrics.evidence, metricQuality: metrics.quality, liveDescription: profile?.liveDescription };
 }
 
 export interface ProbeWebContents {
@@ -128,19 +168,25 @@ export async function probeRoom(webContents: ProbeWebContents, url: string, time
         const image = document.querySelector('meta[property="og:image"]');
         const pageTitle = document.querySelector('meta[property="og:title"]')?.content || document.title;
         const text = document.body?.innerText?.slice(0, 20000) ?? '';
-        const avatar = document.querySelector('img[class*="avatar" i], img[class*="author" i], img[alt*="头像"], img[alt*="主播"]')?.src;
+        const anchorName = document.querySelector('[data-e2e="live-room-nickname"]')?.textContent?.trim() || pageTitle?.split(/[｜|-]/)[0]?.trim();
+        const avatar = document.querySelector('[data-e2e="rooom-info-bar-anchor"] [data-e2e="live-avatar"] img')?.src || document.querySelector('img[class*="avatar" i], img[class*="author" i], img[alt*="头像"], img[alt*="主播"]')?.src;
         const avatarCandidates = Array.from(document.images).map((item) => ({ source: item.currentSrc || item.src, width: item.naturalWidth || item.width, height: item.naturalHeight || item.height, label: [item.alt, item.className].filter((value) => typeof value === 'string').join(' ').slice(0, 160) })).filter((item) => item.source && item.width >= 24 && item.height >= 24).slice(0, 40);
-        const metricCandidates = Array.from(document.querySelectorAll('[aria-label],[title],[data-e2e*="fans" i],[data-e2e*="viewer" i],[data-e2e*="like" i]')).slice(0, 100).flatMap((item) => {
+        const metricCandidates = Array.from(document.querySelectorAll('[aria-label],[title],[data-e2e="live-room-audience"],[data-e2e*="fans" i],[data-e2e*="viewer" i],[data-e2e*="like" i]')).slice(0, 100).flatMap((item) => {
           const values = [item.getAttribute('aria-label'), item.getAttribute('title'), item.textContent].filter((value) => typeof value === 'string' && value.trim()).map((value) => value.trim().slice(0, 160));
           return [...new Set(values)].map((value) => ({ text: value, source: item.hasAttribute('aria-label') || item.hasAttribute('title') ? 'accessibility' : 'visible_text' }));
         });
-        return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, text, title: pageTitle, anchorName: pageTitle?.split(/[｜|-]/)[0]?.trim(), cover: image?.content, avatar, avatarCandidates, metricCandidates };
+        const audience = document.querySelector('[data-e2e="live-room-audience"]')?.textContent?.trim();
+        if (audience) metricCandidates.push({ text: '在线 ' + audience, source: 'accessibility' });
+        return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, text, title: pageTitle, anchorName, cover: image?.content, avatar, avatarCandidates, metricCandidates, profileTrigger: Boolean(document.querySelector('[data-e2e="rooom-info-bar-anchor"]')) };
       })()`);
       if (classifyProbe(evidence) !== "page_error") break;
     }
-    const metrics = extractRoomMetrics({ bodyText: evidence.text, candidates: evidence.metricCandidates ?? [] });
-    const avatar = evidence.avatar && /^https?:\/\//.test(evidence.avatar) ? evidence.avatar : selectAvatarCandidate(evidence.avatarCandidates ?? []);
-    return { status: classifyProbe(evidence), title: evidence.title, anchorName: evidence.anchorName, cover: evidence.cover ? new URL(evidence.cover, url).toString() : undefined, avatar, viewerCount: metrics.viewerCount, followerCount: metrics.followerCount, totalViewerCount: metrics.totalViewerCount, likeCount: metrics.likeCount, metricRaw: metrics.raw, metricEvidence: metrics.evidence, metricQuality: metrics.quality };
+    const status = classifyProbe(evidence);
+    const profile = status === "live" && evidence.profileTrigger ? await inspectProfileCard(webContents) : undefined;
+    const metrics = extractRoomMetrics({ bodyText: [evidence.text, profile?.text].filter(Boolean).join("\n"), candidates: evidence.metricCandidates ?? [] });
+    const preferredAvatar = profile?.avatar ?? evidence.avatar;
+    const avatar = preferredAvatar && /^https?:\/\//.test(preferredAvatar) ? preferredAvatar : selectAvatarCandidate(evidence.avatarCandidates ?? []);
+    return { status, title: evidence.title, anchorName: evidence.anchorName, cover: evidence.cover ? new URL(evidence.cover, url).toString() : undefined, avatar, viewerCount: metrics.viewerCount, followerCount: metrics.followerCount, totalViewerCount: metrics.totalViewerCount, likeCount: metrics.likeCount, metricRaw: metrics.raw, metricEvidence: metrics.evidence, metricQuality: metrics.quality, liveDescription: profile?.liveDescription };
   } catch (error) {
     if (error instanceof Error && error.message === "PROBE_TIMEOUT") { webContents.stop(); return { status: "timeout" }; }
     return { status: "page_error" };

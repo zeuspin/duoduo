@@ -25,7 +25,7 @@ describe("transparent room intelligence UI", () => {
     render(<RoomIntelligenceBadges summary={summary} status="live" onOpen={onOpen} />);
     expect(screen.getByText("当前在线 2,345")).toBeTruthy();
     expect(screen.queryByText("关注 1,200,000")).toBeNull();
-    expect(screen.getByRole("button", { name: /百万级粉丝/ }).getAttribute("title")).toContain("1 个样本");
+    expect(screen.getByRole("button", { name: /百万级粉丝/ }).getAttribute("title")).toContain("依据 1 条记录");
     fireEvent.click(screen.getByRole("button", { name: /近期在线靠前/ }));
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
@@ -41,9 +41,9 @@ describe("transparent room intelligence UI", () => {
     const onClose = vi.fn();
     render(<RoomIntelligenceDrawer roomName="测试主播" details={details} onClose={onClose} />);
     const drawer = screen.getByRole("dialog", { name: "测试主播数据详情" });
-    expect(within(drawer).getByText("标签依据")).toBeTruthy();
+    expect(within(drawer).getByText("标签说明")).toBeTruthy();
     expect(within(drawer).getByText(/本地 8 个有数据主播/)).toBeTruthy();
-    expect(within(drawer).getByText(/数据质量：部分指标/)).toBeTruthy();
+    expect(within(drawer).getByText(/数据完整度：部分数据/)).toBeTruthy();
     expect(within(drawer).getByText("近 7 天")).toBeTruthy();
     expect(within(drawer).getByText(/观测时长 2小时/)).toBeTruthy();
     expect(within(drawer).getByText(/开播证据.*离线.*直播/)).toBeTruthy();

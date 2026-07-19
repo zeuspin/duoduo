@@ -1,0 +1,24 @@
+.usage-filters { display:flex; align-items:center; gap:8px; }
+.usage-filters input,.usage-filters select { min-height:36px; border:1px solid var(--line); background:#fff; padding:0 10px; color:#445065; }
+.usage-filters span { color:var(--muted); font-size:12px; }
+.usage-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:16px; }
+.usage-summary article,.usage-breakdowns>section,.usage-table { background:#fff; border:1px solid var(--line); }
+.usage-summary article { padding:18px; }
+.usage-summary small { color:var(--muted); }
+.usage-summary strong { display:block; margin:9px 0 5px; font-size:24px; font-variant-numeric:tabular-nums; }
+.usage-summary p,.usage-breakdowns p { margin:0; color:var(--muted); font-size:11px; }
+.usage-warning { margin:0 0 16px; padding:11px 13px; border:1px solid #ead6a5; background:#fff9e9; color:#745b22; font-size:12px; }
+.usage-breakdowns { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:16px; }
+.usage-breakdowns>section { padding:16px; min-width:0; }
+.usage-breakdowns h2,.usage-table h2 { margin:0 0 13px; font-size:14px; }
+.usage-breakdowns section>div { display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-top:1px solid #edf0f4; }
+.usage-breakdowns span { min-width:0; display:grid; gap:3px; }
+.usage-breakdowns b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
+.usage-breakdowns small { color:var(--muted); font-size:10px; }
+.usage-breakdowns strong { font-size:12px; font-variant-numeric:tabular-nums; }
+.usage-table { padding:16px; }
+.usage-table-row { display:grid; grid-template-columns:2fr 1.2fr 1fr 1fr .8fr; gap:14px; align-items:center; min-height:48px; border-top:1px solid #edf0f4; font-size:11px; }
+.usage-table-row>span:first-child { display:grid; gap:3px; }
+.usage-table-row small { color:var(--muted); }
+.usage-table-head { min-height:34px; color:var(--muted); }
+.usage-empty { padding:30px; border-top:1px solid #edf0f4; color:var(--muted); text-align:center; font-size:12px; }

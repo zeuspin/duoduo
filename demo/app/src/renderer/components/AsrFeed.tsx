@@ -68,11 +68,11 @@ export function AsrFeed({ roomId, liveEvents, listBefore }: AsrFeedProps) {
     {!historyVisible && <button className="asr-history-button" type="button" onClick={() => void loadOlder()}>查看历史记录</button>}
     {historyVisible && <div className="asr-history-label">已加载历史记录</div>}
     {loading && items.length > 0 && <div className="history-loading">正在加载更早记录...</div>}
-    {items.length === 0 && !loading && <div className="asr-empty">正在建立该直播间的独立音频与识别会话...</div>}
+    {items.length === 0 && !loading && <div className="asr-empty">正在等待主播说话…</div>}
     {items.map((item) => <div className={`asr-row ${item.isFinal ? "final" : "partial"}`} key={`${item.sessionId}:${item.segmentId}`} data-segment={item.segmentId}>
       <time dateTime={item.occurredAt}>{formatNaturalTime(item.occurredAt)}</time>
       <span>{item.text}</span>
-      <small>{item.isFinal ? "已确认" : "识别中"}</small>
+      <small>{item.isFinal ? "已记录" : "记录中"}</small>
     </div>)}
   </div>;
 }

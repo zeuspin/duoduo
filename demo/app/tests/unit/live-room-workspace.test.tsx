@@ -15,10 +15,10 @@ beforeEach(() => Object.assign(window, { duoduo: {
 afterEach(cleanup);
 
 describe("LiveRoomWorkspace", () => {
-  it("binds a parser without interrupting the visible ASR session", async () => {
+  it("binds an analysis rule without interrupting the visible live transcript", async () => {
     render(<LiveRoomWorkspace roomId="123" liveEvents={[{ roomId: "123", sessionId: "current", segmentId: "1", startMs: 0, endMs: 1, text: "本次实时识别", isFinal: true, occurredAt: "2026-07-13T04:06:00.000Z" }]} runtimeState="monitoring" parsers={parserSnapshot as never} onParsersChange={vi.fn()} />);
     expect(screen.getByText("本次实时识别")).toBeTruthy();
-    fireEvent.change(screen.getByLabelText("直播间 123 解析器"), { target: { value: "market-insight:1" } });
+    fireEvent.change(screen.getByLabelText("直播间 123 分析规则"), { target: { value: "market-insight:1" } });
     await waitFor(() => expect(window.duoduo.parsers.bindRoom).toHaveBeenCalledWith("123", "market-insight", 1));
     expect(window.duoduo.rooms.setMonitoring).not.toHaveBeenCalled();
     expect(screen.getByText("本次实时识别")).toBeTruthy();
@@ -29,5 +29,11 @@ describe("LiveRoomWorkspace", () => {
     expect(await screen.findByText("半导体板块短线偏强")).toBeTruthy();
     expect(window.duoduo.insights.list).toHaveBeenCalledWith({ roomId: "123", limit: 20 });
     expect(screen.getByText(/半导体今天放量走强/)).toBeTruthy();
+  });
+
+  it("shows a plain-language reconnecting state", () => {
+    render(<LiveRoomWorkspace roomId="123" liveEvents={[]} runtimeState="recovering" parsers={parserSnapshot as never} onParsersChange={vi.fn()} />);
+    expect(screen.getByText("正在重新连接")).toBeTruthy();
+    expect(screen.queryByText("recovering")).toBeNull();
   });
 });

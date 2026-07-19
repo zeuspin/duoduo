@@ -18,7 +18,7 @@ describe("PreparedRoomHeader", () => {
   it("shows manual batch progress and can stop only the remaining queue", () => {
     const onCancelBatch = vi.fn();
     render(<PreparedRoomHeader count={16} state={{ mode: "running", currentRoomId: "a", queuedRoomIds: ["b"], manualProbes: [], batch: { source: "manual_batch", total: 2, completed: 0 } }} roomName={() => "主播 A"} accessBlocked={false} onProbeAll={vi.fn()} onCancelBatch={onCancelBatch} />);
-    expect(screen.getByText(/批量更新 1\/2/)).toBeTruthy();
+    expect(screen.getByText(/正在更新 1\/2/)).toBeTruthy();
     expect(screen.getByText(/当前：主播 A/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "停止后续更新" }));
     expect(onCancelBatch).toHaveBeenCalledTimes(1);
