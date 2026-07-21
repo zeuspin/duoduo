@@ -81,8 +81,13 @@ export class RoomSession implements MonitorSession {
     this.window.webContents.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36");
     this.window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
     this.attachWindowEvents(this.window);
-    const probe = await probeRoom(this.window.webContents, this.roomUrl);
-    const screenshot = probe.status === "verification_required" ? Buffer.alloc(0) : (await this.window.capturePage()).toPNG();
+    let screenshot: Buffer | undefined;
+    const probe = await probeRoom(this.window.webContents, this.roomUrl, 20_000, {
+      beforeProfile: async (result) => {
+        screenshot = result.status === "verification_required" ? Buffer.alloc(0) : (await this.window!.capturePage()).toPNG();
+      },
+    });
+    screenshot ??= probe.status === "verification_required" ? Buffer.alloc(0) : (await this.window.capturePage()).toPNG();
     await this.onProbe?.(probe, screenshot);
     this.metricSampler.seed(probe);
     this.captureToken = token;

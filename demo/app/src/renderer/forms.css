@@ -1,1 +1,28 @@
 .modal select { height: 39px; border: 1px solid #cbd2da; border-radius: 0; padding: 0 10px; background: white; }
+
+.parser-editor-simple { display: grid; gap: 18px; }
+.parser-editor-simple > label { display: grid; gap: 8px; font-weight: 650; }
+.parser-editor-simple input,
+.parser-editor-simple select,
+.parser-editor-simple textarea { width: 100%; }
+.parser-prompt-field textarea { min-height: 420px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; line-height: 1.65; }
+.model-price-card { border: 1px solid #d8dee8; background: #f7f9fc; padding: 14px 16px; display: grid; gap: 8px; }
+.model-price-card p { margin: 0; }
+.model-price-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.model-price-head > div { display: grid; gap: 3px; }
+.model-price-head span { color: #586578; font-size: 13px; }
+.model-price-tiers { display: grid; gap: 5px; color: #243044; font-variant-numeric: tabular-nums; }
+.model-price-meta { color: #69768a; font-size: 12px; line-height: 1.55; }
+.parser-prompt-readonly { min-height: 420px; width: 100%; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; line-height: 1.65; background: #f7f9fc; }
+
+.parser-view > .model-price-card { margin: 12px 14px 0; padding: 12px 14px; }
+.parser-view .model-price-tiers { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 6px 10px; }
+.parser-view .model-price-tiers p { border: 1px solid #e1e6ed; background: #fff; padding: 8px 10px; font-size: 11px; }
+.parser-view-prompt { display: grid; width: 100%; gap: 8px; padding: 12px 14px 14px; box-sizing: border-box; font-size: 11px; font-weight: 600; }
+.parser-view-prompt textarea { display: block; width: 100%; min-height: 480px; box-sizing: border-box; resize: vertical; border: 1px solid #cbd3dc; background: #fbfcfe; padding: 12px 14px; color: #1f2937; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; line-height: 1.65; }
+.parser-view > .editor-actions { margin: 0 14px; padding: 12px 0 14px; }
+
+@media (max-width: 760px) {
+  .parser-view .model-price-tiers { grid-template-columns: 1fr; }
+  .parser-view .model-price-head { align-items: flex-start; }
+}

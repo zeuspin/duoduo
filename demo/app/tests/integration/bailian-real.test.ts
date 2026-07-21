@@ -10,10 +10,9 @@ async function apiKey(): Promise<string | undefined> {
 }
 
 describe.runIf(process.env.BAILIAN_REAL_SMOKE === "1")("Bailian real connection", () => {
-  it("opens a real paraformer-realtime-v2 task without exposing the key", async () => {
+  it("tests a real paraformer-realtime-v2 connection without exposing the key", async () => {
     const key = await apiKey();
     expect(key, "BAILIAN_API_KEY is required").toBeTruthy();
-    const session = await new BailianProvider({ apiKey: key! }).open("connection-smoke");
-    await session.close();
+    await expect(new BailianProvider({ apiKey: key! }).testConnection()).resolves.toMatchObject({ ok: true });
   }, 20_000);
 });

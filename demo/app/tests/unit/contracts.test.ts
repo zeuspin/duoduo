@@ -5,7 +5,7 @@ import {
   LlmProviderConfigSchema,
   InsightNotificationSettingsSchema,
   MarketInsightSchema,
-  ParserTestRunSchema,
+  ParserSpecSchema,
   PreparedProbeStateSchema,
   RoomInputSchema,
   DataRetentionSettingsSchema,
@@ -18,13 +18,15 @@ import {
 } from "../../src/shared/contracts";
 
 describe("room contracts", () => {
-  it("defaults legacy rooms to manual monitoring", () => {
+  it("defaults auto monitoring off while requiring an explicit group", () => {
     const parsed = RoomSchema.parse({
       roomId: "123",
       canonicalUrl: "https://live.douyin.com/123",
       schedule: null,
       probeIntervalMinutes: null,
       monitoring: false,
+      groupId: "group-a",
+      positionInGroup: 0,
       createdAt: "2026-07-17T00:00:00.000Z",
       updatedAt: "2026-07-17T00:00:00.000Z",
     });
@@ -55,6 +57,7 @@ describe("room contracts", () => {
   it("validates weekly schedules with multiple ranges", () => {
     const parsed = RoomInputSchema.parse({
       url: "https://live.douyin.com/123456",
+      groupId: "group-a",
       schedule: { days: [1, 3, 5], ranges: [{ start: "09:00", end: "12:00" }, { start: "19:00", end: "23:30" }] },
     });
     expect(parsed.schedule?.ranges).toHaveLength(2);
@@ -63,9 +66,19 @@ describe("room contracts", () => {
   it("accepts an uncertain schedule", () => {
     const parsed = RoomInputSchema.parse({
       url: "https://live.douyin.com/123456",
+      groupId: "group-a",
       schedule: null,
     });
     expect(parsed.schedule).toBeNull();
+  });
+
+  it("requires an explicit target group for every room input", () => {
+    expect(() =>
+      RoomInputSchema.parse({
+        url: "https://live.douyin.com/123456",
+        schedule: null,
+      }),
+    ).toThrow();
   });
 
   it("separates access protection from reliable room data", () => {
@@ -142,6 +155,52 @@ describe("room contracts", () => {
 });
 
 describe("LLM parser contracts", () => {
+  it("accepts legacy and visible-prompt parser specs", () => {
+    expect(
+      ParserSpecSchema.parse({
+        name: "旧解析器",
+        description: "说明",
+        objectives: ["sector_direction"],
+        filters: ["advertising"],
+        normalization: "suggest",
+        model: "qwen-plus",
+        advancedPrompt: "附加规则",
+      }),
+    ).toMatchObject({ name: "旧解析器", model: "qwen-plus" });
+    expect(
+      ParserSpecSchema.parse({
+        schemaVersion: 2,
+        name: "新解析器",
+        model: "deepseek-v3.2",
+        prompt: "返回 JSON 格式的观点。",
+      }),
+    ).toEqual({
+      schemaVersion: 2,
+      name: "新解析器",
+      model: "deepseek-v3.2",
+      prompt: "返回 JSON 格式的观点。",
+    });
+  });
+
+  it("rejects empty prompts and unverified models for new parsers", () => {
+    expect(() =>
+      ParserSpecSchema.parse({
+        schemaVersion: 2,
+        name: "空提示词",
+        model: "qwen-plus",
+        prompt: "   ",
+      }),
+    ).toThrow();
+    expect(() =>
+      ParserSpecSchema.parse({
+        schemaVersion: 2,
+        name: "未知模型",
+        model: "unknown-model",
+        prompt: "返回 JSON",
+      }),
+    ).toThrow();
+  });
+
   it("accepts only supported insight notification timeouts", () => {
     expect(InsightNotificationSettingsSchema.parse({ timeoutSeconds: null }).timeoutSeconds).toBeNull();
     for (const timeoutSeconds of [10, 30, 60]) expect(InsightNotificationSettingsSchema.parse({ timeoutSeconds }).timeoutSeconds).toBe(timeoutSeconds);
@@ -160,10 +219,6 @@ describe("LLM parser contracts", () => {
     expect(() => MarketInsightSchema.parse({ ...insight, evidence: [] })).toThrow();
   });
 
-  it("separates draft evaluation runs from formal insight state", () => {
-    const run = ParserTestRunSchema.parse({ id: "run-1", parserId: "market-insight", publishedVersionId: 1, draftVersionId: 2, roomId: "123", sampleAsrIds: [1, 2], status: "completed", publishedResults: [], draftResults: [], createdAt: "2026-07-13T02:30:00.000Z", completedAt: "2026-07-13T02:30:03.000Z" });
-    expect(run.status).toBe("completed");
-  });
 });
 
 describe("ASR contracts", () => {

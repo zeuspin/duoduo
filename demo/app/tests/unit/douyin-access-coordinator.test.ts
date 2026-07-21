@@ -102,6 +102,34 @@ describe("DouyinAccessCoordinator", () => {
     expect(run).toHaveBeenCalledTimes(1);
   });
 
+  it("cancels a queued room without affecting other rooms", async () => {
+    let release!: () => void;
+    const coordinator = new DouyinAccessCoordinator();
+    const active = coordinator.submit({ roomId: "a", type: "startup_probe", run: () => new Promise<{ value: string }>((resolve) => { release = () => resolve({ value: "a" }); }) });
+    const canceled = coordinator.submit({ roomId: "b", type: "startup_probe", run: async () => ({ value: "b" }) });
+    const retained = coordinator.submit({ roomId: "c", type: "startup_probe", run: async () => ({ value: "c" }) });
+
+    coordinator.cancelRoom("b");
+    release();
+
+    await expect(canceled).rejects.toThrow("ACCESS_ROOM_CANCELED");
+    await expect(Promise.all([active, retained])).resolves.toEqual(["a", "c"]);
+  });
+
+  it("interrupts a room while it is waiting for navigation pacing", async () => {
+    const sleep = vi.fn(() => new Promise<void>(() => undefined));
+    const run = vi.fn(async () => ({ value: true }));
+    const coordinator = new DouyinAccessCoordinator({ minimumGapMs: 60_000, sleep });
+    await coordinator.submit({ roomId: "a", type: "startup_probe", run });
+    const canceled = coordinator.submit({ roomId: "b", type: "startup_probe", run });
+    await vi.waitFor(() => expect(sleep).toHaveBeenCalledTimes(1));
+
+    coordinator.cancelRoom("b");
+
+    await expect(canceled).rejects.toThrow("ACCESS_ROOM_CANCELED");
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+
   it("deduplicates the same room and task type", async () => {
     const run = vi.fn(async () => ({ value: "ok" }));
     const coordinator = new DouyinAccessCoordinator();

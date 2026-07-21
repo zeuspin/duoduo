@@ -6,6 +6,7 @@ import { RoomStore } from "../../src/main/storage/room-store";
 
 const input = {
   url: "https://live.douyin.com/123456?from=test",
+  groupId: "group-a",
   schedule: { days: [1, 2, 3, 4, 5], ranges: [{ start: "09:00", end: "12:00" }] },
 };
 

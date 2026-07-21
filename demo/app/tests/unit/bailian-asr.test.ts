@@ -1,5 +1,5 @@
 import { EventEmitter } from "node:events";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { BailianProvider } from "../../src/main/asr/bailian-provider";
 
 class FakeSocket extends EventEmitter {
@@ -9,7 +9,24 @@ class FakeSocket extends EventEmitter {
   close() { this.readyState = 3; this.emit("close"); }
 }
 
+afterEach(() => vi.useRealTimers());
+
 describe("BailianProvider", () => {
+  it("treats task-started as a successful connection test without finishing an empty task", async () => {
+    const socket = new FakeSocket();
+    const provider = new BailianProvider({ apiKey: "test-secret" }, () => socket);
+
+    const testing = provider.testConnection();
+    socket.emit("open");
+    const start = JSON.parse(socket.sent[0] as string);
+    socket.emit("message", Buffer.from(JSON.stringify({ header: { event: "task-started", task_id: start.header.task_id }, payload: {} })));
+    await Promise.resolve();
+
+    expect(socket.sent).toHaveLength(1);
+    expect(socket.readyState).toBe(3);
+    await expect(testing).resolves.toMatchObject({ ok: true, message: "百炼连接成功" });
+  });
+
   it("waits for task-started, sends PCM, and maps result-generated", async () => {
     const socket = new FakeSocket();
     const meter = { duration: vi.fn(), succeed: vi.fn(), fail: vi.fn() };
@@ -45,5 +62,49 @@ describe("BailianProvider", () => {
     const opening = provider.open("room-a");
     socket.emit("error", new Error("rejected sensitive-key"));
     await expect(opening).rejects.not.toThrow("sensitive-key");
+  });
+
+  it("reports a stalled half-open connection when audio continues but server messages stop", async () => {
+    vi.useFakeTimers();
+    const socket = new FakeSocket();
+    const provider = new BailianProvider({ apiKey: "test-secret", responseTimeoutMs: 10_000 }, () => socket);
+    const opening = provider.open("room-a");
+    socket.emit("open");
+    const start = JSON.parse(socket.sent[0] as string);
+    socket.emit("message", Buffer.from(JSON.stringify({ header: { event: "task-started", task_id: start.header.task_id }, payload: {} })));
+    const session = await opening;
+    const failure = vi.fn();
+    session.subscribeFailure?.(failure);
+
+    await session.write({ bytes: Buffer.from([1, 2]), sampleRate: 16000, channels: 1, encoding: "pcm_s16le" });
+    await vi.advanceTimersByTimeAsync(9_999);
+    expect(failure).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+
+    expect(socket.readyState).toBe(1);
+    expect(failure).toHaveBeenCalledOnce();
+    expect(failure.mock.calls[0][0]).toMatchObject({ message: "BAILIAN_RESPONSE_TIMEOUT" });
+    (session as typeof session & { abort(): void }).abort();
+  });
+
+  it("uses heartbeat messages to keep an active silent stream alive", async () => {
+    vi.useFakeTimers();
+    const socket = new FakeSocket();
+    const provider = new BailianProvider({ apiKey: "test-secret", responseTimeoutMs: 10_000 }, () => socket);
+    const opening = provider.open("room-a");
+    socket.emit("open");
+    const start = JSON.parse(socket.sent[0] as string);
+    socket.emit("message", Buffer.from(JSON.stringify({ header: { event: "task-started", task_id: start.header.task_id }, payload: {} })));
+    const session = await opening;
+    const failure = vi.fn();
+    session.subscribeFailure?.(failure);
+    await session.write({ bytes: Buffer.from([1, 2]), sampleRate: 16000, channels: 1, encoding: "pcm_s16le" });
+
+    await vi.advanceTimersByTimeAsync(9_000);
+    socket.emit("message", Buffer.from(JSON.stringify({ header: { event: "result-generated", task_id: start.header.task_id }, payload: { output: { sentence: { heartbeat: true } } } })));
+    await vi.advanceTimersByTimeAsync(9_000);
+
+    expect(failure).not.toHaveBeenCalled();
+    (session as typeof session & { abort(): void }).abort();
   });
 });

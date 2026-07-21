@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getBailianParserModel } from "./bailian-model-catalog";
 
 const TimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 
@@ -10,7 +11,13 @@ export const ScheduleSchema = z.object({
 export const RoomInputSchema = z.object({
   url: z.string().min(1),
   schedule: ScheduleSchema.nullable().default(null),
-  probeIntervalMinutes: z.number().int().refine((value) => [1, 3, 5, 10, 15, 30].includes(value)).nullable().default(null),
+  probeIntervalMinutes: z
+    .number()
+    .int()
+    .refine((value) => [1, 3, 5, 10, 15, 30].includes(value))
+    .nullable()
+    .default(null),
+  groupId: z.string().min(1),
 });
 
 export const RoomSchema = z.object({
@@ -20,8 +27,66 @@ export const RoomSchema = z.object({
   probeIntervalMinutes: z.number().int().nullable().default(null),
   monitoring: z.boolean(),
   autoMonitorOnLive: z.boolean().default(false),
+  groupId: z.string().min(1),
+  positionInGroup: z.number().int().nonnegative().default(0),
   createdAt: z.string(),
   updatedAt: z.string(),
+});
+
+export const RoomGroupSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().trim().min(1).max(30),
+  parserId: z.string().min(1).nullable(),
+  position: z.number().int().nonnegative(),
+  roomCount: z.number().int().min(0).max(9),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export const GroupRunStatusSchema = z.enum([
+  "starting",
+  "running",
+  "stopping",
+  "stopped",
+  "start_failed",
+  "stop_failed",
+  "interrupted",
+]);
+export const GroupRunSchema = z.object({
+  id: z.string().min(1),
+  groupId: z.string().min(1),
+  status: GroupRunStatusSchema,
+  startedAt: z.string().datetime(),
+  stopRequestedAt: z.string().datetime().optional(),
+  completedAt: z.string().datetime().optional(),
+  error: z.string().optional(),
+});
+export const GroupStopProgressSchema = z.object({
+  groupId: z.string().min(1),
+  total: z.number().int().nonnegative(),
+  completed: z.number().int().nonnegative(),
+  failedRoomIds: z.array(z.string()),
+});
+export const GroupRefreshProgressSchema = z.object({
+  groupId: z.string().min(1),
+  total: z.number().int().nonnegative(),
+  completed: z.number().int().nonnegative(),
+  currentRoomId: z.string().optional(),
+  queuedRoomIds: z.array(z.string()),
+});
+export const GroupRefreshResultSchema = z.object({
+  groupId: z.string().min(1),
+  total: z.number().int().nonnegative(),
+  failedRoomIds: z.array(z.string()),
+  completedAt: z.string().datetime(),
+});
+export const GroupSnapshotSchema = z.object({
+  groups: z.array(RoomGroupSchema),
+  activeRun: GroupRunSchema.optional(),
+  lastInterruptedRun: GroupRunSchema.optional(),
+  stopProgress: GroupStopProgressSchema.optional(),
+  refreshProgress: GroupRefreshProgressSchema.optional(),
+  lastRefreshResult: GroupRefreshResultSchema.optional(),
 });
 
 export const AsrProviderConfigSchema = z.discriminatedUnion("type", [
@@ -32,7 +97,9 @@ export const AsrProviderConfigSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal("duoduo-streaming-asr-v1"),
-    endpoint: z.url().refine((url) => url.startsWith("ws://") || url.startsWith("wss://")),
+    endpoint: z
+      .url()
+      .refine((url) => url.startsWith("ws://") || url.startsWith("wss://")),
     auth: z.enum(["none", "bearer", "x-api-key"]),
     secretId: z.string().min(1).optional(),
   }),
@@ -49,52 +116,126 @@ export const AsrEventSchema = z.object({
   occurredAt: z.string().datetime().optional(),
 });
 
-const HttpUrlSchema = z.url().refine((url) => url.startsWith("https://") || url.startsWith("http://"));
+const HttpUrlSchema = z
+  .url()
+  .refine((url) => url.startsWith("https://") || url.startsWith("http://"));
 
 export const LlmProviderConfigSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("bailian"), endpoint: HttpUrlSchema, model: z.string().min(1), secretId: z.string().min(1) }),
   z.object({
-    type: z.literal("openai-compatible"),
+    type: z.literal("bailian"),
     endpoint: HttpUrlSchema,
     model: z.string().min(1),
-    auth: z.enum(["none", "bearer", "x-api-key"]),
-    secretId: z.string().min(1).optional(),
-  }).superRefine((value, context) => {
-    if (value.auth !== "none" && !value.secretId) context.addIssue({ code: "custom", message: "LLM_SECRET_REQUIRED", path: ["secretId"] });
+    secretId: z.string().min(1),
   }),
+  z
+    .object({
+      type: z.literal("openai-compatible"),
+      endpoint: HttpUrlSchema,
+      model: z.string().min(1),
+      auth: z.enum(["none", "bearer", "x-api-key"]),
+      secretId: z.string().min(1).optional(),
+    })
+    .superRefine((value, context) => {
+      if (value.auth !== "none" && !value.secretId)
+        context.addIssue({
+          code: "custom",
+          message: "LLM_SECRET_REQUIRED",
+          path: ["secretId"],
+        });
+    }),
 ]);
 
 export const InsightNotificationSettingsSchema = z.object({
-  timeoutSeconds: z.union([z.literal(10), z.literal(30), z.literal(60), z.null()]),
+  timeoutSeconds: z.union([
+    z.literal(10),
+    z.literal(30),
+    z.literal(60),
+    z.null(),
+  ]),
 });
 
 export const MonitoringSettingsSchema = z.object({
-  monitoredCheckSeconds: z.union([z.literal(15), z.literal(30), z.literal(60), z.literal(120)]),
-  preparedCheckMinutes: z.union([z.literal(1), z.literal(3), z.literal(5), z.literal(10), z.literal(15), z.literal(30)]).optional(),
+  monitoredCheckSeconds: z.union([
+    z.literal(15),
+    z.literal(30),
+    z.literal(60),
+    z.literal(120),
+  ]),
+  preparedCheckMinutes: z
+    .union([
+      z.literal(1),
+      z.literal(3),
+      z.literal(5),
+      z.literal(10),
+      z.literal(15),
+      z.literal(30),
+    ])
+    .optional(),
 });
 
-export const DouyinTaskTypeSchema = z.enum(["verification_recovery_check", "user_play", "monitor_start", "manual_probe", "avatar_refresh", "monitor_reconnect", "startup_probe"]);
+export const DouyinTaskTypeSchema = z.enum([
+  "verification_recovery_check",
+  "user_play",
+  "monitor_start",
+  "manual_probe",
+  "avatar_refresh",
+  "monitor_reconnect",
+  "startup_probe",
+]);
 export const DouyinAccessStateSchema = z.discriminatedUnion("mode", [
   z.object({ mode: z.literal("normal") }),
-  z.object({ mode: z.literal("verification_paused"), roomId: z.string().min(1), taskType: DouyinTaskTypeSchema, triggeredAt: z.string().datetime(), reason: z.enum(["verification_required", "suspected_verification"]) }),
-  z.object({ mode: z.literal("recovery_checking"), roomId: z.string().min(1), taskType: DouyinTaskTypeSchema, triggeredAt: z.string().datetime() }),
-  z.object({ mode: z.literal("recovery_ready"), roomId: z.string().min(1), taskType: DouyinTaskTypeSchema, triggeredAt: z.string().datetime() }),
+  z.object({
+    mode: z.literal("verification_paused"),
+    roomId: z.string().min(1),
+    taskType: DouyinTaskTypeSchema,
+    triggeredAt: z.string().datetime(),
+    reason: z.enum(["verification_required", "suspected_verification"]),
+  }),
+  z.object({
+    mode: z.literal("recovery_checking"),
+    roomId: z.string().min(1),
+    taskType: DouyinTaskTypeSchema,
+    triggeredAt: z.string().datetime(),
+  }),
+  z.object({
+    mode: z.literal("recovery_ready"),
+    roomId: z.string().min(1),
+    taskType: DouyinTaskTypeSchema,
+    triggeredAt: z.string().datetime(),
+  }),
 ]);
 
-export const PreparedProbeSourceSchema = z.enum(["startup", "scheduled", "manual", "initial", "manual_batch"]);
+export const PreparedProbeSourceSchema = z.enum([
+  "startup",
+  "scheduled",
+  "manual",
+  "initial",
+  "manual_batch",
+]);
 export const ProbeRequestStateSchema = z.discriminatedUnion("phase", [
-  z.object({ roomId: z.string().min(1), requestType: z.enum(["manual", "initial"]), phase: z.enum(["queued", "running"]) }),
-  z.object({ roomId: z.string().min(1), requestType: z.literal("manual"), phase: z.literal("cooldown"), cooldownUntil: z.string().datetime() }),
+  z.object({
+    roomId: z.string().min(1),
+    requestType: z.enum(["manual", "initial"]),
+    phase: z.enum(["queued", "running"]),
+  }),
+  z.object({
+    roomId: z.string().min(1),
+    requestType: z.literal("manual"),
+    phase: z.literal("cooldown"),
+    cooldownUntil: z.string().datetime(),
+  }),
 ]);
 export const PreparedProbeStateSchema = z.object({
   mode: z.enum(["idle", "running"]),
   currentRoomId: z.string().min(1).optional(),
   queuedRoomIds: z.array(z.string().min(1)),
-  batch: z.object({
-    source: z.enum(["startup", "manual_batch"]),
-    total: z.number().int().nonnegative(),
-    completed: z.number().int().nonnegative(),
-  }).optional(),
+  batch: z
+    .object({
+      source: z.enum(["startup", "manual_batch"]),
+      total: z.number().int().nonnegative(),
+      completed: z.number().int().nonnegative(),
+    })
+    .optional(),
   nextRunAt: z.string().datetime().optional(),
   lastCompletedAt: z.string().datetime().optional(),
   estimatedCompletionAt: z.string().datetime().optional(),
@@ -108,26 +249,71 @@ export const DataRetentionSettingsSchema = z.object({
   logDays: z.number().int().min(1).max(3650),
 });
 
-export const AiUsageQuerySchema = z.object({
-  from: z.string().datetime(),
-  to: z.string().datetime(),
-  usageKind: z.enum(["production", "test"]).optional(),
-  apiKind: z.enum(["chat_completions", "paraformer_realtime"]).optional(),
-  roomId: z.string().min(1).optional(),
-  model: z.string().min(1).optional(),
-}).refine((value) => value.from < value.to, { message: "AI_USAGE_INVALID_RANGE" });
+export const AiUsageQuerySchema = z
+  .object({
+    from: z.string().datetime(),
+    to: z.string().datetime(),
+    usageKind: z.enum(["production", "test"]).optional(),
+    apiKind: z.enum(["chat_completions", "paraformer_realtime"]).optional(),
+    roomId: z.string().min(1).optional(),
+    model: z.string().min(1).optional(),
+  })
+  .refine((value) => value.from < value.to, {
+    message: "AI_USAGE_INVALID_RANGE",
+  });
 
-export const DataCategorySchema = z.enum(["observations", "aggregates", "asr", "insights", "sessions"]);
-export const CleanupRequestSchema = z.object({ category: DataCategorySchema, before: z.string().datetime(), roomId: z.string().min(1).optional() });
-export const CleanupPreviewSchema = z.object({ token: z.string().min(1), category: DataCategorySchema, count: z.number().int().nonnegative(), before: z.string().datetime(), roomId: z.string().optional() });
+export const DataCategorySchema = z.enum([
+  "observations",
+  "aggregates",
+  "asr",
+  "insights",
+  "sessions",
+]);
+export const CleanupRequestSchema = z.object({
+  category: DataCategorySchema,
+  before: z.string().datetime(),
+  roomId: z.string().min(1).optional(),
+});
+export const CleanupPreviewSchema = z.object({
+  token: z.string().min(1),
+  category: DataCategorySchema,
+  count: z.number().int().nonnegative(),
+  before: z.string().datetime(),
+  roomId: z.string().optional(),
+});
 export const StorageUsageSchema = z.object({
-  databaseBytes: z.number().int().nonnegative(), walBytes: z.number().int().nonnegative(), avatarBytes: z.number().int().nonnegative(), coverBytes: z.number().int().nonnegative(), logBytes: z.number().int().nonnegative(),
-  categories: z.array(z.object({ category: DataCategorySchema, count: z.number().int().nonnegative(), oldestAt: z.string().optional(), newestAt: z.string().optional() })),
+  databaseBytes: z.number().int().nonnegative(),
+  walBytes: z.number().int().nonnegative(),
+  avatarBytes: z.number().int().nonnegative(),
+  coverBytes: z.number().int().nonnegative(),
+  logBytes: z.number().int().nonnegative(),
+  categories: z.array(
+    z.object({
+      category: DataCategorySchema,
+      count: z.number().int().nonnegative(),
+      oldestAt: z.string().optional(),
+      newestAt: z.string().optional(),
+    }),
+  ),
 });
 
-export const ParserObjectiveSchema = z.enum(["sector_direction", "market_indicator", "volume_and_funds", "market_sentiment", "conditional_view", "risk_signal"]);
-export const ParserFilterSchema = z.enum(["greeting", "audience_question", "unendorsed_quote", "advertising", "unsupported_sentiment", "duplicate_view"]);
-export const ParserSpecSchema = z.object({
+export const ParserObjectiveSchema = z.enum([
+  "sector_direction",
+  "market_indicator",
+  "volume_and_funds",
+  "market_sentiment",
+  "conditional_view",
+  "risk_signal",
+]);
+export const ParserFilterSchema = z.enum([
+  "greeting",
+  "audience_question",
+  "unendorsed_quote",
+  "advertising",
+  "unsupported_sentiment",
+  "duplicate_view",
+]);
+export const LegacyParserSpecSchema = z.object({
   name: z.string().min(1).max(80),
   description: z.string().max(300),
   objectives: z.array(ParserObjectiveSchema).min(1),
@@ -135,6 +321,25 @@ export const ParserSpecSchema = z.object({
   normalization: z.enum(["preserve", "suggest", "strict"]),
   model: z.string().min(1),
   advancedPrompt: z.string().max(12_000).default(""),
+});
+export const ParserSpecV2Schema = z.object({
+  schemaVersion: z.literal(2),
+  name: z.string().trim().min(1).max(80),
+  model: z.string().refine((model) => Boolean(getBailianParserModel(model)), {
+    message: "PARSER_MODEL_NOT_SELECTABLE",
+  }),
+  prompt: z.string().trim().min(1).max(20_000),
+});
+export const ParserSpecSchema = z.union([
+  ParserSpecV2Schema,
+  LegacyParserSpecSchema,
+]);
+
+export const ImmutableParserSchema = z.object({
+  id: z.string().min(1),
+  spec: ParserSpecSchema,
+  createdAt: z.string().datetime(),
+  deletedAt: z.string().datetime().optional(),
 });
 
 export const ParserVersionSchema = z.object({
@@ -157,10 +362,32 @@ export const ParserDefinitionSchema = z.object({
   draftVersion: ParserVersionSchema.optional(),
 });
 
-export const RoomParserBindingSchema = z.object({ roomId: z.string().min(1), parserId: z.string().min(1), parserVersionId: z.number().int().positive(), updatedAt: z.string().datetime() });
-export const InsightNatureSchema = z.enum(["explicit", "conditional", "quote", "inference", "fact"]);
-export const InsightSubjectKindSchema = z.enum(["market", "sector", "indicator", "style", "sentiment"]);
-export const InsightDirectionSchema = z.enum(["positive", "neutral", "cautious", "risk"]);
+export const RoomParserBindingSchema = z.object({
+  roomId: z.string().min(1),
+  parserId: z.string().min(1),
+  parserVersionId: z.number().int().positive(),
+  updatedAt: z.string().datetime(),
+});
+export const InsightNatureSchema = z.enum([
+  "explicit",
+  "conditional",
+  "quote",
+  "inference",
+  "fact",
+]);
+export const InsightSubjectKindSchema = z.enum([
+  "market",
+  "sector",
+  "indicator",
+  "style",
+  "sentiment",
+]);
+export const InsightDirectionSchema = z.enum([
+  "positive",
+  "neutral",
+  "cautious",
+  "risk",
+]);
 export const InsightAlertLevelSchema = z.enum(["none", "normal", "important"]);
 
 export const MarketInsightCandidateSchema = z.object({
@@ -178,20 +405,36 @@ export const MarketInsightCandidateSchema = z.object({
 });
 
 export const MarketInsightSchema = MarketInsightCandidateSchema.extend({
-  id: z.number().int().positive(), roomId: z.string().min(1), parserId: z.string().min(1), parserVersionId: z.number().int().positive(),
-  sourceAsrIds: z.array(z.number().int().positive()).min(1), startedAt: z.string().datetime(), endedAt: z.string().datetime(), createdAt: z.string().datetime(),
-});
-
-export const ParserTestRunSchema = z.object({
-  id: z.string().min(1), parserId: z.string().min(1), publishedVersionId: z.number().int().positive(), draftVersionId: z.number().int().positive(), roomId: z.string().min(1),
-  sampleAsrIds: z.array(z.number().int().positive()).min(1), status: z.enum(["pending", "running", "completed", "failed"]),
-  publishedResults: z.array(MarketInsightCandidateSchema), draftResults: z.array(MarketInsightCandidateSchema), error: z.string().optional(), createdAt: z.string().datetime(), completedAt: z.string().datetime().optional(),
+  id: z.number().int().positive(),
+  roomId: z.string().min(1),
+  parserId: z.string().min(1),
+  parserVersionId: z.number().int().positive(),
+  sourceAsrIds: z.array(z.number().int().positive()).min(1),
+  startedAt: z.string().datetime(),
+  endedAt: z.string().datetime(),
+  createdAt: z.string().datetime(),
 });
 
 export const RoomRuntimeSchema = z.object({
   roomId: z.string(),
-  state: z.enum(["idle", "starting", "monitoring", "waiting_for_live", "recovering", "stopped", "error"]),
-  liveStatus: z.enum(["checking", "live", "offline", "login_required", "verification_required", "timeout", "page_error"]),
+  state: z.enum([
+    "idle",
+    "starting",
+    "monitoring",
+    "waiting_for_live",
+    "recovering",
+    "stopped",
+    "error",
+  ]),
+  liveStatus: z.enum([
+    "checking",
+    "live",
+    "offline",
+    "login_required",
+    "verification_required",
+    "timeout",
+    "page_error",
+  ]),
   error: z.string().optional(),
   asr: z.array(AsrEventSchema),
 });
@@ -210,7 +453,15 @@ export const MetricEvidenceSchema = z.object({
 
 export const RoomSnapshotSchema = z.object({
   roomId: z.string(),
-  status: z.enum(["checking", "live", "offline", "login_required", "verification_required", "timeout", "page_error"]),
+  status: z.enum([
+    "checking",
+    "live",
+    "offline",
+    "login_required",
+    "verification_required",
+    "timeout",
+    "page_error",
+  ]),
   title: z.string().optional(),
   anchorName: z.string().optional(),
   coverPath: z.string().optional(),
@@ -231,7 +482,14 @@ export const RoomSnapshotSchema = z.object({
 });
 
 export const TransparentLabelSchema = z.object({
-  kind: z.enum(["audience_scale", "recent_heat", "growth", "activity", "duration", "insufficient_data"]),
+  kind: z.enum([
+    "audience_scale",
+    "recent_heat",
+    "growth",
+    "activity",
+    "duration",
+    "insufficient_data",
+  ]),
   text: z.string().min(1).max(80),
   explanation: z.string().min(1).max(500),
   observedAt: z.string().datetime().optional(),
@@ -294,9 +552,17 @@ export const RoomIntelligenceSchema = RoomIntelligenceSummarySchema.extend({
 
 export type RoomInput = z.input<typeof RoomInputSchema>;
 export type Room = z.infer<typeof RoomSchema>;
+export type RoomGroup = z.infer<typeof RoomGroupSchema>;
+export type GroupRun = z.infer<typeof GroupRunSchema>;
+export type GroupStopProgress = z.infer<typeof GroupStopProgressSchema>;
+export type GroupRefreshProgress = z.infer<typeof GroupRefreshProgressSchema>;
+export type GroupRefreshResult = z.infer<typeof GroupRefreshResultSchema>;
+export type GroupSnapshot = z.infer<typeof GroupSnapshotSchema>;
 export type AsrProviderConfig = z.infer<typeof AsrProviderConfigSchema>;
 export type LlmProviderConfig = z.infer<typeof LlmProviderConfigSchema>;
-export type InsightNotificationSettings = z.infer<typeof InsightNotificationSettingsSchema>;
+export type InsightNotificationSettings = z.infer<
+  typeof InsightNotificationSettingsSchema
+>;
 export type MonitoringSettings = z.infer<typeof MonitoringSettingsSchema>;
 export type DouyinTaskType = z.infer<typeof DouyinTaskTypeSchema>;
 export type DouyinAccessState = z.infer<typeof DouyinAccessStateSchema>;
@@ -315,24 +581,40 @@ export type TransparentLabel = z.infer<typeof TransparentLabelSchema>;
 export type RoomMetricPoint = z.infer<typeof RoomMetricPointSchema>;
 export type RoomPeriodSummary = z.infer<typeof RoomPeriodSummarySchema>;
 export type RoomSessionSummary = z.infer<typeof RoomSessionSummarySchema>;
-export type RoomIntelligenceSummary = z.infer<typeof RoomIntelligenceSummarySchema>;
+export type RoomIntelligenceSummary = z.infer<
+  typeof RoomIntelligenceSummarySchema
+>;
 export type RoomIntelligence = z.infer<typeof RoomIntelligenceSchema>;
 export type ParserSpec = z.infer<typeof ParserSpecSchema>;
+export type LegacyParserSpec = z.infer<typeof LegacyParserSpecSchema>;
+export type ParserSpecV2 = z.infer<typeof ParserSpecV2Schema>;
+export type ImmutableParser = z.infer<typeof ImmutableParserSchema>;
 export type ParserVersion = z.infer<typeof ParserVersionSchema>;
 export type ParserDefinition = z.infer<typeof ParserDefinitionSchema>;
 export type RoomParserBinding = z.infer<typeof RoomParserBindingSchema>;
-export type MarketInsightCandidate = z.infer<typeof MarketInsightCandidateSchema>;
+export type MarketInsightCandidate = z.infer<
+  typeof MarketInsightCandidateSchema
+>;
 export type MarketInsight = z.infer<typeof MarketInsightSchema>;
-export type ParserTestRun = z.infer<typeof ParserTestRunSchema>;
 
-export function normalizeDouyinUrl(value: string): { roomId: string; canonicalUrl: string } {
+export function normalizeDouyinUrl(value: string): {
+  roomId: string;
+  canonicalUrl: string;
+} {
   try {
     const url = new URL(value);
     const match = url.pathname.match(/^\/(\d+)\/?$/);
-    if (url.protocol !== "https:" || url.hostname !== "live.douyin.com" || !match) {
+    if (
+      url.protocol !== "https:" ||
+      url.hostname !== "live.douyin.com" ||
+      !match
+    ) {
       throw new Error();
     }
-    return { roomId: match[1], canonicalUrl: `https://live.douyin.com/${match[1]}` };
+    return {
+      roomId: match[1],
+      canonicalUrl: `https://live.douyin.com/${match[1]}`,
+    };
   } catch {
     throw new Error("INVALID_ROOM_URL");
   }

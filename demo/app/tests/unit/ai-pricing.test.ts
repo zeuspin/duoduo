@@ -3,6 +3,48 @@ import { calculateCatalogCost } from "../../src/main/usage/pricing";
 
 describe("calculateCatalogCost", () => {
   it.each([
+    ["qwen3.7-plus-2026-05-26", 2, 8],
+    ["qwen3.7-max-2026-05-20", 12, 36],
+    ["qwen3.5-flash-2026-02-23", 0.2, 2],
+    ["deepseek-v4-pro", 12, 24],
+    ["deepseek-v4-flash", 1, 2],
+    ["deepseek-v3.2", 2, 3],
+    ["glm-5.2", 8, 28],
+    ["kimi-k2.6", 6.5, 27],
+  ])("prices verified model %s", (model, inputPrice, outputPrice) => {
+    expect(
+      calculateCatalogCost({
+        apiKind: "chat_completions",
+        model,
+        region: "cn-beijing",
+        thinkingEnabled: false,
+        promptTokens: 1_000,
+        completionTokens: 500,
+      }),
+    ).toEqual({
+      status: "calculated",
+      ruleKey: expect.stringContaining(model),
+      inputCostMicros: Math.round(1_000 * inputPrice),
+      outputCostMicros: Math.round(500 * outputPrice),
+      totalCostMicros: Math.round(1_000 * inputPrice + 500 * outputPrice),
+      currency: "CNY",
+    });
+  });
+
+  it("uses the qwen 3.7 plus long-context tier", () => {
+    expect(
+      calculateCatalogCost({
+        apiKind: "chat_completions",
+        model: "qwen3.7-plus-2026-05-26",
+        region: "cn-beijing",
+        thinkingEnabled: false,
+        promptTokens: 262_145,
+        completionTokens: 1,
+      }),
+    ).toMatchObject({ inputCostMicros: 1_572_870, outputCostMicros: 24 });
+  });
+
+  it.each([
     [1, 1, 262_144],
     [131_072, 104_858, 262_144],
     [131_073, 314_575, 2_621_440],

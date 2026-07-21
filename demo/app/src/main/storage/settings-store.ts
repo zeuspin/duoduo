@@ -34,7 +34,11 @@ export class SettingsStore {
 
   async ensureDefaultBailianLlm(): Promise<boolean> {
     const document = await this.read();
-    if (document.llmProvider || document.provider?.type !== "bailian") return false;
+    if (document.provider?.type !== "bailian") return false;
+    if (
+      document.llmProvider?.type === "bailian" &&
+      document.llmProvider.secretId === document.provider.secretId
+    ) return false;
     document.llmProvider = { type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: document.provider.secretId };
     await this.write(document);
     return true;

@@ -29,4 +29,11 @@ describe("InsightNotificationRail", () => {
     render(<InsightNotificationRail items={Array.from({ length: 24 }, (_, index) => item(index + 1))} timeoutSeconds={null} roomName={() => "直播间"} onOpen={vi.fn()} onDismiss={vi.fn()} />);
     expect(document.querySelectorAll(".insight-notification-track article")).toHaveLength(20);
   });
+
+  it("uses the room avatar and keeps the room identity separate from time", () => {
+    render(<InsightNotificationRail items={[item(1)]} timeoutSeconds={null} roomName={() => "大潘说股的抖音直播间"} roomAvatar={() => "duoduo-avatar://123?v=avatar.png"} onOpen={vi.fn()} onDismiss={vi.fn()} />);
+    expect(document.querySelector(".insight-notification-avatar")?.getAttribute("src")).toBe("duoduo-avatar://123?v=avatar.png");
+    expect(screen.getByText("大潘说股的抖音直播间").tagName).toBe("STRONG");
+    expect(document.querySelector(".insight-notification-identity time")).not.toBeNull();
+  });
 });

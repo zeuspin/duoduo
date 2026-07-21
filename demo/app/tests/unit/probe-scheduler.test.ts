@@ -1,13 +1,39 @@
 import { describe, expect, it, vi } from "vitest";
-import { estimateSafeBatchDurationMs, ProbeScheduler, splitPreparedStartupRooms } from "../../src/main/rooms/probe-scheduler";
+import {
+  estimateSafeBatchDurationMs,
+  ProbeScheduler,
+  splitPreparedStartupRooms,
+} from "../../src/main/rooms/probe-scheduler";
 import type { PreparedProbeState } from "../../src/shared/contracts";
 
 describe("ProbeScheduler", () => {
+  it("moves an automatic probe that would fall outside the room schedule to the next allowed window", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 6, 20, 8, 0, 0)); // Monday
+    const scheduler = new ProbeScheduler(vi.fn(), {
+      now: () => Date.now(),
+      jitterRatio: 0,
+    });
+    scheduler.schedule("a", {
+      probeIntervalMinutes: 5,
+      schedule: { days: [1], ranges: [{ start: "09:00", end: "10:00" }] },
+    });
+    expect(scheduler.state().nextRunAt).toBe(
+      new Date(2026, 6, 20, 9, 0, 0).toISOString(),
+    );
+    void scheduler.stop();
+    vi.useRealTimers();
+  });
   it("restores rooms without a final snapshot as prioritized initial probes", () => {
-    expect(splitPreparedStartupRooms(["new", "stuck", "known"], [
-      { roomId: "stuck", status: "checking" },
-      { roomId: "known", status: "offline" },
-    ])).toEqual({ initialRoomIds: ["new", "stuck"], refreshRoomIds: ["known"] });
+    expect(
+      splitPreparedStartupRooms(
+        ["new", "stuck", "known"],
+        [
+          { roomId: "stuck", status: "checking" },
+          { roomId: "known", status: "offline" },
+        ],
+      ),
+    ).toEqual({ initialRoomIds: ["new", "stuck"], refreshRoomIds: ["known"] });
   });
   it("estimates the earliest safe batch completion across rolling-hour limits", () => {
     expect(estimateSafeBatchDurationMs(1, 60_000, 10)).toBe(0);
@@ -18,7 +44,12 @@ describe("ProbeScheduler", () => {
 
   it("prevents overlapping probes for the same room", async () => {
     let release!: () => void;
-    const probe = vi.fn(() => new Promise<void>((resolve) => { release = resolve; }));
+    const probe = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
     const scheduler = new ProbeScheduler(probe);
     const first = scheduler.runNow("123");
     const second = scheduler.runNow("123");
@@ -28,7 +59,9 @@ describe("ProbeScheduler", () => {
   });
 
   it("uses the room interval override or global default", () => {
-    const scheduler = new ProbeScheduler(async () => undefined, { defaultIntervalMinutes: 5 });
+    const scheduler = new ProbeScheduler(async () => undefined, {
+      defaultIntervalMinutes: 5,
+    });
     expect(scheduler.intervalMs({ probeIntervalMinutes: 1 })).toBe(60_000);
     expect(scheduler.intervalMs({ probeIntervalMinutes: null })).toBe(300_000);
   });
@@ -59,7 +92,9 @@ describe("ProbeScheduler", () => {
 
   it("limits probes across different rooms to the configured concurrency", async () => {
     const releases: Array<() => void> = [];
-    const probe = vi.fn(() => new Promise<void>((resolve) => releases.push(resolve)));
+    const probe = vi.fn(
+      () => new Promise<void>((resolve) => releases.push(resolve)),
+    );
     const scheduler = new ProbeScheduler(probe, { maxConcurrency: 1 });
     const first = scheduler.runNow("a");
     const second = scheduler.runNow("b");
@@ -75,16 +110,24 @@ describe("ProbeScheduler", () => {
   it("promotes a requested room ahead of queued automatic probes", async () => {
     const order: string[] = [];
     const releases: Array<() => void> = [];
-    const scheduler = new ProbeScheduler((roomId) => new Promise((resolve) => {
-      order.push(roomId);
-      releases.push(() => resolve({ status: "offline" }));
-    }), { maxConcurrency: 1 });
+    const scheduler = new ProbeScheduler(
+      (roomId) =>
+        new Promise((resolve) => {
+          order.push(roomId);
+          releases.push(() => resolve({ status: "offline" }));
+        }),
+      { maxConcurrency: 1 },
+    );
     const active = scheduler.runNow("a", "scheduled");
     const automatic = scheduler.runNow("b", "scheduled");
     const requested = scheduler.runNow("c", "manual");
 
     expect(order).toEqual(["a", "c"]);
-    expect(scheduler.state().manualProbes).toContainEqual({ roomId: "c", requestType: "manual", phase: "running" });
+    expect(scheduler.state().manualProbes).toContainEqual({
+      roomId: "c",
+      requestType: "manual",
+      phase: "running",
+    });
     releases.shift()!();
     await active;
     releases.shift()!();
@@ -97,16 +140,24 @@ describe("ProbeScheduler", () => {
   it("lets an initial probe bypass an automatic task that is waiting upstream", async () => {
     const releases = new Map<string, () => void>();
     const started: string[] = [];
-    const scheduler = new ProbeScheduler((roomId) => new Promise((resolve) => {
-      started.push(roomId);
-      releases.set(roomId, () => resolve({ status: "offline" }));
-    }), { maxConcurrency: 1 });
+    const scheduler = new ProbeScheduler(
+      (roomId) =>
+        new Promise((resolve) => {
+          started.push(roomId);
+          releases.set(roomId, () => resolve({ status: "offline" }));
+        }),
+      { maxConcurrency: 1 },
+    );
     const automatic = scheduler.runNow("automatic", "scheduled");
 
     const initial = scheduler.runNow("new-room", "initial");
 
     expect(started).toEqual(["automatic", "new-room"]);
-    expect(scheduler.state().manualProbes).toContainEqual({ roomId: "new-room", requestType: "initial", phase: "running" });
+    expect(scheduler.state().manualProbes).toContainEqual({
+      roomId: "new-room",
+      requestType: "initial",
+      phase: "running",
+    });
     releases.get("new-room")!();
     await initial;
     releases.get("automatic")!();
@@ -116,16 +167,24 @@ describe("ProbeScheduler", () => {
   it("upgrades an already queued automatic room without duplicating it", async () => {
     const order: string[] = [];
     const releases: Array<() => void> = [];
-    const scheduler = new ProbeScheduler((roomId) => new Promise((resolve) => {
-      order.push(roomId);
-      releases.push(() => resolve({ status: "offline" }));
-    }), { maxConcurrency: 1 });
+    const scheduler = new ProbeScheduler(
+      (roomId) =>
+        new Promise((resolve) => {
+          order.push(roomId);
+          releases.push(() => resolve({ status: "offline" }));
+        }),
+      { maxConcurrency: 1 },
+    );
     const active = scheduler.runNow("a", "scheduled");
     const automatic = scheduler.runNow("b", "scheduled");
     const upgraded = scheduler.runNow("b", "manual");
 
     expect(upgraded).toBe(automatic);
-    expect(scheduler.state().manualProbes).toContainEqual({ roomId: "b", requestType: "manual", phase: "queued" });
+    expect(scheduler.state().manualProbes).toContainEqual({
+      roomId: "b",
+      requestType: "manual",
+      phase: "queued",
+    });
     releases.shift()!();
     await active;
     await vi.waitFor(() => expect(order).toEqual(["a", "b"]));
@@ -137,26 +196,48 @@ describe("ProbeScheduler", () => {
   it("starts manual cooldown only after a successful probe completes", async () => {
     let now = 1_000;
     let release!: () => void;
-    const scheduler = new ProbeScheduler(() => new Promise((resolve) => {
-      release = () => resolve({ status: "offline" });
-    }), { now: () => now, manualCooldownMs: 60_000 });
+    const scheduler = new ProbeScheduler(
+      () =>
+        new Promise((resolve) => {
+          release = () => resolve({ status: "offline" });
+        }),
+      { now: () => now, manualCooldownMs: 60_000 },
+    );
 
     const task = scheduler.runNow("a", "manual");
-    expect(scheduler.state().manualProbes).toContainEqual({ roomId: "a", requestType: "manual", phase: "running" });
-    expect(scheduler.state().manualProbes.some((item) => item.phase === "cooldown")).toBe(false);
+    expect(scheduler.state().manualProbes).toContainEqual({
+      roomId: "a",
+      requestType: "manual",
+      phase: "running",
+    });
+    expect(
+      scheduler.state().manualProbes.some((item) => item.phase === "cooldown"),
+    ).toBe(false);
     now += 10_000;
     release();
     await task;
-    expect(scheduler.state().manualProbes).toContainEqual({ roomId: "a", requestType: "manual", phase: "cooldown", cooldownUntil: new Date(71_000).toISOString() });
+    expect(scheduler.state().manualProbes).toContainEqual({
+      roomId: "a",
+      requestType: "manual",
+      phase: "cooldown",
+      cooldownUntil: new Date(71_000).toISOString(),
+    });
   });
 
   it("publishes initial progress without adding a manual cooldown", async () => {
     let release!: () => void;
-    const scheduler = new ProbeScheduler(() => new Promise((resolve) => {
-      release = () => resolve({ status: "offline" });
-    }));
+    const scheduler = new ProbeScheduler(
+      () =>
+        new Promise((resolve) => {
+          release = () => resolve({ status: "offline" });
+        }),
+    );
     const task = scheduler.runNow("new-room", "initial");
-    expect(scheduler.state().manualProbes).toContainEqual({ roomId: "new-room", requestType: "initial", phase: "running" });
+    expect(scheduler.state().manualProbes).toContainEqual({
+      roomId: "new-room",
+      requestType: "initial",
+      phase: "running",
+    });
     release();
     await task;
     expect(scheduler.state().manualProbes).toEqual([]);
@@ -165,10 +246,13 @@ describe("ProbeScheduler", () => {
   it("runs a startup batch serially without scheduling recurring probes", async () => {
     const order: string[] = [];
     let release!: () => void;
-    const scheduler = new ProbeScheduler((roomId) => new Promise((resolve) => {
-      order.push(roomId);
-      release = () => resolve({ status: "offline" });
-    }));
+    const scheduler = new ProbeScheduler(
+      (roomId) =>
+        new Promise((resolve) => {
+          order.push(roomId);
+          release = () => resolve({ status: "offline" });
+        }),
+    );
     const batch = scheduler.runStartup(["a", "b"]);
     expect(order).toEqual(["a"]);
     release();
@@ -181,7 +265,10 @@ describe("ProbeScheduler", () => {
   it("rejects a repeated manual probe during the 60 second cooldown", async () => {
     let now = 1_000;
     const probe = vi.fn(async () => ({ status: "offline" as const }));
-    const scheduler = new ProbeScheduler(probe, { now: () => now, manualCooldownMs: 60_000 });
+    const scheduler = new ProbeScheduler(probe, {
+      now: () => now,
+      manualCooldownMs: 60_000,
+    });
     await scheduler.runNow("123");
     await expect(scheduler.runNow("123")).rejects.toThrow("PROBE_COOLDOWN");
     now += 60_000;
@@ -190,7 +277,12 @@ describe("ProbeScheduler", () => {
   });
 
   it("stops the remaining startup queue after a verification page", async () => {
-    const probe = vi.fn(async (roomId: string) => ({ status: roomId === "a" ? "verification_required" as const : "offline" as const }));
+    const probe = vi.fn(async (roomId: string) => ({
+      status:
+        roomId === "a"
+          ? ("verification_required" as const)
+          : ("offline" as const),
+    }));
     const scheduler = new ProbeScheduler(probe);
     await scheduler.runStartup(["a", "b", "c"]);
     expect(probe).toHaveBeenCalledTimes(1);
@@ -199,7 +291,13 @@ describe("ProbeScheduler", () => {
 
   it("clears already queued manual probes after a verification page", async () => {
     let release!: (result: { status: string }) => void;
-    const probe = vi.fn((roomId: string) => roomId === "a" ? new Promise<{ status: string }>((resolve) => { release = resolve; }) : Promise.resolve({ status: "offline" }));
+    const probe = vi.fn((roomId: string) =>
+      roomId === "a"
+        ? new Promise<{ status: string }>((resolve) => {
+            release = resolve;
+          })
+        : Promise.resolve({ status: "offline" }),
+    );
     const scheduler = new ProbeScheduler(probe);
     const first = scheduler.runNow("a");
     const queued = scheduler.runNow("b");
@@ -209,15 +307,25 @@ describe("ProbeScheduler", () => {
   });
 
   it("jitters recurring delays to avoid synchronized platform requests", () => {
-    const scheduler = new ProbeScheduler(async () => undefined, { defaultIntervalMinutes: 5, jitterRatio: 0.2, random: () => 0 });
-    expect(scheduler.jitteredIntervalMs({ probeIntervalMinutes: null })).toBe(240_000);
+    const scheduler = new ProbeScheduler(async () => undefined, {
+      defaultIntervalMinutes: 5,
+      jitterRatio: 0.2,
+      random: () => 0,
+    });
+    expect(scheduler.jitteredIntervalMs({ probeIntervalMinutes: null })).toBe(
+      240_000,
+    );
   });
 
   it("runs a manual batch serially and publishes progress", async () => {
     const releases: Array<() => void> = [];
-    const scheduler = new ProbeScheduler((_roomId, _source) => new Promise((resolve) => {
-      releases.push(() => resolve({ status: "offline" }));
-    }), { maxConcurrency: 1 });
+    const scheduler = new ProbeScheduler(
+      (_roomId, _source) =>
+        new Promise((resolve) => {
+          releases.push(() => resolve({ status: "offline" }));
+        }),
+      { maxConcurrency: 1 },
+    );
     const states: PreparedProbeState[] = [];
     scheduler.subscribe((state) => states.push(state));
 
@@ -240,14 +348,25 @@ describe("ProbeScheduler", () => {
   it("publishes the earliest safe completion estimate for a batch", async () => {
     const now = Date.parse("2026-07-17T06:00:00.000Z");
     let release!: () => void;
-    const scheduler = new ProbeScheduler(() => new Promise<void>((resolve) => { release = resolve; }), {
-      now: () => now,
-      safeNavigationGapMs: 60_000,
-      automaticBudgetPerHour: 10,
-    });
+    const scheduler = new ProbeScheduler(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+      {
+        now: () => now,
+        safeNavigationGapMs: 60_000,
+        automaticBudgetPerHour: 10,
+      },
+    );
 
-    const batch = scheduler.runBatch(Array.from({ length: 18 }, (_, index) => String(index)), "manual_batch");
-    expect(scheduler.state().estimatedCompletionAt).toBe(new Date(now + 67 * 60_000).toISOString());
+    const batch = scheduler.runBatch(
+      Array.from({ length: 18 }, (_, index) => String(index)),
+      "manual_batch",
+    );
+    expect(scheduler.state().estimatedCompletionAt).toBe(
+      new Date(now + 67 * 60_000).toISOString(),
+    );
     scheduler.cancelManualBatch();
     release();
     await batch;
@@ -255,7 +374,12 @@ describe("ProbeScheduler", () => {
 
   it("cancels only queued manual-batch rooms and lets the active room finish", async () => {
     let release!: () => void;
-    const probe = vi.fn(() => new Promise<void>((resolve) => { release = resolve; }));
+    const probe = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
     const scheduler = new ProbeScheduler(probe, { maxConcurrency: 1 });
     const batch = scheduler.runBatch(["a", "b", "c"], "manual_batch");
 
@@ -268,10 +392,17 @@ describe("ProbeScheduler", () => {
 
   it("waits for an active room probe when cancellation must hand off its page access", async () => {
     let release!: () => void;
-    const scheduler = new ProbeScheduler(() => new Promise<void>((resolve) => { release = resolve; }));
+    const scheduler = new ProbeScheduler(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
     void scheduler.runNow("a", "scheduled");
     let canceled = false;
-    const cancellation = Promise.resolve(scheduler.cancel("a")).then(() => { canceled = true; });
+    const cancellation = Promise.resolve(scheduler.cancel("a")).then(() => {
+      canceled = true;
+    });
 
     await Promise.resolve();
     expect(canceled).toBe(false);
@@ -283,9 +414,14 @@ describe("ProbeScheduler", () => {
   it("records the earliest recurring deadline and uses scheduled source", async () => {
     vi.useFakeTimers();
     const probe = vi.fn(async () => ({ status: "offline" as const }));
-    const scheduler = new ProbeScheduler(probe, { now: () => Date.now(), jitterRatio: 0 });
+    const scheduler = new ProbeScheduler(probe, {
+      now: () => Date.now(),
+      jitterRatio: 0,
+    });
     scheduler.schedule("a", { probeIntervalMinutes: 1 }, 1_000);
-    expect(scheduler.state().nextRunAt).toBe(new Date(Date.now() + 1_000).toISOString());
+    expect(scheduler.state().nextRunAt).toBe(
+      new Date(Date.now() + 1_000).toISOString(),
+    );
     await vi.advanceTimersByTimeAsync(1_000);
     expect(probe).toHaveBeenCalledWith("a", "scheduled");
     vi.useRealTimers();
@@ -294,35 +430,54 @@ describe("ProbeScheduler", () => {
   it("backs trusted offline rooms off for 30, 60, then 120 minutes", async () => {
     vi.useFakeTimers();
     const probe = vi.fn(async () => ({ status: "offline" as const }));
-    const scheduler = new ProbeScheduler(probe, { now: () => Date.now(), jitterRatio: 0 });
+    const scheduler = new ProbeScheduler(probe, {
+      now: () => Date.now(),
+      jitterRatio: 0,
+    });
     scheduler.schedule("a", { probeIntervalMinutes: 1 }, 1_000);
 
     await vi.advanceTimersByTimeAsync(1_000);
-    expect(scheduler.state().nextRunAt).toBe(new Date(Date.now() + 30 * 60_000).toISOString());
+    expect(scheduler.state().nextRunAt).toBe(
+      new Date(Date.now() + 30 * 60_000).toISOString(),
+    );
     await vi.advanceTimersByTimeAsync(30 * 60_000);
-    expect(scheduler.state().nextRunAt).toBe(new Date(Date.now() + 60 * 60_000).toISOString());
+    expect(scheduler.state().nextRunAt).toBe(
+      new Date(Date.now() + 60 * 60_000).toISOString(),
+    );
     await vi.advanceTimersByTimeAsync(60 * 60_000);
-    expect(scheduler.state().nextRunAt).toBe(new Date(Date.now() + 120 * 60_000).toISOString());
+    expect(scheduler.state().nextRunAt).toBe(
+      new Date(Date.now() + 120 * 60_000).toISOString(),
+    );
     vi.useRealTimers();
   });
 
   it("never schedules a known live room status navigation faster than ten minutes", async () => {
     vi.useFakeTimers();
     const probe = vi.fn(async () => ({ status: "live" as const }));
-    const scheduler = new ProbeScheduler(probe, { now: () => Date.now(), jitterRatio: 0 });
+    const scheduler = new ProbeScheduler(probe, {
+      now: () => Date.now(),
+      jitterRatio: 0,
+    });
     scheduler.schedule("a", { probeIntervalMinutes: 1 }, 1_000);
     await vi.advanceTimersByTimeAsync(1_000);
-    expect(scheduler.state().nextRunAt).toBe(new Date(Date.now() + 10 * 60_000).toISOString());
+    expect(scheduler.state().nextRunAt).toBe(
+      new Date(Date.now() + 10 * 60_000).toISOString(),
+    );
     vi.useRealTimers();
   });
 
   it("re-arms the safe delay from a startup result instead of retaining the short initial timer", async () => {
     vi.useFakeTimers();
     const probe = vi.fn(async () => ({ status: "offline" as const }));
-    const scheduler = new ProbeScheduler(probe, { now: () => Date.now(), jitterRatio: 0 });
+    const scheduler = new ProbeScheduler(probe, {
+      now: () => Date.now(),
+      jitterRatio: 0,
+    });
     scheduler.schedule("a", { probeIntervalMinutes: 1 }, 60_000);
     await scheduler.runStartup(["a"]);
-    expect(scheduler.state().nextRunAt).toBe(new Date(Date.now() + 30 * 60_000).toISOString());
+    expect(scheduler.state().nextRunAt).toBe(
+      new Date(Date.now() + 30 * 60_000).toISOString(),
+    );
     vi.useRealTimers();
   });
 });

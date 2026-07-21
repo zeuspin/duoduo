@@ -1,51 +1,303 @@
-import { Check, Flask, PencilSimple, Trash, Warning } from "@phosphor-icons/react";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
-import type { LlmProviderConfig, ParserDefinition, ParserSpec, ParserTestRun, Room, RoomParserBinding, RoomSnapshot } from "../../shared/contracts";
+import { useEffect, useState, type FormEvent } from "react";
+import type {
+  ImmutableParser,
+  ParserSpecV2,
+  Room,
+  RoomSnapshot,
+} from "../../shared/contracts";
+import {
+  BAILIAN_PARSER_MODELS,
+  DEFAULT_PARSER_MODEL_ID,
+  getBailianParserModel,
+  type BailianParserModel,
+} from "../../shared/bailian-model-catalog";
+import {
+  DEFAULT_PARSER_PROMPT,
+  materializeParserPrompt,
+} from "../../shared/parser-prompt";
 
-interface ParserSnapshot { definitions: ParserDefinition[]; bindings: RoomParserBinding[]; tests: ParserTestRun[]; llmConfigured: boolean }
-const objectives: Array<[ParserSpec["objectives"][number], string]> = [["sector_direction", "板块方向"], ["market_indicator", "大盘指标解读"], ["volume_and_funds", "量价与资金"], ["market_sentiment", "市场情绪"], ["conditional_view", "条件性判断"], ["risk_signal", "风险信号"]];
-const filters: Array<[ParserSpec["filters"][number], string]> = [["greeting", "寒暄互动"], ["audience_question", "观众提问"], ["unendorsed_quote", "未认可的转述"], ["advertising", "广告引导"], ["unsupported_sentiment", "无依据情绪词"], ["duplicate_view", "重复观点"]];
-const testStatusLabels: Record<string, string> = { running: "测试中", completed: "测试完成", failed: "测试失败" };
-
-export function ParserManagement({ rooms, snapshots }: { rooms: Room[]; snapshots: RoomSnapshot[] }) {
-  const [data, setData] = useState<ParserSnapshot>({ definitions: [], bindings: [], tests: [], llmConfigured: false });
-  const [editing, setEditing] = useState<ParserDefinition>();
-  const [message, setMessage] = useState("");
-  const [llm, setLlm] = useState<LlmProviderConfig>({ type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: "llm-main" });
-  const [secret, setSecret] = useState("");
-  const [testRoom, setTestRoom] = useState(rooms[0]?.roomId ?? "");
-  const refresh = async () => setData(await window.duoduo.parsers.list() as ParserSnapshot);
-  useEffect(() => { void refresh(); void window.duoduo.llm.get().then((value) => { if (value) setLlm(value as LlmProviderConfig); }); }, []);
-
-  async function beginEdit(parser: ParserDefinition) {
-    const next = parser.draftVersion ? data : await window.duoduo.parsers.createDraft(parser.id) as ParserSnapshot;
-    setData(next); setEditing(next.definitions.find((item) => item.id === parser.id));
-  }
-  async function bind(roomId: string, value: string) {
-    const [parserId, version] = value.split(":");
-    setData(await window.duoduo.parsers.bindRoom(roomId, value === "none" ? null : parserId, value === "none" ? null : Number(version)) as ParserSnapshot);
-    setMessage(value === "none" ? "该直播间将仅保存直播文字" : "直播间分析规则已更新");
-  }
-  async function saveLlm(event: FormEvent) { event.preventDefault(); await window.duoduo.llm.save(llm, secret); setSecret(""); setMessage("内容分析服务设置已保存"); await refresh(); }
-  async function testLlm() { const result = await window.duoduo.llm.test(llm, secret) as { message: string }; setMessage(result.message); }
-  const latestTest = data.tests[0];
-
-  return <div className="parser-page">
-    <div className="heading"><div><h1>内容分析规则</h1><p>设置需要关注的内容，并选择应用这些规则的直播间。</p></div></div>
-    <section className="parser-panel"><div className="parser-panel-head"><b>内容分析服务</b><span>{data.llmConfigured ? "已设置" : "设置后才能产生观点"}</span></div><form className="llm-row" onSubmit={saveLlm}><select value={llm.type} onChange={(event) => setLlm(event.target.value === "bailian" ? { type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: "llm-main" } : { type: "openai-compatible", endpoint: "https://", model: "", auth: "bearer", secretId: "llm-main" })}><option value="bailian">阿里云百炼</option><option value="openai-compatible">OpenAI-compatible</option></select>{llm.type === "openai-compatible" && <input className="endpoint-input" aria-label="模型接口地址" value={llm.endpoint} onChange={(event) => setLlm({ ...llm, endpoint: event.target.value })} placeholder="https://gateway.example/v1/chat/completions" />}<input aria-label="模型" value={llm.model} onChange={(event) => setLlm({ ...llm, model: event.target.value })} placeholder="模型名" /><input aria-label="模型 API Key" type="password" value={secret} onChange={(event) => setSecret(event.target.value)} placeholder="API Key（留空则使用已保存值）" /><button type="button" onClick={() => void testLlm()}>测试连接</button><button className="primary" type="submit">保存</button></form></section>
-    <section className="parser-panel"><div className="parser-panel-head"><b>分析规则</b><span>已启用版本与测试草稿相互独立</span></div><div className="parser-table"><div className="parser-tr parser-th"><span>分析规则</span><span>版本</span><span>使用直播间</span><span>操作</span></div>{data.definitions.map((parser) => <div className="parser-tr" key={parser.id}><div><b>{parser.name}</b><small>{parser.description}</small></div><span>{parser.publishedVersion ? `已启用 v${parser.publishedVersion.version}` : "未启用"}{parser.draftVersion && <i>草稿 v{parser.draftVersion.version}</i>}</span><b>{data.bindings.filter((binding) => binding.parserId === parser.id).length} 路</b><div className="parser-actions"><button onClick={() => void beginEdit(parser)}><PencilSimple />编辑</button>{parser.draftVersion && <button onClick={() => void window.duoduo.parsers.removeDraft(parser.id).then(refresh)}><Trash />删除草稿</button>}</div></div>)}</div></section>
-    {editing?.draftVersion && <ParserEditor parser={editing} rooms={rooms} testRoom={testRoom} setTestRoom={setTestRoom} onUpdated={(next) => { setData(next); setEditing(next.definitions.find((item) => item.id === editing.id)); }} onMessage={setMessage} />}
-    <section className="parser-panel"><div className="parser-panel-head"><b>应用到直播间</b><span>每个直播间最多使用一条分析规则</span></div><div className="binding-list">{rooms.map((room) => { const snapshot = snapshots.find((item) => item.roomId === room.roomId); const binding = data.bindings.find((item) => item.roomId === room.roomId); return <div className="binding-row" key={room.roomId}><div><b>{snapshot?.anchorName || snapshot?.title || `直播间 ${room.roomId}`}</b><small>{room.monitoring ? "正在监看 · 正在记录直播文字" : "未监看"}</small></div><select aria-label={`直播间 ${room.roomId} 的分析规则`} value={binding ? `${binding.parserId}:${binding.parserVersionId}` : "none"} onChange={(event) => void bind(room.roomId, event.target.value)}><option value="none">不分析（仅保存直播文字）</option>{data.definitions.flatMap((parser) => parser.publishedVersion ? [<option value={`${parser.id}:${parser.publishedVersion.id}`} key={parser.id}>{parser.name} v{parser.publishedVersion.version}</option>] : [])}</select><span className={binding ? "binding-on" : "binding-off"}>{binding ? "正在分析" : "仅保存直播文字"}</span></div>; })}</div></section>
-    {latestTest && <section className="parser-panel"><div className="parser-panel-head"><b>最近对照测试</b><span>{testStatusLabels[latestTest.status] ?? "状态更新中"}</span></div><div className="compare-grid"><div><h3>当前启用版本</h3>{latestTest.publishedResults.map((item, index) => <p key={index}>{item.summary}</p>)}</div><div><h3>测试草稿</h3>{latestTest.draftResults.map((item, index) => <p key={index}>{item.summary}</p>)}</div></div></section>}
-    {message && <div className="toast">{message}<button onClick={() => setMessage("")}>×</button></div>}
-  </div>;
+interface ParserSnapshot {
+  parsers: ImmutableParser[];
+  llmConfigured: boolean;
 }
 
-function ParserEditor({ parser, rooms, testRoom, setTestRoom, onUpdated, onMessage }: { parser: ParserDefinition; rooms: Room[]; testRoom: string; setTestRoom(value: string): void; onUpdated(value: ParserSnapshot): void; onMessage(value: string): void }) {
-  const draft = parser.draftVersion!; const [spec, setSpec] = useState(draft.spec);
-  const toggle = <T extends string>(values: T[], value: T) => values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
-  async function save() { onUpdated(await window.duoduo.parsers.updateDraft(draft.id, spec) as ParserSnapshot); onMessage(`测试草稿 v${draft.version} 已保存，当前启用版本未受影响`); }
-  async function run() { if (!testRoom) return; onUpdated(await window.duoduo.parsers.runTest(parser.id, testRoom, 50) as ParserSnapshot); onMessage("相同直播文字样本的对照已完成"); }
-  async function publish() { if (!confirm(`启用 v${draft.version}？使用这条规则的直播间将从下一段文字起使用新版本。`)) return; onUpdated(await window.duoduo.parsers.publish(parser.id, draft.id) as ParserSnapshot); onMessage(`v${draft.version} 已启用`); }
-  return <section className="parser-panel editor-panel"><div className="parser-panel-head"><b>编辑测试草稿 v{draft.version}</b><span>不会影响当前启用版本</span></div><div className="parser-editor"><label>分析规则名称<input value={spec.name} onChange={(event) => setSpec({ ...spec, name: event.target.value })} /></label><label>说明<input value={spec.description} onChange={(event) => setSpec({ ...spec, description: event.target.value })} /></label><fieldset><legend>关注内容</legend>{objectives.map(([value, label]) => <label key={value}><input type="checkbox" checked={spec.objectives.includes(value)} onChange={() => setSpec({ ...spec, objectives: toggle(spec.objectives, value) })} />{label}</label>)}</fieldset><fieldset><legend>忽略内容</legend>{filters.map(([value, label]) => <label key={value}><input type="checkbox" checked={spec.filters.includes(value)} onChange={() => setSpec({ ...spec, filters: toggle(spec.filters, value) })} />{label}</label>)}</fieldset><label>模型<input value={spec.model} onChange={(event) => setSpec({ ...spec, model: event.target.value })} /></label><label>板块名称<select value={spec.normalization} onChange={(event) => setSpec({ ...spec, normalization: event.target.value as ParserSpec["normalization"] })}><option value="preserve">保留主播原话</option><option value="suggest">保留原话并建议标准名称</option><option value="strict">仅明确时规范化</option></select></label><details><summary>高级提示规则</summary><textarea value={spec.advancedPrompt} onChange={(event) => setSpec({ ...spec, advancedPrompt: event.target.value })} /></details><div className="editor-actions"><button onClick={() => void save()}><Check />保存草稿</button><select aria-label="测试直播间" value={testRoom} onChange={(event) => setTestRoom(event.target.value)}><option value="">选择历史直播文字</option>{rooms.map((room) => <option value={room.roomId} key={room.roomId}>直播间 {room.roomId}</option>)}</select><button onClick={() => void run()} disabled={!testRoom}><Flask />运行对照</button><button className="primary" onClick={() => void publish()}><Warning />启用 v{draft.version}</button></div></div></section>;
+const emptyDraft = (): ParserSpecV2 => ({
+  schemaVersion: 2,
+  name: "",
+  model: DEFAULT_PARSER_MODEL_ID,
+  prompt: DEFAULT_PARSER_PROMPT,
+});
+
+const groupLabels: Record<BailianParserModel["vendor"], string> = {
+  recommended: "推荐",
+  qwen: "千问",
+  deepseek: "DeepSeek",
+  other: "其他",
+};
+const positionLabels: Record<BailianParserModel["position"], string> = {
+  balanced: "均衡",
+  quality: "高质量",
+  economy: "低成本",
+};
+
+export function ParserManagement({
+  rooms: _rooms,
+  snapshots: _snapshots,
+}: {
+  rooms: Room[];
+  snapshots: RoomSnapshot[];
+}) {
+  const [data, setData] = useState<ParserSnapshot>({
+    parsers: [],
+    llmConfigured: false,
+  });
+  const [viewing, setViewing] = useState<ImmutableParser>();
+  const [sourceId, setSourceId] = useState<string>();
+  const [draft, setDraft] = useState<ParserSpecV2>();
+  const [message, setMessage] = useState("");
+  const refresh = async () =>
+    setData((await window.duoduo.parsers.list()) as ParserSnapshot);
+
+  useEffect(() => {
+    void refresh();
+  }, []);
+
+  async function saveParser(event: FormEvent) {
+    event.preventDefault();
+    if (!draft) return;
+    setData(
+      (await (sourceId
+        ? window.duoduo.parsers.copy(sourceId, draft)
+        : window.duoduo.parsers.create(draft))) as ParserSnapshot,
+    );
+    setDraft(undefined);
+    setSourceId(undefined);
+    setMessage("新解析器已创建；原解析器没有被修改");
+  }
+
+  async function remove(parser: ImmutableParser) {
+    if (!confirm(`删除解析器“${parser.spec.name}”？历史分析结果不会删除。`))
+      return;
+    try {
+      setData(
+        (await window.duoduo.parsers.remove(parser.id)) as ParserSnapshot,
+      );
+    } catch (error) {
+      setMessage(
+        String(error).includes("PARSER_IN_USE")
+          ? "该解析器正在被分组使用，请先切换分组解析器"
+          : String(error),
+      );
+    }
+  }
+
+  function copyParser(parser: ImmutableParser) {
+    setSourceId(parser.id);
+    setDraft({
+      schemaVersion: 2,
+      name: `${parser.spec.name} 副本`,
+      model: getBailianParserModel(parser.spec.model)
+        ? parser.spec.model
+        : DEFAULT_PARSER_MODEL_ID,
+      prompt: materializeParserPrompt(parser.spec),
+    });
+    setViewing(undefined);
+  }
+
+  return (
+    <div className="parser-page">
+      <div className="heading">
+        <div>
+          <h1>内容解析器</h1>
+          <p>提示词完整可见；创建后不可修改，需要调整时请复制新建。</p>
+        </div>
+        <button
+          className="primary"
+          onClick={() => {
+            setSourceId(undefined);
+            setDraft(emptyDraft());
+          }}
+        >
+          新建解析器
+        </button>
+      </div>
+
+      <section className="parser-panel">
+        <div className="parser-panel-head">
+          <b>解析器列表</b>
+          <span>{data.parsers.length} 个可用解析器</span>
+        </div>
+        <div className="parser-table">
+          {data.parsers.map((parser) => (
+            <div className="parser-tr" key={parser.id}>
+              <div>
+                <b>{parser.spec.name}</b>
+                <small>完整提示词 · 保存后不可编辑</small>
+              </div>
+              <span>模型：{parser.spec.model}</span>
+              <span>{new Date(parser.createdAt).toLocaleDateString()}</span>
+              <div className="parser-actions">
+                <button onClick={() => setViewing(parser)}>查看</button>
+                <button onClick={() => copyParser(parser)}>复制新建</button>
+                <button onClick={() => void remove(parser)}>删除</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        {data.parsers.length === 0 && <p>暂无解析器，请新建一个后再为分组选择。</p>}
+      </section>
+
+      {viewing && (
+        <section className="parser-panel editor-panel parser-view">
+          <div className="parser-panel-head">
+            <b>{viewing.spec.name}</b>
+            <button onClick={() => setViewing(undefined)}>关闭</button>
+          </div>
+          <ModelPriceCard modelId={viewing.spec.model} />
+          <label className="parser-view-prompt">
+            完整提示词
+            <textarea
+              aria-label="解析器提示词"
+              readOnly
+              value={materializeParserPrompt(viewing.spec)}
+            />
+          </label>
+          <div className="editor-actions">
+            <button
+              onClick={() =>
+                void navigator.clipboard
+                  ?.writeText(materializeParserPrompt(viewing.spec))
+                  .then(() => setMessage("提示词已复制"))
+              }
+            >
+              复制提示词
+            </button>
+            <button className="primary" onClick={() => copyParser(viewing)}>
+              复制到新建
+            </button>
+          </div>
+        </section>
+      )}
+
+      {draft && (
+        <form className="parser-panel editor-panel" onSubmit={saveParser}>
+          <div className="parser-panel-head">
+            <b>{sourceId ? "从现有解析器新建" : "新建解析器"}</b>
+            <span>保存后不可编辑</span>
+          </div>
+          <div className="parser-editor parser-editor-simple">
+            <label>
+              解析器名称
+              <input
+                aria-label="解析器名称"
+                required
+                value={draft.name}
+                onChange={(event) =>
+                  setDraft({ ...draft, name: event.target.value })
+                }
+              />
+            </label>
+            <label>
+              模型
+              <select
+                aria-label="模型"
+                value={draft.model}
+                onChange={(event) =>
+                  setDraft({ ...draft, model: event.target.value })
+                }
+              >
+                {Object.entries(groupLabels).map(([group, label]) => (
+                  <optgroup label={label} key={group}>
+                    {BAILIAN_PARSER_MODELS.filter(
+                      (model) => model.vendor === group,
+                    ).map((model) => (
+                      <option value={model.id} key={model.id}>
+                        {model.label} · {positionLabels[model.position]}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+            <ModelPriceCard modelId={draft.model} />
+            <label className="parser-prompt-field">
+              用户提示词
+              <textarea
+                aria-label="用户提示词"
+                required
+                value={draft.prompt}
+                onChange={(event) =>
+                  setDraft({ ...draft, prompt: event.target.value })
+                }
+              />
+            </label>
+            <div className="editor-actions">
+              <button
+                type="button"
+                onClick={() => {
+                  setDraft(undefined);
+                  setSourceId(undefined);
+                }}
+              >
+                取消
+              </button>
+              <button className="primary" type="submit">
+                创建并保存
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+
+      {message && (
+        <div className="toast">
+          {message}
+          <button onClick={() => setMessage("")}>×</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ModelPriceCard({ modelId }: { modelId: string }) {
+  const model = getBailianParserModel(modelId);
+  if (!model)
+    return <div className="model-price-card muted">当前目录无价格</div>;
+  return (
+    <div className="model-price-card">
+      <div className="model-price-head">
+        <div>
+          <b>{model.label}</b>
+          <span>{positionLabels[model.position]} · 华北 2（北京）</span>
+        </div>
+        <strong>
+          {model.versionKind === "rolling"
+            ? "滚动版本"
+            : model.versionKind === "fixed"
+              ? "固定版本"
+              : "代际版本"}
+        </strong>
+      </div>
+      {model.currentEquivalent && <p>当前等效版本：{model.currentEquivalent}</p>}
+      <div className="model-price-tiers">
+        {model.nonThinkingPriceTiers.map((tier, index) => (
+          <p key={`${tier.maxInputTokens ?? "flat"}-${index}`}>
+            {formatTier(model.nonThinkingPriceTiers[index - 1]?.maxInputTokens, tier.maxInputTokens)}：输入 ¥{tier.inputCnyPerMillion} / 输出 ¥{tier.outputCnyPerMillion}（每百万 Token）
+          </p>
+        ))}
+      </div>
+      <small>非思考模式 · 价格核对于 {model.checkedAt} · 目录价估算，以百炼账单为准</small>
+    </div>
+  );
+}
+
+function formatTier(previous: number | null | undefined, maximum: number | null) {
+  if (maximum === null) return "不区分输入阶梯";
+  const upper = formatTokenCount(maximum);
+  return previous ? `${formatTokenCount(previous)}–${upper}` : `≤ ${upper}`;
+}
+
+function formatTokenCount(value: number) {
+  if (value % 1_048_576 === 0) return `${value / 1_048_576}M`;
+  return `${Math.round(value / 1024)}K`;
 }

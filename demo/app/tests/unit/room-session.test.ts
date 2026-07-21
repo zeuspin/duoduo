@@ -23,7 +23,7 @@ vi.mock("electron", () => ({
       harness.events.push("window:create");
       if (!options.webPreferences.session) throw new Error("SESSION_REQUIRED");
     }
-    async capturePage() { return { toPNG: () => Buffer.from("png") }; }
+    async capturePage() { harness.events.push("capture"); return { toPNG: () => Buffer.from("png") }; }
     isDestroyed() { return this.destroyed; }
     destroy() { this.destroyed = true; harness.events.push("window:destroy"); }
   },
@@ -45,7 +45,12 @@ describe("RoomSession", () => {
     harness.probeRoom.mockReset();
     harness.evaluateNow.mockReset();
     harness.inspectCurrentRoom.mockReset();
-    harness.probeRoom.mockImplementation(async () => { harness.events.push("probe"); return { status: "live" as const }; });
+    harness.probeRoom.mockImplementation(async (_webContents, _url, _timeoutMs, options) => {
+      harness.events.push("probe:start");
+      await options?.beforeProfile?.({ status: "live" });
+      harness.events.push("probe:profile");
+      return { status: "live" as const, followerCount: 35_000 };
+    });
     harness.evaluateNow.mockResolvedValue(true);
     harness.inspectCurrentRoom.mockResolvedValue({ hasVideo: true, videoReadyState: 4, currentTime: 20, paused: false, audioTrackState: "live", text: "", viewerCount: 200, metricQuality: "partial" });
   });
@@ -79,7 +84,8 @@ describe("RoomSession", () => {
 
     await session.start();
 
-    expect(harness.events.slice(0, 5)).toEqual(["gate:start", "window:create", "probe", "gate:end", "asr:open"]);
+    expect(harness.events.slice(0, 6)).toEqual(["gate:start", "window:create", "probe:start", "capture", "probe:profile", "gate:end"]);
+    expect(harness.events).toContain("asr:open");
     expect(provider.open).toHaveBeenCalledTimes(1);
     await session.close();
   });

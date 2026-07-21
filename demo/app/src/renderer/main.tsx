@@ -7,4 +7,6 @@ import "./live-insights.css";
 import "./forms.css";
 import "./parser.css";
 import "./usage.css";
+import "./group-workspace.css";
+import "./theme.css";
 createRoot(document.getElementById("root")!).render(<React.StrictMode><App /></React.StrictMode>);

@@ -9,6 +9,8 @@ const room = (autoMonitorOnLive: boolean): Room => ({
   probeIntervalMinutes: null,
   monitoring: false,
   autoMonitorOnLive,
+  groupId: "default",
+  positionInGroup: 0,
   createdAt: "2026-07-17T00:00:00.000Z",
   updatedAt: "2026-07-17T00:00:00.000Z",
 });
@@ -22,8 +24,8 @@ describe("automatic monitoring policy", () => {
     expect(shouldAutoMonitor(room(true), undefined, "live")).toBe(true);
   });
 
-  it("does not restart while the same room remains live", () => {
-    expect(shouldAutoMonitor(room(true), "live", "live")).toBe(false);
+  it("starts an unmonitored room even when a persisted snapshot was already live", () => {
+    expect(shouldAutoMonitor(room(true), "live", "live")).toBe(true);
   });
 
   it("does not start when disabled or when the new status is not live", () => {

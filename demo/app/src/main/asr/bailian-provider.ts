@@ -13,7 +13,12 @@ interface SocketLike {
 }
 
 export interface AsrUsageMeter { duration(seconds: number): void; succeed(): void; fail(status: "provider_failed" | "timed_out" | "interrupted", errorCode?: string): void }
-interface Options { apiKey: string; endpoint?: string; meter?: (roomId: string, taskId: string) => AsrUsageMeter }
+interface Options {
+  apiKey: string;
+  endpoint?: string;
+  meter?: (roomId: string, taskId: string) => AsrUsageMeter;
+  responseTimeoutMs?: number;
+}
 type SocketFactory = (endpoint: string, headers: Record<string, string>) => SocketLike;
 
 function defaultSocketFactory(endpoint: string, headers: Record<string, string>): SocketLike {
@@ -25,12 +30,16 @@ export class BailianProvider implements AsrProvider {
 
   async testConnection(): Promise<ConnectionTestResult> {
     const startedAt = Date.now();
-    const session = await this.open(`connection-test-${randomUUID()}`);
-    await session.close();
+    const session = await this.openSession(`connection-test-${randomUUID()}`);
+    session.abort();
     return { ok: true, message: "百炼连接成功", latencyMs: Date.now() - startedAt };
   }
 
   open(roomId: string): Promise<AsrSession> {
+    return this.openSession(roomId);
+  }
+
+  private openSession(roomId: string): Promise<BailianSession> {
     const socket = this.socketFactory(this.options.endpoint ?? DEFAULT_ENDPOINT, { Authorization: `Bearer ${this.options.apiKey}`, "User-Agent": "duoduo-live/0.1" });
     const taskId = randomUUID();
     return new Promise((resolve, reject) => {
@@ -39,7 +48,13 @@ export class BailianProvider implements AsrProvider {
         if (!settled) reject(redact(error, this.options.apiKey));
       });
       socket.on("open", () => socket.send(JSON.stringify(runTask(taskId))));
-      const session = new BailianSession(roomId, taskId, socket, this.options.meter?.(roomId, taskId));
+      const session = new BailianSession(
+        roomId,
+        taskId,
+        socket,
+        this.options.meter?.(roomId, taskId),
+        this.options.responseTimeoutMs,
+      );
       socket.on("message", (data: Buffer | string) => {
         const message = parseMessage(data);
         if (!message || message.header?.task_id !== taskId) return;
@@ -59,10 +74,18 @@ class BailianSession implements AsrSession {
   private readonly failureListeners = new Set<(error: Error) => void>();
   private readonly finalSegments = new Set<string>();
   private closed = false;
+  private responseTimer?: NodeJS.Timeout;
+  private hasWrittenAudio = false;
   private finishResolve?: () => void;
   private finishReject?: (error: Error) => void;
 
-  constructor(private readonly roomId: string, private readonly taskId: string, private readonly socket: SocketLike, private readonly meter?: AsrUsageMeter) {
+  constructor(
+    private readonly roomId: string,
+    private readonly taskId: string,
+    private readonly socket: SocketLike,
+    private readonly meter?: AsrUsageMeter,
+    private readonly responseTimeoutMs = 30_000,
+  ) {
     socket.on("message", (data: Buffer | string) => this.handle(data));
     socket.on("error", (error: unknown) => this.fail(error instanceof Error ? error : new Error(String(error))));
     socket.on("close", () => { if (!this.closed) this.fail(new Error("BAILIAN_SOCKET_CLOSED")); });
@@ -72,10 +95,24 @@ class BailianSession implements AsrSession {
     if (this.closed || this.socket.readyState !== 1) throw new Error("ASR_SESSION_NOT_OPEN");
     if (chunk.sampleRate !== 16000 || chunk.channels !== 1 || chunk.encoding !== "pcm_s16le") throw new Error("INVALID_PCM_FORMAT");
     this.socket.send(chunk.bytes);
+    if (!this.hasWrittenAudio) {
+      this.hasWrittenAudio = true;
+      this.armResponseTimer();
+    }
+  }
+
+  abort(): void {
+    if (this.closed) return;
+    this.closed = true;
+    this.clearResponseTimer();
+    this.socket.close();
+    this.listeners.clear();
+    this.failureListeners.clear();
   }
 
   async close(): Promise<void> {
     if (this.closed) return;
+    this.clearResponseTimer();
     if (this.socket.readyState !== 1) { this.closed = true; this.meter?.fail("interrupted", "BAILIAN_SOCKET_NOT_OPEN"); return; }
     this.socket.send(JSON.stringify(finishTask(this.taskId)));
     const finished = new Promise<void>((resolve, reject) => { this.finishResolve = resolve; this.finishReject = reject; });
@@ -97,15 +134,26 @@ class BailianSession implements AsrSession {
     return () => this.failureListeners.delete(listener);
   }
 
-  private fail(error: Error): void { for (const listener of this.failureListeners) listener(error); }
+  private fail(error: Error): void {
+    this.clearResponseTimer();
+    for (const listener of this.failureListeners) listener(error);
+  }
 
   recordFailure(errorCode: string): void { this.meter?.fail("provider_failed", errorCode); }
 
   private handle(data: Buffer | string): void {
     const message = parseMessage(data);
     if (!message || message.header?.task_id !== this.taskId) return;
+    if (this.hasWrittenAudio) this.armResponseTimer();
     if (message.header.event === "task-finished") { this.meter?.succeed(); this.finishResolve?.(); return; }
-    if (message.header.event === "task-failed") { const code = String(message.header.error_code ?? "BAILIAN_TASK_FAILED"); this.meter?.fail("provider_failed", code); this.finishReject?.(new Error(code)); return; }
+    if (message.header.event === "task-failed") {
+      const code = String(message.header.error_code ?? "BAILIAN_TASK_FAILED");
+      const error = new Error(code);
+      this.meter?.fail("provider_failed", code);
+      this.finishReject?.(error);
+      if (!this.closed) this.fail(error);
+      return;
+    }
     if (message.header.event !== "result-generated") return;
     const sentence = message.payload?.output?.sentence;
     if (!sentence || sentence.heartbeat || typeof sentence.text !== "string" || !sentence.text.trim()) return;
@@ -119,6 +167,20 @@ class BailianSession implements AsrSession {
       const event = AsrEventSchema.parse({ roomId: this.roomId, sessionId: this.taskId, segmentId, startMs: Number(sentence.begin_time ?? 0), endMs: Number(sentence.end_time ?? sentence.begin_time ?? 0), text: sentence.text, isFinal });
       for (const listener of this.listeners) listener(event);
     } catch { /* Ignore malformed service events. */ }
+  }
+
+  private armResponseTimer(): void {
+    this.clearResponseTimer();
+    this.responseTimer = setTimeout(() => {
+      this.responseTimer = undefined;
+      if (!this.closed) this.fail(new Error("BAILIAN_RESPONSE_TIMEOUT"));
+    }, this.responseTimeoutMs);
+    this.responseTimer.unref?.();
+  }
+
+  private clearResponseTimer(): void {
+    if (this.responseTimer) clearTimeout(this.responseTimer);
+    this.responseTimer = undefined;
   }
 }
 

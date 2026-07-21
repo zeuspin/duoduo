@@ -50,6 +50,16 @@ describe("SettingsStore", () => {
     expect(await readFile(path, "utf8")).not.toContain("one-shared-key");
   });
 
+  it("replaces a conflicting LLM key reference with the Bailian key from system settings", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-")); const path = join(dir, "settings.json"); const store = new SettingsStore(path, cipher);
+    await store.saveLlm({ type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: "llm-main" }, "old-key");
+    await store.save({ type: "bailian", model: "paraformer-realtime-v2", secretId: "bailian-main" }, "shared-key");
+
+    expect(await store.ensureDefaultBailianLlm()).toBe(true);
+    expect(await store.getLlmConfig()).toMatchObject({ type: "bailian", secretId: "bailian-main" });
+    expect(await store.getSecret("bailian-main")).toBe("shared-key");
+  });
+
   it("persists monitoring intervals with safe defaults", async () => {
     const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-"));
     const path = join(dir, "settings.json");

@@ -22,11 +22,16 @@
 .live-insight-conditions { color:#8b641d; }
 .insight-notification-rail { position:fixed; top:64px; left:250px; right:0; z-index:2; padding:8px 14px; background:#f4f6fa; border-bottom:1px solid var(--line); }
 .insight-notification-track { display:flex; gap:8px; overflow-x:auto; scrollbar-gutter:stable; }
-.insight-notification-track article { position:relative; flex:0 0 310px; min-width:0; height:62px; border:1px solid #d5dbe3; border-left:3px solid #d6a642; background:#fff; }
+.insight-notification-track article { position:relative; flex:0 0 344px; min-width:0; height:68px; border:1px solid #d5dbe3; border-left:3px solid #d6a642; background:#fff; }
 .insight-notification-track article.important { border-left-color:#d34854; }
-.insight-notification-open { width:100%; height:100%; padding:8px 34px 8px 10px; border:0; background:transparent; text-align:left; }
-.insight-notification-open small { display:block; margin-bottom:5px; color:var(--muted); font-size:9px; }
-.insight-notification-open b { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
+.insight-notification-open { width:100%; height:100%; padding:8px 34px 8px 9px; border:0; background:transparent; display:grid; grid-template-columns:40px minmax(0,1fr); align-items:center; gap:10px; text-align:left; }
+.insight-notification-avatar { width:40px; height:40px; border-radius:50%; display:block; object-fit:cover; background:var(--surface-subtle); box-shadow:0 0 0 1px var(--border),0 2px 7px #1720331f; }
+.insight-notification-avatar.fallback { display:grid; place-items:center; color:var(--accent); font-size:14px; font-weight:700; }
+.insight-notification-content { min-width:0; display:grid; gap:5px; }
+.insight-notification-identity { min-width:0; display:flex; align-items:baseline; gap:7px; }
+.insight-notification-identity strong { min-width:0; overflow:hidden; color:var(--text); font-size:11px; font-weight:720; text-overflow:ellipsis; white-space:nowrap; }
+.insight-notification-identity time { flex:none; color:var(--text-muted); font-size:9px; font-variant-numeric:tabular-nums; }
+.insight-notification-content>b { display:block; overflow:hidden; color:var(--text); text-overflow:ellipsis; white-space:nowrap; font-size:12px; font-weight:650; }
 .insight-notification-close { position:absolute; top:5px; right:5px; width:24px; height:24px; border:0; background:transparent; color:#7b8591; display:grid; place-items:center; }
-.shell.has-insight-notifications { padding-top:142px; }
-.shell.has-insight-notifications main { scroll-margin-top:142px; }
+.shell.has-insight-notifications { padding-top:148px; }
+.shell.has-insight-notifications main { scroll-margin-top:148px; }

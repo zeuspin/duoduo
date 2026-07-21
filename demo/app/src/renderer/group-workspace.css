@@ -1,0 +1,229 @@
+.running-group-banner {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+  padding: 10px 13px;
+  border: 1px solid #b8ddc9;
+  background: #f0faf5;
+  font-size: 12px;
+}
+.running-group-banner > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #27a36a;
+  box-shadow: 0 0 0 4px #27a36a1c;
+}
+.running-group-banner button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+}
+.group-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+.group-tabs > button {
+  flex: none;
+  min-width: 132px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff;
+  color: #303b4b;
+  text-align: left;
+}
+.group-tabs > button b,
+.group-tabs > button small {
+  display: block;
+}
+.group-tabs > button small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.group-tabs > button.selected {
+  border: 2px solid var(--blue);
+  padding: 8px 11px;
+}
+.group-tabs > button.running {
+  background: #f2faf6;
+  border-color: #91c8aa;
+}
+.group-tabs .new-group {
+  min-width: auto;
+  border-style: dashed;
+  color: var(--muted);
+}
+.new-group-form {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  margin: -4px 0 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: #f8fafc;
+}
+.new-group-form label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.new-group-form input,
+.new-group-form select {
+  min-width: 180px;
+  height: 34px;
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 0 9px;
+}
+.group-panel {
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.group-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.group-identity {
+  min-width: 0;
+}
+.group-title-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+}
+.group-panel-head h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.group-rename-trigger,
+.group-name-editor button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #768398;
+  display: grid;
+  place-items: center;
+}
+.group-rename-trigger:hover,
+.group-rename-trigger:focus-visible,
+.group-name-editor button:hover,
+.group-name-editor button:focus-visible {
+  background: #eef3fa;
+  color: var(--blue);
+}
+.group-name-editor {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.group-name-editor input {
+  width: 220px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #9db4dc;
+  outline: none;
+  color: #26364a;
+  font-weight: 650;
+}
+.group-panel-head span {
+  color: var(--muted);
+  font-size: 10px;
+}
+.group-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.group-parser-control {
+  position: relative;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-left: 10px;
+  border: 1px solid #d5dae2;
+  background: #fff;
+  color: #66758a;
+  font-size: 11px;
+}
+.group-parser-control select {
+  width: 210px;
+  height: 33px;
+  padding: 0 30px 0 8px;
+  border: 0;
+  border-left: 1px solid #e3e7ed;
+  outline: none;
+  appearance: none;
+  background: #fff;
+  color: #3f4f64;
+}
+.group-parser-control>svg {
+  position: absolute;
+  right: 9px;
+  width: 14px;
+  height: 14px;
+  color: #7a8798;
+  pointer-events: none;
+}
+.group-parser-control:focus-within {
+  border-color: #8ea9df;
+  box-shadow: 0 0 0 2px #4f7df31a;
+}
+.group-parser-control:has(select:disabled) {
+  opacity: .48;
+}
+.group-actions button {
+  min-height: 35px;
+  padding: 0 11px;
+  border: 1px solid #d5dae2;
+  background: #fff;
+  color: #4a5667;
+}
+.group-actions .start {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.group-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.other-group-running {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 16px 0;
+  padding: 10px 12px;
+  border: 1px solid #ead6a5;
+  background: #fff9e9;
+  font-size: 11px;
+}
+.other-group-running span {
+  color: #745b22;
+}
+.group-panel > div:last-child > section {
+  margin: 14px 16px;
+}
+.group-panel > div:last-child .monitor-list {
+  padding: 14px 16px;
+  margin: 0;
+}
+.group-panel > div:last-child .grid {
+  padding: 14px 16px;
+}

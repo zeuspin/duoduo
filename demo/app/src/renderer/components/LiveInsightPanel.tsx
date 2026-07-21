@@ -32,7 +32,7 @@ export function LiveInsightPanel({ roomId, enabled, llmConfigured, focusInsightI
   }
 
   return <div className="live-insight-feed" ref={feedRef} onScroll={(event) => { const feed = event.currentTarget; followingRef.current = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 32; if (feed.scrollTop <= 8) void loadOlder(); }}>
-    <div className={`live-parser-state ${enabled && llmConfigured ? "enabled" : "disabled"}`}>{!enabled ? "未启用内容分析，直播文字仍会正常保存；已有观点继续保留" : !llmConfigured ? "内容分析服务未设置，直播文字仍会保存，但暂不产生观点" : "正在分析直播内容，主播说完后会生成观点"}</div>
+    <div className={`live-parser-state ${enabled && llmConfigured ? "enabled" : "disabled"}`}>{!enabled ? "未启用内容分析，直播文字仍会正常保存；已有观点继续保留" : !llmConfigured ? "请先在系统设置中配置百炼 API Key；直播文字仍会保存，但暂不产生观点" : "正在分析直播内容，主播说完后会生成观点"}</div>
     {loading && <div className="live-insight-loading">正在加载更早观点...</div>}
     {items.length === 0 ? <div className="live-insight-empty">尚未产生观点</div> : items.map((item) => <article id={`room-insight-${item.id}`} className={`live-insight-item ${focusInsightId === item.id ? "focused" : ""}`} key={item.id}>
       <div className="live-insight-meta"><time>{formatTime(item.startedAt)}</time><span className={item.alertLevel}>{item.alertLevel === "important" ? "重点关注" : "普通关注"} · {natureLabels[item.nature]}</span></div>

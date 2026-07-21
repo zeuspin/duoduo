@@ -48,6 +48,7 @@ export class DouyinAccessCoordinator {
   private active = false;
   private activeTask?: QueuedTask;
   private interruptPacing?: () => void;
+  private readonly canceledTaskKeys = new Set<string>();
   private stopped = false;
   private lastNavigationStartedAt: number | undefined;
   private automaticStarts: number[] = [];
@@ -83,6 +84,20 @@ export class DouyinAccessCoordinator {
   }
 
   getState(): DouyinAccessState { return structuredClone(this.state); }
+
+  cancelRoom(roomId: string): void {
+    for (let index = this.pending.length - 1; index >= 0; index -= 1) {
+      const task = this.pending[index];
+      if (task.roomId !== roomId) continue;
+      this.pending.splice(index, 1);
+      this.tasks.delete(task.key);
+      task.reject(new Error("ACCESS_ROOM_CANCELED"));
+    }
+    if (this.activeTask?.roomId === roomId && this.interruptPacing) {
+      this.canceledTaskKeys.add(this.activeTask.key);
+      this.interruptPacing();
+    }
+  }
 
   subscribe(listener: (state: DouyinAccessState) => void): () => void {
     this.listeners.add(listener);
@@ -150,6 +165,7 @@ export class DouyinAccessCoordinator {
         await Promise.race([this.sleep(delay), interruption]);
         this.interruptPacing = undefined;
         if (this.stopped) throw new Error("ACCESS_STOPPED");
+        if (this.canceledTaskKeys.delete(task.key)) throw new Error("ACCESS_ROOM_CANCELED");
         if (interrupted) {
           this.pending.push(task);
           this.pending.sort((left, right) => priority[left.type] - priority[right.type]);

@@ -31,6 +31,8 @@ export class RoomStore {
         probeIntervalMinutes: parsed.probeIntervalMinutes,
         monitoring: false,
         autoMonitorOnLive: false,
+        groupId: parsed.groupId,
+        positionInGroup: rooms.length,
         createdAt: now,
         updatedAt: now,
       };

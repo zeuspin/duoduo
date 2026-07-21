@@ -14,13 +14,13 @@ function labelTitle(label: TransparentLabel): string {
 
 const qualityText = { complete: "数据完整", partial: "部分数据", missing: "暂无数据" } as const;
 
-export function RoomIntelligenceBadges({ summary, status, onOpen }: { summary?: RoomIntelligenceSummary; status?: string; loading?: boolean; onOpen(): void }) {
+export function RoomIntelligenceBadges({ summary, status, showCurrentMetric = true, onOpen }: { summary?: RoomIntelligenceSummary; status?: string; loading?: boolean; showCurrentMetric?: boolean; onOpen(): void }) {
   if (!summary) return null;
   const { currentMetrics } = summary;
   const labels = summary.labels.filter((label) => label.kind !== "insufficient_data");
-  if (currentMetrics.viewerCount === undefined && labels.length === 0) return null;
+  if ((!showCurrentMetric || currentMetrics.viewerCount === undefined) && labels.length === 0) return null;
   return <div className="room-intelligence-compact">
-    {currentMetrics.viewerCount !== undefined && <div className="room-current-metrics">
+    {showCurrentMetric && currentMetrics.viewerCount !== undefined && <div className="room-current-metrics">
       {currentMetrics.viewerCount !== undefined && <span>{status === "live" ? "当前在线" : "上次在线"} {count(currentMetrics.viewerCount)}</span>}
     </div>}
     <div className="room-labels">

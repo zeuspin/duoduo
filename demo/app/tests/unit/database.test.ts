@@ -16,7 +16,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
 
     expect((await database.rooms.list())[0].autoMonitorOnLive).toBe(false);
     await database.rooms.setAutoMonitorOnLive("123", true);
@@ -31,7 +31,7 @@ describe("DuoduoDatabase", () => {
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
     await database.migrateLegacyRooms(legacyPath);
-    await database.rooms.add({ url: "https://live.douyin.com/456", schedule: null, probeIntervalMinutes: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/456", schedule: null, probeIntervalMinutes: null });
     expect((await database.rooms.list()).map((room) => [room.roomId, room.schedule])).toEqual([
       ["123", { days: [1], ranges: [{ start: "09:00", end: "10:00" }] }],
       ["456", null],
@@ -42,7 +42,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null });
     for (let index = 0; index < 4; index += 1) {
       database.asr.insert({ roomId: "123", sessionId: "session", segmentId: `segment-${index}`, startMs: index * 1000, endMs: index * 1000 + 500, text: `文本 ${index}`, isFinal: true, occurredAt: `2026-07-12T00:00:0${index}.000Z` });
     }
@@ -58,7 +58,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     database.snapshots.upsert({ roomId: "123", status: "live", title: "第一次", anchorName: "主播", coverPath: "/covers/123.jpg", viewerCount: 1200, followerCount: 9000, checkedAt: "2026-07-12T01:00:00.000Z" });
     database.snapshots.upsert({ roomId: "123", status: "timeout", checkedAt: "2026-07-12T01:05:00.000Z", error: "PROBE_TIMEOUT" });
     expect(database.snapshots.list()).toEqual([expect.objectContaining({ roomId: "123", status: "timeout", title: "第一次", anchorName: "主播", coverPath: "/covers/123.jpg", viewerCount: 1200, followerCount: 9000, lastReliableStatus: "live", lastReliableStatusAt: "2026-07-12T01:00:00.000Z", metricsObservedAt: "2026-07-12T01:00:00.000Z", checkedAt: "2026-07-12T01:05:00.000Z", error: "PROBE_TIMEOUT" })]);
@@ -68,7 +68,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     database.snapshots.upsert({ roomId: "123", status: "live", liveDescription: "每周日 18:00", checkedAt: "2026-07-18T01:00:00.000Z" });
     database.snapshots.upsert({ roomId: "123", status: "live", checkedAt: "2026-07-18T01:05:00.000Z" });
     expect(database.snapshots.list()[0].liveDescription).toBe("每周日 18:00");
@@ -78,7 +78,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     database.snapshots.upsert({ roomId: "123", status: "live", title: "正常直播标题", anchorName: "正常主播", coverPath: "/covers/123.jpg", checkedAt: "2026-07-15T01:00:00.000Z" });
     database.snapshots.upsert({ roomId: "123", status: "verification_required", title: "请完成验证", anchorName: "安全验证", checkedAt: "2026-07-15T01:05:00.000Z", error: "PROBE_VERIFICATION_REQUIRED" });
     expect(database.snapshots.list()).toEqual([expect.objectContaining({ roomId: "123", status: "verification_required", title: "正常直播标题", anchorName: "正常主播", coverPath: "/covers/123.jpg", lastReliableStatus: "live", lastReliableStatusAt: "2026-07-15T01:00:00.000Z", checkedAt: "2026-07-15T01:05:00.000Z", error: "PROBE_VERIFICATION_REQUIRED" })]);
@@ -88,7 +88,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     database.snapshots.upsert({ roomId: "123", status: "offline", checkedAt: "2026-07-17T01:00:00.000Z" });
 
     expect(database.snapshots.setAvatarIfMissing("123", "/avatars/123.png")).toBe(true);
@@ -100,7 +100,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     database.snapshots.upsert({ roomId: "123", status: "offline", checkedAt: "2026-07-17T01:00:00.000Z" });
     database.snapshots.setAvatarIfMissing("123", "/avatars/old.png");
 
@@ -113,7 +113,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     database.snapshots.record({ roomId: "123", status: "live", viewerCount: 1200, checkedAt: "2026-07-12T01:00:00.000Z" });
     database.snapshots.record({ roomId: "123", status: "live", checkedAt: "2026-07-12T01:05:00.000Z" });
     const history = database.snapshots.listHistory("123", 10);
@@ -125,7 +125,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
 
     database.snapshots.record({ roomId: "123", status: "live", metricRaw: {}, metricQuality: "missing", checkedAt: "2026-07-17T01:00:00.000Z" });
 
@@ -136,7 +136,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     const metricEvidence = { viewerCount: { raw: "2.3万", source: "accessibility" as const } };
 
     database.snapshots.record({ roomId: "123", status: "live", viewerCount: 23_000, metricEvidence, metricQuality: "partial", checkedAt: "2026-07-17T01:00:00.000Z" });
@@ -149,7 +149,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     for (const [checkedAt, viewerCount] of [
       ["2026-07-01T01:00:00.000Z", 100],
       ["2026-07-16T01:00:00.000Z", 200],
@@ -194,7 +194,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     database.snapshots.record({ roomId: "123", status: "offline", checkedAt: "2026-07-12T00:55:00.000Z" });
     database.snapshots.record({ roomId: "123", status: "live", viewerCount: 100, checkedAt: "2026-07-12T01:00:00.000Z" });
     database.snapshots.record({ roomId: "123", status: "live", viewerCount: 300, checkedAt: "2026-07-12T01:05:00.000Z" });
@@ -206,7 +206,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     database.snapshots.record({ roomId: "123", status: "live", checkedAt: "2026-07-12T01:00:00.000Z" });
     database.snapshots.record({ roomId: "123", status: "timeout", checkedAt: "2026-07-12T01:01:00.000Z" });
     database.snapshots.record({ roomId: "123", status: "page_error", checkedAt: "2026-07-12T01:06:00.000Z" });
@@ -235,7 +235,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     const parser = database.parsers.list()[0];
     const binding = database.parsers.bindRoom("123", parser.id, parser.publishedVersion!.id);
     expect(binding!.parserId).toBe("market-insight");

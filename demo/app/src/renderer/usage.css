@@ -16,6 +16,10 @@
 .usage-breakdowns b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
 .usage-breakdowns small { color:var(--muted); font-size:10px; }
 .usage-breakdowns strong { font-size:12px; font-variant-numeric:tabular-nums; }
+.usage-breakdowns .usage-room-identity { min-width:0; display:flex; align-items:center; gap:9px; }
+.usage-room-identity img,.usage-room-avatar { flex:none; width:34px; height:34px; border-radius:50%; object-fit:cover; background:#e9eef6; color:#65758a; }
+.usage-room-avatar { display:grid; place-items:center; font-size:12px; font-weight:600; }
+.usage-room-identity>span:last-child { min-width:0; display:grid; gap:3px; }
 .usage-table { padding:16px; }
 .usage-table-row { display:grid; grid-template-columns:2fr 1.2fr 1fr 1fr .8fr; gap:14px; align-items:center; min-height:48px; border-top:1px solid #edf0f4; font-size:11px; }
 .usage-table-row>span:first-child { display:grid; gap:3px; }

@@ -12,7 +12,7 @@ async function listen(server) { await new Promise((done) => server.listen(0, "12
       const parsed = JSON.parse(body); const user = parsed.messages.find((message) => message.role === "user")?.content || "";
       const evidence = user.includes("现在市场情绪只能算修复，还不能说反转。") ? "现在市场情绪只能算修复，还不能说反转。" : "今天指数虽然是红的，但是量没有明显放出来。";
       const content = JSON.stringify({ insights: [{ nature: "explicit", subjectKind: "market", subjectOriginal: "大盘", direction: "cautious", summary: "市场处于修复阶段，尚不能确认反转", rationale: "指数上涨但量能未放大", conditions: [], evidence: [evidence], confidence: 0.96, alertLevel: "important" }] });
-      response.setHeader("content-type", "application/json"); response.end(JSON.stringify({ choices: [{ message: { content } }] }));
+      response.setHeader("content-type", "application/json"); response.end(JSON.stringify({ id: "chatcmpl-e2e", model: "fixture-market", choices: [{ message: { content } }], usage: { prompt_tokens: 120, completion_tokens: 40, total_tokens: 160 } }));
     });
   });
   const port = await listen(llm); const userData = await mkdtemp(join(tmpdir(), "duoduo-insight-e2e-")); const now = new Date().toISOString();
@@ -26,8 +26,7 @@ async function listen(server) { await new Promise((done) => server.listen(0, "12
   const code = await new Promise((done) => child.on("exit", done)); clearTimeout(watchdog); llm.close(); await writeFile(resolve("reports/insight-parser-e2e.log"), logs);
   if (code !== 0) throw new Error(`app exited ${code}`); const result = JSON.parse(await readFile(report, "utf8")); await access(screenshot);
   if (result.formalInsights?.length !== 1) throw new Error(`formal insight mismatch: ${JSON.stringify(result)}`);
-  if (result.testRuns?.[0]?.status !== "completed" || result.testRuns[0].publishedResults.length !== 1 || result.testRuns[0].draftResults.length !== 1) throw new Error(`test run mismatch: ${JSON.stringify(result.testRuns)}`);
-  if (result.binding?.roomId !== "123") throw new Error("binding missing");
+  if (!result.groupParserId || !result.copiedParserId || result.groupParserId === result.copiedParserId) throw new Error(`immutable parser lifecycle mismatch: ${JSON.stringify(result)}`);
   if (!result.notificationVisible || !result.navigation?.roomCard || !result.navigation?.focusedInsight || !result.navigation?.insightTab) throw new Error(`notification navigation mismatch: ${JSON.stringify(result.navigation)}`);
-  process.stdout.write(`${JSON.stringify({ ok: true, report, screenshot, formalInsights: result.formalInsights.length, comparison: result.testRuns[0].status })}\n`);
+  process.stdout.write(`${JSON.stringify({ ok: true, report, screenshot, formalInsights: result.formalInsights.length, parser: result.groupParserId })}\n`);
 })().catch((error) => { process.stderr.write(`${error.stack}\n`); process.exit(1); });

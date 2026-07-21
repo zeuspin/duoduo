@@ -1,7 +1,15 @@
-import type { PreparedProbeSource, PreparedProbeState, ProbeRequestState } from "../../shared/contracts";
+import type {
+  PreparedProbeSource,
+  PreparedProbeState,
+  ProbeRequestState,
+} from "../../shared/contracts";
 
 export interface ProbeSchedule {
   probeIntervalMinutes: number | null;
+  schedule?: {
+    days: number[];
+    ranges: Array<{ start: string; end: string }>;
+  } | null;
 }
 
 interface ProbeSchedulerOptions {
@@ -15,7 +23,9 @@ interface ProbeSchedulerOptions {
   automaticBudgetPerHour?: number;
 }
 
-interface ProbeOutcome { status?: string }
+interface ProbeOutcome {
+  status?: string;
+}
 
 interface QueuedProbe {
   roomId: string;
@@ -31,27 +41,45 @@ interface BatchProgress {
   source: "startup" | "manual_batch";
   total: number;
   completed: number;
-  promise?: Promise<void>;
+  promise?: Promise<{ total: number; failedRoomIds: string[] }>;
 }
 
-type Probe = (roomId: string, source: PreparedProbeSource) => Promise<ProbeOutcome | void>;
+type Probe = (
+  roomId: string,
+  source: PreparedProbeSource,
+) => Promise<ProbeOutcome | void>;
 type StateListener = (state: PreparedProbeState) => void;
 
-export function estimateSafeBatchDurationMs(remaining: number, gapMs: number, budgetPerHour: number): number {
+export function estimateSafeBatchDurationMs(
+  remaining: number,
+  gapMs: number,
+  budgetPerHour: number,
+): number {
   if (remaining <= 1) return 0;
   const transitions = remaining - 1;
   const fullBudgetBoundaries = Math.floor(transitions / budgetPerHour);
-  return transitions * gapMs + fullBudgetBoundaries * Math.max(0, 3_600_000 - budgetPerHour * gapMs);
+  return (
+    transitions * gapMs +
+    fullBudgetBoundaries * Math.max(0, 3_600_000 - budgetPerHour * gapMs)
+  );
 }
 
-export function splitPreparedStartupRooms(roomIds: string[], snapshots: Array<{ roomId: string; status: string }>): { initialRoomIds: string[]; refreshRoomIds: string[] } {
-  const statusByRoom = new Map(snapshots.map((snapshot) => [snapshot.roomId, snapshot.status]));
+export function splitPreparedStartupRooms(
+  roomIds: string[],
+  snapshots: Array<{ roomId: string; status: string }>,
+): { initialRoomIds: string[]; refreshRoomIds: string[] } {
+  const statusByRoom = new Map(
+    snapshots.map((snapshot) => [snapshot.roomId, snapshot.status]),
+  );
   const initialRoomIds = roomIds.filter((roomId) => {
     const status = statusByRoom.get(roomId);
     return status === undefined || status === "checking";
   });
   const initialSet = new Set(initialRoomIds);
-  return { initialRoomIds, refreshRoomIds: roomIds.filter((roomId) => !initialSet.has(roomId)) };
+  return {
+    initialRoomIds,
+    refreshRoomIds: roomIds.filter((roomId) => !initialSet.has(roomId)),
+  };
 }
 
 export class ProbeScheduler {
@@ -79,7 +107,10 @@ export class ProbeScheduler {
   private lastCompletedAt: string | undefined;
   private stopped = false;
 
-  constructor(private readonly probe: Probe, options: ProbeSchedulerOptions = {}) {
+  constructor(
+    private readonly probe: Probe,
+    options: ProbeSchedulerOptions = {},
+  ) {
     this.defaultIntervalMinutes = options.defaultIntervalMinutes ?? 5;
     this.maxConcurrency = options.maxConcurrency ?? 1;
     this.jitterRatio = options.jitterRatio ?? 0.2;
@@ -90,69 +121,176 @@ export class ProbeScheduler {
     this.automaticBudgetPerHour = options.automaticBudgetPerHour ?? 10;
   }
 
-  runNow(roomId: string, source: PreparedProbeSource = "manual"): Promise<ProbeOutcome | void> {
+  runNow(
+    roomId: string,
+    source: PreparedProbeSource = "manual",
+  ): Promise<ProbeOutcome | void> {
     if (this.stopped) return Promise.resolve();
     const existing = this.running.get(roomId);
     if (existing) {
-      if (source === "manual" || source === "initial") this.promoteExisting(roomId, source);
+      if (source === "manual" || source === "initial") {
+        const activeAutomatic = [...this.active].some(
+          (item) => item.roomId === roomId && !item.requestType,
+        );
+        this.promoteExisting(roomId, source);
+        if (activeAutomatic) return this.probe(roomId, source);
+      }
       return existing;
     }
     if (source === "manual") {
       const now = this.now();
       const lastProbeAt = this.lastManualProbeAt.get(roomId);
-      if (lastProbeAt !== undefined && now - lastProbeAt < this.manualCooldownMs) return Promise.reject(new Error("PROBE_COOLDOWN"));
+      if (
+        lastProbeAt !== undefined &&
+        now - lastProbeAt < this.manualCooldownMs
+      )
+        return Promise.reject(new Error("PROBE_COOLDOWN"));
     }
     return this.enqueue(roomId, source);
   }
 
-  runBatch(roomIds: string[], source: "startup" | "manual_batch"): Promise<void> {
-    if (this.stopped) return Promise.resolve();
+  runBatch(
+    roomIds: string[],
+    source: "startup" | "manual_batch",
+  ): Promise<{ total: number; failedRoomIds: string[] }> {
+    if (this.stopped) return Promise.resolve({ total: 0, failedRoomIds: [] });
     if (this.batch?.promise) return this.batch.promise;
     const unique = [...new Set(roomIds)];
-    const eligible = unique.filter((roomId) => !this.running.has(roomId));
-    const batch: BatchProgress = { id: ++this.batchSequence, source, total: unique.length, completed: unique.length - eligible.length };
+    const batch: BatchProgress = {
+      id: ++this.batchSequence,
+      source,
+      total: unique.length,
+      completed: 0,
+    };
     this.batch = batch;
-    const tasks = eligible.map((roomId) => this.enqueue(roomId, source, batch.id));
-    const promise = Promise.allSettled(tasks).then(() => {
+    const tasks = unique.map((roomId) => {
+      const existing = this.running.get(roomId);
+      const activeAutomatic = Boolean(
+        existing &&
+        [...this.active].some(
+          (item) => item.roomId === roomId && !item.requestType,
+        ),
+      );
+      if (existing) this.promoteExisting(roomId, "manual");
+      const task = activeAutomatic
+        ? this.probe(roomId, "manual_batch")
+        : (existing ?? this.enqueue(roomId, source, batch.id));
+      return task.finally(() => {
+        if (this.batch?.id === batch.id) {
+          this.batch.completed += 1;
+          this.emit();
+        }
+      });
+    });
+    const promise = Promise.allSettled(tasks).then((results) => {
+      const failedRoomIds = results.flatMap((result, index) =>
+        result.status === "rejected" ||
+        (result.value?.status &&
+          !["live", "offline"].includes(result.value.status))
+          ? [unique[index]]
+          : [],
+      );
       if (this.batch?.id === batch.id) this.batch = undefined;
       this.emit();
+      return { total: unique.length, failedRoomIds };
     });
     batch.promise = promise;
     this.emit();
     return promise;
   }
 
-  runStartup(roomIds: string[]): Promise<void> { return this.runBatch(roomIds, "startup"); }
+  runStartup(
+    roomIds: string[],
+  ): Promise<{ total: number; failedRoomIds: string[] }> {
+    return this.runBatch(roomIds, "startup");
+  }
 
   cancelManualBatch(): void {
     if (this.batch?.source !== "manual_batch") return;
-    this.clearPending((queued) => queued.source === "manual_batch" && queued.batchId === this.batch?.id);
+    this.clearPending(
+      (queued) =>
+        queued.source === "manual_batch" && queued.batchId === this.batch?.id,
+    );
     this.emit();
   }
 
   state(): PreparedProbeState {
     const now = this.now();
     for (const [roomId, completedAt] of this.lastManualProbeAt) {
-      if (now - completedAt >= this.manualCooldownMs) this.lastManualProbeAt.delete(roomId);
+      if (now - completedAt >= this.manualCooldownMs)
+        this.lastManualProbeAt.delete(roomId);
     }
-    const earliestDeadline = this.timerDeadlines.size ? Math.min(...this.timerDeadlines.values()) : undefined;
+    const earliestDeadline = this.timerDeadlines.size
+      ? Math.min(...this.timerDeadlines.values())
+      : undefined;
     const currentRoomId = this.active.values().next().value?.roomId;
-    const remaining = this.batch ? Math.max(0, this.batch.total - this.batch.completed) : 0;
+    const remaining = this.batch
+      ? Math.max(0, this.batch.total - this.batch.completed)
+      : 0;
     const estimatedCompletionAt = this.batch
-      ? new Date(this.now() + estimateSafeBatchDurationMs(remaining, this.safeNavigationGapMs, this.automaticBudgetPerHour)).toISOString()
+      ? new Date(
+          this.now() +
+            estimateSafeBatchDurationMs(
+              remaining,
+              this.safeNavigationGapMs,
+              this.automaticBudgetPerHour,
+            ),
+        ).toISOString()
       : undefined;
     const manualProbes: ProbeRequestState[] = [
-      ...[...this.active].flatMap((item): ProbeRequestState[] => item.requestType ? [{ roomId: item.roomId, requestType: item.requestType, phase: "running" }] : []),
-      ...this.pending.flatMap((item): ProbeRequestState[] => item.requestType ? [{ roomId: item.roomId, requestType: item.requestType, phase: "queued" }] : []),
-      ...[...this.lastManualProbeAt].map(([roomId, completedAt]): ProbeRequestState => ({ roomId, requestType: "manual", phase: "cooldown", cooldownUntil: new Date(completedAt + this.manualCooldownMs).toISOString() })),
+      ...[...this.active].flatMap((item): ProbeRequestState[] =>
+        item.requestType
+          ? [
+              {
+                roomId: item.roomId,
+                requestType: item.requestType,
+                phase: "running",
+              },
+            ]
+          : [],
+      ),
+      ...this.pending.flatMap((item): ProbeRequestState[] =>
+        item.requestType
+          ? [
+              {
+                roomId: item.roomId,
+                requestType: item.requestType,
+                phase: "queued",
+              },
+            ]
+          : [],
+      ),
+      ...[...this.lastManualProbeAt].map(
+        ([roomId, completedAt]): ProbeRequestState => ({
+          roomId,
+          requestType: "manual",
+          phase: "cooldown",
+          cooldownUntil: new Date(
+            completedAt + this.manualCooldownMs,
+          ).toISOString(),
+        }),
+      ),
     ];
     return {
-      mode: this.activeCount > 0 || this.pending.length > 0 ? "running" : "idle",
+      mode:
+        this.activeCount > 0 || this.pending.length > 0 ? "running" : "idle",
       ...(currentRoomId ? { currentRoomId } : {}),
       queuedRoomIds: this.pending.map((item) => item.roomId),
-      ...(this.batch ? { batch: { source: this.batch.source, total: this.batch.total, completed: this.batch.completed } } : {}),
-      ...(earliestDeadline === undefined ? {} : { nextRunAt: new Date(earliestDeadline).toISOString() }),
-      ...(this.lastCompletedAt ? { lastCompletedAt: this.lastCompletedAt } : {}),
+      ...(this.batch
+        ? {
+            batch: {
+              source: this.batch.source,
+              total: this.batch.total,
+              completed: this.batch.completed,
+            },
+          }
+        : {}),
+      ...(earliestDeadline === undefined
+        ? {}
+        : { nextRunAt: new Date(earliestDeadline).toISOString() }),
+      ...(this.lastCompletedAt
+        ? { lastCompletedAt: this.lastCompletedAt }
+        : {}),
       ...(estimatedCompletionAt ? { estimatedCompletionAt } : {}),
       manualProbes,
     };
@@ -163,12 +301,25 @@ export class ProbeScheduler {
     return () => this.listeners.delete(listener);
   }
 
-  private enqueue(roomId: string, source: PreparedProbeSource, batchId?: number): Promise<ProbeOutcome | void> {
+  private enqueue(
+    roomId: string,
+    source: PreparedProbeSource,
+    batchId?: number,
+  ): Promise<ProbeOutcome | void> {
     const existing = this.running.get(roomId);
     if (existing) return existing;
     let queued!: QueuedProbe;
     const task = new Promise<ProbeOutcome | void>((resolve, reject) => {
-      queued = { roomId, source, batchId, ...(source === "manual" || source === "initial" ? { requestType: source } : {}), resolve, reject };
+      queued = {
+        roomId,
+        source,
+        batchId,
+        ...(source === "manual" || source === "initial"
+          ? { requestType: source }
+          : {}),
+        resolve,
+        reject,
+      };
       this.insertPending(queued);
     });
     this.running.set(roomId, task);
@@ -178,15 +329,28 @@ export class ProbeScheduler {
   }
 
   private insertPending(item: QueuedProbe): void {
-    if (!item.requestType) { this.pending.push(item); return; }
-    const firstAutomatic = this.pending.findIndex((queued) => !queued.requestType);
-    this.pending.splice(firstAutomatic < 0 ? this.pending.length : firstAutomatic, 0, item);
+    if (!item.requestType) {
+      this.pending.push(item);
+      return;
+    }
+    const firstAutomatic = this.pending.findIndex(
+      (queued) => !queued.requestType,
+    );
+    this.pending.splice(
+      firstAutomatic < 0 ? this.pending.length : firstAutomatic,
+      0,
+      item,
+    );
   }
 
-  private promoteExisting(roomId: string, requestType: "manual" | "initial"): void {
+  private promoteExisting(
+    roomId: string,
+    requestType: "manual" | "initial",
+  ): void {
     const active = [...this.active].find((item) => item.roomId === roomId);
     if (active) {
-      active.requestType = active.requestType === "manual" ? "manual" : requestType;
+      active.requestType =
+        active.requestType === "manual" ? "manual" : requestType;
       this.emit();
       return;
     }
@@ -203,44 +367,53 @@ export class ProbeScheduler {
     while (!this.stopped && this.pending.length) {
       const next = this.pending[0];
       const hasCapacity = this.activeCount < this.maxConcurrency;
-      const requestedCanBypassAutomaticWait = Boolean(next.requestType) && ![...this.active].some((item) => item.requestType);
+      const requestedCanBypassAutomaticWait =
+        Boolean(next.requestType) &&
+        ![...this.active].some((item) => item.requestType);
       if (!hasCapacity && !requestedCanBypassAutomaticWait) break;
       this.pending.shift();
       this.activeCount += 1;
       this.active.add(next);
       this.emit();
       let work: Promise<ProbeOutcome | void>;
-      try { work = this.probe(next.roomId, next.source); }
-      catch (error) { work = Promise.reject(error); }
-      void work.then((result) => {
-        if (result?.status === "verification_required") this.clearPending();
-        this.finishStarted(next);
-        this.completeStarted(next, result?.status);
-        next.resolve(result);
-      }, (error) => {
-        this.finishStarted(next);
-        this.completeStarted(next, undefined, error);
-        next.reject(error);
-      });
+      try {
+        work = this.probe(next.roomId, next.source);
+      } catch (error) {
+        work = Promise.reject(error);
+      }
+      void work.then(
+        (result) => {
+          if (result?.status === "verification_required") this.clearPending();
+          this.completeStarted(next, result?.status);
+          next.resolve(result);
+        },
+        (error) => {
+          this.completeStarted(next, undefined, error);
+          next.reject(error);
+        },
+      );
     }
   }
 
-  private finishStarted(item: QueuedProbe): void {
-    if (item.batchId !== undefined && this.batch?.id === item.batchId) this.batch.completed += 1;
-  }
-
-  private completeStarted(item: QueuedProbe, status?: string, error?: unknown): void {
+  private completeStarted(
+    item: QueuedProbe,
+    status?: string,
+    error?: unknown,
+  ): void {
     this.running.delete(item.roomId);
     this.active.delete(item);
     this.activeCount -= 1;
     this.lastCompletedAt = new Date(this.now()).toISOString();
-    if (item.requestType === "manual" && error === undefined) this.lastManualProbeAt.set(item.roomId, this.now());
+    if (item.requestType === "manual" && error === undefined)
+      this.lastManualProbeAt.set(item.roomId, this.now());
     this.scheduleAfterOutcome(item.roomId, status, error);
     this.drain();
     this.emit();
   }
 
-  private clearPending(predicate: (queued: QueuedProbe) => boolean = () => true): void {
+  private clearPending(
+    predicate: (queued: QueuedProbe) => boolean = () => true,
+  ): void {
     for (let index = this.pending.length - 1; index >= 0; index -= 1) {
       const queued = this.pending[index];
       if (!predicate(queued)) continue;
@@ -255,14 +428,22 @@ export class ProbeScheduler {
     return (room.probeIntervalMinutes ?? this.defaultIntervalMinutes) * 60_000;
   }
 
-  setDefaultIntervalMinutes(value: number): void { this.defaultIntervalMinutes = value; }
+  setDefaultIntervalMinutes(value: number): void {
+    this.defaultIntervalMinutes = value;
+  }
 
   jitteredIntervalMs(room: ProbeSchedule): number {
     const base = this.intervalMs(room);
-    return Math.round(base * (1 - this.jitterRatio + this.random() * this.jitterRatio * 2));
+    return Math.round(
+      base * (1 - this.jitterRatio + this.random() * this.jitterRatio * 2),
+    );
   }
 
-  schedule(roomId: string, room: ProbeSchedule, initialDelayMs = this.jitteredIntervalMs(room)): void {
+  schedule(
+    roomId: string,
+    room: ProbeSchedule,
+    initialDelayMs = this.jitteredIntervalMs(room),
+  ): void {
     if (this.stopped) return;
     const version = (this.scheduleVersions.get(roomId) ?? 0) + 1;
     this.scheduleVersions.set(roomId, version);
@@ -270,20 +451,59 @@ export class ProbeScheduler {
     this.armSchedule(roomId, room, initialDelayMs, version);
   }
 
-  private armSchedule(roomId: string, room: ProbeSchedule, delayMs: number, version: number): void {
+  private armSchedule(
+    roomId: string,
+    room: ProbeSchedule,
+    delayMs: number,
+    version: number,
+  ): void {
     const existing = this.timers.get(roomId);
     if (existing) clearTimeout(existing);
-    const deadline = this.now() + delayMs;
+    const eligibleDelayMs = this.nextEligibleDelayMs(room, delayMs);
+    const deadline = this.now() + eligibleDelayMs;
     const timer = setTimeout(() => {
       this.timers.delete(roomId);
       this.timerDeadlines.delete(roomId);
       this.emit();
       void this.runNow(roomId, "scheduled").catch(() => undefined);
-    }, delayMs);
+    }, eligibleDelayMs);
     timer.unref?.();
     this.timers.set(roomId, timer);
     this.timerDeadlines.set(roomId, deadline);
     this.emit();
+  }
+
+  private nextEligibleDelayMs(
+    room: ProbeSchedule,
+    requestedDelayMs: number,
+  ): number {
+    if (!room.schedule) return requestedDelayMs;
+    const now = this.now();
+    const requestedAt = now + requestedDelayMs;
+    const requested = new Date(requestedAt);
+    let candidate = Number.POSITIVE_INFINITY;
+    for (let offset = -1; offset <= 8; offset += 1) {
+      const day = new Date(requested);
+      day.setHours(0, 0, 0, 0);
+      day.setDate(day.getDate() + offset);
+      if (!room.schedule.days.includes(day.getDay())) continue;
+      for (const range of room.schedule.ranges) {
+        const [startHour, startMinute] = range.start.split(":").map(Number);
+        const [endHour, endMinute] = range.end.split(":").map(Number);
+        const start = new Date(day);
+        start.setHours(startHour, startMinute, 0, 0);
+        const end = new Date(day);
+        end.setHours(endHour, endMinute, 0, 0);
+        if (end <= start) end.setDate(end.getDate() + 1);
+        if (requestedAt >= start.getTime() && requestedAt <= end.getTime())
+          candidate = Math.min(candidate, requestedAt);
+        else if (start.getTime() >= requestedAt)
+          candidate = Math.min(candidate, start.getTime());
+      }
+    }
+    return Number.isFinite(candidate)
+      ? Math.max(0, candidate - now)
+      : requestedDelayMs;
   }
 
   cancel(roomId: string): Promise<void> {
@@ -297,7 +517,12 @@ export class ProbeScheduler {
     this.backoffStages.delete(roomId);
     this.clearPending((item) => item.roomId === roomId);
     this.emit();
-    return running ? running.then(() => undefined, () => undefined) : Promise.resolve();
+    return running
+      ? running.then(
+          () => undefined,
+          () => undefined,
+        )
+      : Promise.resolve();
   }
 
   async stop(): Promise<void> {
@@ -319,7 +544,11 @@ export class ProbeScheduler {
     for (const listener of this.listeners) listener(structuredClone(snapshot));
   }
 
-  private scheduleAfterOutcome(roomId: string, status?: string, error?: unknown): void {
+  private scheduleAfterOutcome(
+    roomId: string,
+    status?: string,
+    error?: unknown,
+  ): void {
     if (this.stopped) return;
     const room = this.schedules.get(roomId);
     const version = this.scheduleVersions.get(roomId);
@@ -330,10 +559,20 @@ export class ProbeScheduler {
     }
     if (status === "live") {
       this.backoffStages.delete(roomId);
-      this.armSchedule(roomId, room, this.safeJitter(Math.max(this.intervalMs(room), 10 * 60_000)), version);
+      this.armSchedule(
+        roomId,
+        room,
+        this.safeJitter(Math.max(this.intervalMs(room), 10 * 60_000)),
+        version,
+      );
       return;
     }
-    const accessPaused = error instanceof Error && ["ACCESS_VERIFICATION_PAUSED", "ACCESS_CANCELED_BY_VERIFICATION"].includes(error.message);
+    const accessPaused =
+      error instanceof Error &&
+      [
+        "ACCESS_VERIFICATION_PAUSED",
+        "ACCESS_CANCELED_BY_VERIFICATION",
+      ].includes(error.message);
     if (accessPaused) {
       this.armSchedule(roomId, room, this.safeJitter(120 * 60_000), version);
       return;
@@ -341,7 +580,12 @@ export class ProbeScheduler {
     const backoffs = [30, 60, 120] as const;
     const stage = this.backoffStages.get(roomId) ?? 0;
     this.backoffStages.set(roomId, Math.min(stage + 1, backoffs.length - 1));
-    this.armSchedule(roomId, room, this.safeJitter(backoffs[Math.min(stage, backoffs.length - 1)] * 60_000), version);
+    this.armSchedule(
+      roomId,
+      room,
+      this.safeJitter(backoffs[Math.min(stage, backoffs.length - 1)] * 60_000),
+      version,
+    );
   }
 
   private safeJitter(base: number): number {

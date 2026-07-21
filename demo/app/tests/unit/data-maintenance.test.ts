@@ -11,7 +11,11 @@ async function setup() {
   const directory = await mkdtemp(join(tmpdir(), "duoduo-maintenance-"));
   const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
   databases.push(database);
-  await database.rooms.add({ url: "https://live.douyin.com/123", schedule: null });
+  await database.rooms.add({
+    groupId: database.groups.list()[0].id,
+    url: "https://live.douyin.com/123",
+    schedule: null,
+  });
   return database;
 }
 
