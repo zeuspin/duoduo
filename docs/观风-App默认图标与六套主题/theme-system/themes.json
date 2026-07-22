@@ -1,0 +1,12 @@
+{
+  "defaultTheme": "ink",
+  "appIcon": "01-ink",
+  "themes": [
+    {"id":"ink","name":"宣纸墨","icon":"01-ink","mode":"light","background":"#F3EFE5","surface":"#FFFCF5","primary":"#111111","primaryHover":"#2B2B2B","onPrimary":"#F3EFE5","text":"#171717","textSecondary":"#68625A","border":"#D8D1C3","selected":"#E3DDD1","shadow":"#1111111A"},
+    {"id":"navy","name":"观海蓝","icon":"02-navy","mode":"light","background":"#F2F5F3","surface":"#FFFFFF","primary":"#163A4A","primaryHover":"#0F2D3A","onPrimary":"#F2F5F3","text":"#14252C","textSecondary":"#607078","border":"#D4DFE1","selected":"#DCE8EC","shadow":"#163A4A1A"},
+    {"id":"jade","name":"松石青","icon":"03-jade","mode":"light","background":"#DCE9E1","surface":"#F4FAF6","primary":"#174C43","primaryHover":"#103A33","onPrimary":"#F4FAF6","text":"#18332E","textSecondary":"#587169","border":"#BFD3C8","selected":"#C9DED3","shadow":"#174C431A"},
+    {"id":"cinnabar","name":"朱砂红","icon":"04-cinnabar","mode":"light","background":"#F3E8D5","surface":"#FFF9ED","primary":"#A52D27","primaryHover":"#7F211D","onPrimary":"#FFF9ED","text":"#3A211C","textSecondary":"#7E6258","border":"#E1CBB3","selected":"#F0D2C3","shadow":"#A52D271A"},
+    {"id":"gold","name":"玄黑金","icon":"05-gold","mode":"dark","background":"#171717","surface":"#232323","primary":"#D2AA5A","primaryHover":"#E0C079","onPrimary":"#171717","text":"#F4EAD4","textSecondary":"#B8A98E","border":"#3C372E","selected":"#342D20","shadow":"#00000066"},
+    {"id":"violet","name":"云雾紫","icon":"06-violet","mode":"light","background":"#EEEAF2","surface":"#FAF8FC","primary":"#4A315E","primaryHover":"#352243","onPrimary":"#FAF8FC","text":"#2D2434","textSecondary":"#74677C","border":"#D8CFE0","selected":"#E0D7E8","shadow":"#4A315E1A"}
+  ]
+}

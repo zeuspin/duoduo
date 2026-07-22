@@ -72,13 +72,18 @@ describe("calculateCatalogCost", () => {
   });
 
   it("prices provider-reported Paraformer seconds", () => {
-    expect(calculateCatalogCost({ apiKind: "paraformer_realtime", model: "paraformer-realtime-v2", region: "cn-beijing", billingDurationSeconds: 3600 })).toEqual({
+    expect(calculateCatalogCost({ apiKind: "asr_realtime", model: "paraformer-realtime-v2", region: "cn-beijing", billingDurationSeconds: 3600 })).toEqual({
       status: "calculated",
-      ruleKey: "paraformer-realtime-v2:cn-beijing:seconds:2026-07-19",
+      ruleKey: "paraformer-realtime-v2:cn-beijing:seconds:2026-07-21",
       inputCostMicros: 864_000,
       outputCostMicros: 0,
       totalCostMicros: 864_000,
       currency: "CNY",
     });
+  });
+
+  it("prices provider-reported Fun-ASR seconds", () => {
+    expect(calculateCatalogCost({ apiKind: "asr_realtime", model: "fun-asr-realtime", region: "cn-beijing", billingDurationSeconds: 3600 }))
+      .toMatchObject({ status: "calculated", totalCostMicros: 1_188_000 });
   });
 });

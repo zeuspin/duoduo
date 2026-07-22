@@ -22,7 +22,7 @@ describe("AiUsageRepository", () => {
 
   it("replaces cumulative ASR duration instead of summing final sentences", () => {
     const repository = memoryDatabase().aiUsage;
-    const callId = repository.startCall({ featureKey: "live_asr", usageKind: "production", apiKind: "paraformer_realtime", requestedModel: "paraformer-realtime-v2", region: "cn-beijing" });
+    const callId = repository.startCall({ featureKey: "live_asr", usageKind: "production", apiKind: "asr_realtime", requestedModel: "paraformer-realtime-v2", region: "cn-beijing" });
     repository.updateAsrDuration(callId, "task-1", 3);
     repository.updateAsrDuration(callId, "task-1", 8);
     repository.finishCall(callId, "succeeded");
@@ -39,14 +39,14 @@ describe("AiUsageRepository", () => {
 
   it("marks completed calls without provider usage as usage missing", () => {
     const repository = memoryDatabase().aiUsage;
-    const callId = repository.startCall({ featureKey: "connection_test", usageKind: "test", apiKind: "paraformer_realtime", requestedModel: "paraformer-realtime-v2", region: "cn-beijing" });
+    const callId = repository.startCall({ featureKey: "connection_test", usageKind: "test", apiKind: "asr_realtime", requestedModel: "paraformer-realtime-v2", region: "cn-beijing" });
     repository.finishCall(callId, "provider_failed", "CLIENT_ERROR");
     expect(repository.getCall(callId)).toEqual(expect.objectContaining({ status: "provider_failed", errorCode: "CLIENT_ERROR", cost: expect.objectContaining({ status: "usage_missing" }) }));
   });
 
   it("marks abandoned running calls interrupted", () => {
     const repository = memoryDatabase().aiUsage;
-    const callId = repository.startCall({ featureKey: "live_asr", usageKind: "production", apiKind: "paraformer_realtime", requestedModel: "paraformer-realtime-v2", region: "cn-beijing" });
+    const callId = repository.startCall({ featureKey: "live_asr", usageKind: "production", apiKind: "asr_realtime", requestedModel: "paraformer-realtime-v2", region: "cn-beijing" });
     expect(repository.markRunningInterrupted()).toBe(1);
     expect(repository.getCall(callId)?.status).toBe("interrupted");
   });

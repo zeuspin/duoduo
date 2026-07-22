@@ -20,7 +20,7 @@
 .live-insight-item blockquote { padding:7px; border-left:2px solid #aeb8c5; background:#f7f8fa; color:#5f6b78; }
 .live-insight-item small { color:var(--muted); font-size:9px; }
 .live-insight-conditions { color:#8b641d; }
-.insight-notification-rail { position:fixed; top:64px; left:250px; right:0; z-index:2; padding:8px 14px; background:#f4f6fa; border-bottom:1px solid var(--line); }
+.insight-notification-rail { position:fixed; top:64px; left:var(--sidebar-offset); right:0; z-index:2; padding:8px 14px; background:#f4f6fa; border-bottom:1px solid var(--line); transition:left 260ms cubic-bezier(.22,.8,.3,1); }
 .insight-notification-track { display:flex; gap:8px; overflow-x:auto; scrollbar-gutter:stable; }
 .insight-notification-track article { position:relative; flex:0 0 344px; min-width:0; height:68px; border:1px solid #d5dbe3; border-left:3px solid #d6a642; background:#fff; }
 .insight-notification-track article.important { border-left-color:#d34854; }
@@ -32,6 +32,7 @@
 .insight-notification-identity strong { min-width:0; overflow:hidden; color:var(--text); font-size:11px; font-weight:720; text-overflow:ellipsis; white-space:nowrap; }
 .insight-notification-identity time { flex:none; color:var(--text-muted); font-size:9px; font-variant-numeric:tabular-nums; }
 .insight-notification-content>b { display:block; overflow:hidden; color:var(--text); text-overflow:ellipsis; white-space:nowrap; font-size:12px; font-weight:650; }
+.insight-notification-content>small { color:var(--text-muted); font-size:8px; }
 .insight-notification-close { position:absolute; top:5px; right:5px; width:24px; height:24px; border:0; background:transparent; color:#7b8591; display:grid; place-items:center; }
 .shell.has-insight-notifications { padding-top:148px; }
 .shell.has-insight-notifications main { scroll-margin-top:148px; }

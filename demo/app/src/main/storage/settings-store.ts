@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { AsrProviderConfigSchema, DataRetentionSettingsSchema, DouyinAccessStateSchema, InsightNotificationSettingsSchema, LlmProviderConfigSchema, MonitoringSettingsSchema, type AsrProviderConfig, type DataRetentionSettings, type DouyinAccessState, type InsightNotificationSettings, type LlmProviderConfig, type MonitoringSettings } from "../../shared/contracts";
+import { DEFAULT_AGENT_MODEL_ID, DEFAULT_ANALYSIS_MODEL_ID, DEFAULT_ASR_MODEL_ID, isModelAvailable } from "../../shared/bailian-model-catalog";
 
 export interface StringCipher {
   encryptString(value: string): string;
@@ -34,18 +35,20 @@ export class SettingsStore {
 
   async ensureDefaultBailianLlm(): Promise<boolean> {
     const document = await this.read();
-    if (document.provider?.type !== "bailian") return false;
-    if (
-      document.llmProvider?.type === "bailian" &&
-      document.llmProvider.secretId === document.provider.secretId
-    ) return false;
-    document.llmProvider = { type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: document.provider.secretId };
+    if (!document.provider) return false;
+    if (document.llmProvider?.secretId === document.provider.secretId) return false;
+    document.llmProvider = {
+      type: "bailian",
+      analysisModel: DEFAULT_ANALYSIS_MODEL_ID,
+      agentModel: DEFAULT_AGENT_MODEL_ID,
+      secretId: document.provider.secretId,
+    };
     await this.write(document);
     return true;
   }
 
   async getInsightNotifications(): Promise<InsightNotificationSettings> { return (await this.read()).insightNotifications ?? { timeoutSeconds: 30 }; }
-  async getMonitoringSettings(): Promise<MonitoringSettings> { return (await this.read()).monitoring ?? { monitoredCheckSeconds: 30 }; }
+  async getMonitoringSettings(): Promise<MonitoringSettings> { return (await this.read()).monitoring ?? { monitoredCheckSeconds: 30, preparedCheckMinutes: 5 }; }
   async getDouyinAccessState(): Promise<DouyinAccessState> {
     const state = (await this.read()).douyinAccessState ?? { mode: "normal" as const };
     if (state.mode === "normal" || state.mode === "verification_paused") return state;
@@ -95,8 +98,16 @@ export class SettingsStore {
 
   private async read(): Promise<SettingsDocument> {
     try {
-      const parsed = JSON.parse(await readFile(this.filePath, "utf8")) as SettingsDocument;
-      return { provider: parsed.provider ? AsrProviderConfigSchema.parse(parsed.provider) : undefined, llmProvider: parsed.llmProvider ? LlmProviderConfigSchema.parse(parsed.llmProvider) : undefined, insightNotifications: parsed.insightNotifications ? InsightNotificationSettingsSchema.parse(parsed.insightNotifications) : undefined, monitoring: parsed.monitoring ? MonitoringSettingsSchema.parse(parsed.monitoring) : undefined, douyinAccessState: parsed.douyinAccessState ? DouyinAccessStateSchema.parse(parsed.douyinAccessState) : undefined, dataRetention: parsed.dataRetention ? DataRetentionSettingsSchema.parse(parsed.dataRetention) : undefined, secrets: parsed.secrets ?? {} };
+      const parsed = JSON.parse(await readFile(this.filePath, "utf8")) as Record<string, unknown>;
+      return {
+        provider: normalizeProvider(parsed.provider),
+        llmProvider: normalizeLlmProvider(parsed.llmProvider),
+        insightNotifications: parsed.insightNotifications ? InsightNotificationSettingsSchema.parse(parsed.insightNotifications) : undefined,
+        monitoring: parsed.monitoring ? MonitoringSettingsSchema.parse(parsed.monitoring) : undefined,
+        douyinAccessState: parsed.douyinAccessState ? DouyinAccessStateSchema.parse(parsed.douyinAccessState) : undefined,
+        dataRetention: parsed.dataRetention ? DataRetentionSettingsSchema.parse(parsed.dataRetention) : undefined,
+        secrets: typeof parsed.secrets === "object" && parsed.secrets ? parsed.secrets as Record<string, string> : {},
+      };
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") return { secrets: {} };
       throw error;
@@ -113,4 +124,31 @@ export class SettingsStore {
     this.writeQueue = operation.catch(() => undefined);
     return operation;
   }
+}
+
+function normalizeProvider(value: unknown): AsrProviderConfig | undefined {
+  if (!value || typeof value !== "object" || (value as { type?: unknown }).type !== "bailian") return undefined;
+  const input = value as { model?: unknown; secretId?: unknown };
+  if (typeof input.secretId !== "string" || !input.secretId) return undefined;
+  const model = typeof input.model === "string" && isModelAvailable("asr_extraction", input.model)
+    ? input.model
+    : DEFAULT_ASR_MODEL_ID;
+  return AsrProviderConfigSchema.parse({ type: "bailian", model, secretId: input.secretId });
+}
+
+function normalizeLlmProvider(value: unknown): LlmProviderConfig | undefined {
+  if (!value || typeof value !== "object" || (value as { type?: unknown }).type !== "bailian") return undefined;
+  const input = value as { model?: unknown; analysisModel?: unknown; agentModel?: unknown; secretId?: unknown };
+  if (typeof input.secretId !== "string" || !input.secretId) return undefined;
+  const requestedAnalysisModel = input.analysisModel ?? input.model;
+  return LlmProviderConfigSchema.parse({
+    type: "bailian",
+    analysisModel: typeof requestedAnalysisModel === "string" && isModelAvailable("asr_analysis", requestedAnalysisModel)
+      ? requestedAnalysisModel
+      : DEFAULT_ANALYSIS_MODEL_ID,
+    agentModel: typeof input.agentModel === "string" && isModelAvailable("analyzer_agent", input.agentModel)
+      ? input.agentModel
+      : DEFAULT_AGENT_MODEL_ID,
+    secretId: input.secretId,
+  });
 }

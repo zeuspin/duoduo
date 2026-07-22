@@ -28,7 +28,6 @@ export class RoomStore {
       const room: Room = {
         ...normalized,
         schedule: parsed.schedule,
-        probeIntervalMinutes: parsed.probeIntervalMinutes,
         monitoring: false,
         autoMonitorOnLive: false,
         groupId: parsed.groupId,
@@ -56,7 +55,7 @@ export class RoomStore {
       const rooms = await this.list();
       const index = rooms.findIndex((room) => room.roomId === roomId);
       if (index < 0) throw new Error("ROOM_NOT_FOUND");
-      const updated = { ...rooms[index], canonicalUrl: normalized.canonicalUrl, schedule: parsed.schedule, probeIntervalMinutes: parsed.probeIntervalMinutes, updatedAt: new Date().toISOString() };
+      const updated = { ...rooms[index], canonicalUrl: normalized.canonicalUrl, schedule: parsed.schedule, updatedAt: new Date().toISOString() };
       rooms[index] = updated;
       await this.write(rooms);
       return updated;

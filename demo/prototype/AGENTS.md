@@ -19,3 +19,4 @@ When implementing from a selected generated mock, treat that image as the source
 - Monitored rooms use full-width horizontal work cards with their own live ASR feed on the right; ASR from different rooms is never merged into one reading stream.
 - Unmonitored rooms use compact image-led cards. Starting or stopping monitoring moves the room between the two sections and changes the card layout.
 - Do not include a notification center or a persistent sidebar load/monitor-count summary in the first feature.
+- The appearance system uses the six 观风 palettes (宣纸墨、观海蓝、松石青、朱砂红、玄黑金、云雾紫); Apple-style translucent glass is a shared material treatment across all six themes, not a separate theme.

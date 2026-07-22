@@ -43,12 +43,11 @@ describe("immutable parsers", () => {
     const database = open();
     const legacy = database.parsers.createImmutable(spec("旧格式"));
     const copied = database.parsers.copyImmutable(legacy.id, {
-      schemaVersion: 2,
+      schemaVersion: 3,
       name: "旧格式副本",
-      model: legacy.spec.model,
       prompt: materializeParserPrompt(legacy.spec),
     });
-    expect(copied.spec).toMatchObject({ schemaVersion: 2, name: "旧格式副本" });
+    expect(copied.spec).toMatchObject({ schemaVersion: 3, name: "旧格式副本" });
     expect(materializeParserPrompt(copied.spec)).toBe(
       materializeParserPrompt(legacy.spec),
     );
@@ -89,7 +88,6 @@ describe("immutable parsers", () => {
     await database.rooms.add({
       url: "https://live.douyin.com/900",
       schedule: null,
-      probeIntervalMinutes: null,
       groupId: group.id,
     });
     expect(() => database.parsers.removeImmutable(parser.id)).toThrow(

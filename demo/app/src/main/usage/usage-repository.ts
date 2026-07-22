@@ -45,7 +45,7 @@ export class AiUsageRepository {
     this.transaction(() => {
       this.database.prepare("UPDATE ai_calls SET provider_request_id=? WHERE id=?").run(taskId, callId);
       this.upsertUsage(callId, "billing_duration", durationSeconds, "second");
-      this.saveCost(callId, calculateCatalogCost({ apiKind: "paraformer_realtime", model: String(call.requested_model), region: "cn-beijing", billingDurationSeconds: durationSeconds }));
+      this.saveCost(callId, calculateCatalogCost({ apiKind: "asr_realtime", model: String(call.requested_model), region: "cn-beijing", billingDurationSeconds: durationSeconds }));
     });
   }
 

@@ -5,7 +5,13 @@ import { CleanupRequestSchema, type CleanupPreview, type CleanupRequest, type Da
 export interface HourlyAggregate { roomId: string; hourStartedAt: string; sampleCount: number; minViewerCount?: number; maxViewerCount?: number; averageViewerCount?: number }
 export interface CategoryUsage { category: "observations" | "aggregates" | "asr" | "insights" | "sessions"; count: number; oldestAt?: string; newestAt?: string }
 
-const categoryTable = { observations: ["room_observations", "checked_at"], aggregates: ["room_hourly_aggregates", "hour_started_at"], asr: ["asr_segments", "occurred_at"], insights: ["market_insights", "created_at"], sessions: ["live_sessions", "first_live_at"] } as const;
+const categoryTables = {
+  observations: [["room_observations", "checked_at"]],
+  aggregates: [["room_hourly_aggregates", "hour_started_at"]],
+  asr: [["asr_segments", "occurred_at"]],
+  insights: [["market_insights", "created_at"], ["content_records", "created_at"]],
+  sessions: [["live_sessions", "first_live_at"]],
+} as const;
 
 export class DataMaintenance {
   private readonly previews = new Map<string, string>();
@@ -13,11 +19,13 @@ export class DataMaintenance {
 
   previewCleanup(input: CleanupRequest): CleanupPreview {
     const request = CleanupRequestSchema.parse(input);
-    const [table, time] = categoryTable[request.category];
-    const where = `${time}<?${request.roomId ? " AND room_id=?" : ""}`;
     const params = request.roomId ? [request.before, request.roomId] : [request.before];
-    const row = this.database.prepare(`SELECT COUNT(*) count FROM ${table} WHERE ${where}`).get(...params) as Record<string, unknown>;
-    const preview = { token: randomUUID(), ...request, count: Number(row.count) };
+    const count = categoryTables[request.category].reduce((sum, [table, time]) => {
+      const where = `${time}<?${request.roomId ? " AND room_id=?" : ""}`;
+      const row = this.database.prepare(`SELECT COUNT(*) count FROM ${table} WHERE ${where}`).get(...params) as Record<string, unknown>;
+      return sum + Number(row.count);
+    }, 0);
+    const preview = { token: randomUUID(), ...request, count };
     this.previews.set(preview.token, JSON.stringify(request));
     return preview;
   }
@@ -26,15 +34,17 @@ export class DataMaintenance {
     const request = CleanupRequestSchema.parse(input);
     if (this.previews.get(token) !== JSON.stringify(request)) throw new Error("CLEANUP_PREVIEW_MISMATCH");
     this.previews.delete(token);
-    const [table, time] = categoryTable[request.category];
-    const where = `${time}<?${request.roomId ? " AND room_id=?" : ""}`;
     const params = request.roomId ? [request.before, request.roomId] : [request.before];
     this.database.exec("BEGIN IMMEDIATE");
     try {
-      if (request.category === "observations") this.aggregateObservations(where, params);
-      const result = this.database.prepare(`DELETE FROM ${table} WHERE ${where}`).run(...params);
+      let removed = 0;
+      for (const [table, time] of categoryTables[request.category]) {
+        const where = `${time}<?${request.roomId ? " AND room_id=?" : ""}`;
+        if (request.category === "observations") this.aggregateObservations(where, params);
+        removed += Number(this.database.prepare(`DELETE FROM ${table} WHERE ${where}`).run(...params).changes);
+      }
       this.database.exec("COMMIT");
-      return Number(result.changes);
+      return removed;
     } catch (error) { this.database.exec("ROLLBACK"); throw error; }
   }
 
@@ -43,9 +53,12 @@ export class DataMaintenance {
   }
 
   getCategoryUsage(): CategoryUsage[] {
-    return (Object.entries(categoryTable) as Array<[CategoryUsage["category"], readonly [string, string]]>).map(([category, [table, time]]) => {
-      const row = this.database.prepare(`SELECT COUNT(*) count,MIN(${time}) oldest,MAX(${time}) newest FROM ${table}`).get() as Record<string, unknown>;
-      return { category, count: Number(row.count), ...(typeof row.oldest === "string" ? { oldestAt: row.oldest } : {}), ...(typeof row.newest === "string" ? { newestAt: row.newest } : {}) };
+    return (Object.keys(categoryTables) as CategoryUsage["category"][]).map((category) => {
+      const rows = categoryTables[category].map(([table, time]) =>
+        this.database.prepare(`SELECT COUNT(*) count,MIN(${time}) oldest,MAX(${time}) newest FROM ${table}`).get() as Record<string, unknown>,
+      );
+      const times = rows.flatMap((row) => [row.oldest, row.newest]).filter((value): value is string => typeof value === "string");
+      return { category, count: rows.reduce((sum, row) => sum + Number(row.count), 0), ...(times.length ? { oldestAt: [...times].sort()[0], newestAt: [...times].sort().at(-1) } : {}) };
     });
   }
 

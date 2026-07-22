@@ -11,7 +11,7 @@ const { spawn } = require("node:child_process");
   const rooms = process.argv.slice(2); if (rooms.length < 3) throw new Error("at least three rooms required");
   const durationMs = Math.min(Number(process.env.DUODUO_REAL_INSIGHT_DURATION_MS || 300000), 1200000);
   const userData = await mkdtemp(join(tmpdir(), "duoduo-real-insight-")); const now = new Date().toISOString();
-  await writeFile(join(userData, "rooms.json"), JSON.stringify(rooms.map((roomId) => ({ roomId, canonicalUrl: `https://live.douyin.com/${roomId}`, schedule: null, probeIntervalMinutes: 30, monitoring: true, createdAt: now, updatedAt: now }))));
+  await writeFile(join(userData, "rooms.json"), JSON.stringify(rooms.map((roomId) => ({ roomId, canonicalUrl: `https://live.douyin.com/${roomId}`, schedule: null, monitoring: true, createdAt: now, updatedAt: now }))));
   await writeFile(join(userData, "settings.json"), JSON.stringify({ provider: { type: "bailian", model: "paraformer-realtime-v2", secretId: "smoke-only" }, llmProvider: { type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: "smoke-only" }, secrets: {} }));
   await mkdir(resolve("reports"), { recursive: true }); const report = resolve("reports/insight-real-smoke.json"); const screenshot = resolve("reports/insight-real-smoke.png");
   const executable = resolve("node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");

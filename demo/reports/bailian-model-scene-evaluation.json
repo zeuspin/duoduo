@@ -1,0 +1,1173 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-21T09:34:56.754Z",
+  "provider": "bailian",
+  "region": "cn-beijing",
+  "domains": [
+    "stock_finance",
+    "ecommerce"
+  ],
+  "gates": {
+    "asr_analysis": {
+      "minimumScore": 95,
+      "requiresAllSchemaValid": true,
+      "requiresAllEvidenceGrounded": true,
+      "requiresEveryNoiseCaseRejected": true,
+      "minimumTermCoveragePerPositiveCase": 0.75
+    },
+    "analyzer_agent": {
+      "minimumScore": 85,
+      "requiresAllSchemaValid": true,
+      "requiresEveryAmbiguousCaseToRequestClarification": true,
+      "requiresUsableDraftForEverySpecifiedCase": true,
+      "minimumTermCoveragePerCase": 0.75
+    }
+  },
+  "results": [
+    {
+      "modelId": "qwen-flash-2025-07-28",
+      "pricing": {
+        "inputCnyPerMillion": 0.15,
+        "outputCnyPerMillion": 1.5
+      },
+      "analysis": {
+        "score": 100,
+        "passed": true,
+        "estimatedCostCny": 0.0006755999999999999,
+        "promptTokens": 834,
+        "completionTokens": 367,
+        "runs": [
+          {
+            "id": "stock-conditional-risk",
+            "domain": "stock_finance",
+            "latencyMs": 1150,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 142,
+              "completionTokens": 78,
+              "totalTokens": 220
+            }
+          },
+          {
+            "id": "stock-explicit-view",
+            "domain": "stock_finance",
+            "latencyMs": 902,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 136,
+              "completionTokens": 78,
+              "totalTokens": 214
+            }
+          },
+          {
+            "id": "stock-noise",
+            "domain": "stock_finance",
+            "latencyMs": 335,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 138,
+              "completionTokens": 4,
+              "totalTokens": 142
+            }
+          },
+          {
+            "id": "commerce-price-promise",
+            "domain": "ecommerce",
+            "latencyMs": 1156,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 141,
+              "completionTokens": 76,
+              "totalTokens": 217
+            }
+          },
+          {
+            "id": "commerce-service-limit",
+            "domain": "ecommerce",
+            "latencyMs": 1315,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 140,
+              "completionTokens": 127,
+              "totalTokens": 267
+            }
+          },
+          {
+            "id": "commerce-noise",
+            "domain": "ecommerce",
+            "latencyMs": 307,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 137,
+              "completionTokens": 4,
+              "totalTokens": 141
+            }
+          }
+        ]
+      },
+      "agent": {
+        "score": 91.66666666666667,
+        "passed": false,
+        "estimatedCostCny": 0.00213645,
+        "promptTokens": 1043,
+        "completionTokens": 1320,
+        "runs": [
+          {
+            "id": "stock-alert",
+            "domain": "stock_finance",
+            "latencyMs": 3248,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 191,
+              "completionTokens": 308,
+              "totalTokens": 499
+            }
+          },
+          {
+            "id": "stock-ambiguous",
+            "domain": "stock_finance",
+            "latencyMs": 1280,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": false,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 157,
+              "completionTokens": 109,
+              "totalTokens": 266
+            }
+          },
+          {
+            "id": "commerce-promotion",
+            "domain": "ecommerce",
+            "latencyMs": 3839,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 186,
+              "completionTokens": 310,
+              "totalTokens": 496
+            }
+          },
+          {
+            "id": "commerce-claim",
+            "domain": "ecommerce",
+            "latencyMs": 3525,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 175,
+              "completionTokens": 228,
+              "totalTokens": 403
+            }
+          },
+          {
+            "id": "commerce-ambiguous-competitor",
+            "domain": "ecommerce",
+            "latencyMs": 1752,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": false,
+            "asksWhenNeeded": false,
+            "ambiguityHandled": false,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 50,
+            "usage": {
+              "promptTokens": 161,
+              "completionTokens": 156,
+              "totalTokens": 317
+            }
+          },
+          {
+            "id": "cross-domain-evidence",
+            "domain": "stock_finance,ecommerce",
+            "latencyMs": 2298,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 173,
+              "completionTokens": 209,
+              "totalTokens": 382
+            }
+          }
+        ]
+      }
+    },
+    {
+      "modelId": "qwen3.5-flash-2026-02-23",
+      "pricing": {
+        "inputCnyPerMillion": 0.2,
+        "outputCnyPerMillion": 2
+      },
+      "analysis": {
+        "score": 96.66666666666667,
+        "passed": false,
+        "estimatedCostCny": 0.0013392,
+        "promptTokens": 816,
+        "completionTokens": 588,
+        "runs": [
+          {
+            "id": "stock-conditional-risk",
+            "domain": "stock_finance",
+            "latencyMs": 1444,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 141,
+              "completionTokens": 124,
+              "totalTokens": 265
+            }
+          },
+          {
+            "id": "stock-explicit-view",
+            "domain": "stock_finance",
+            "latencyMs": 1395,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 134,
+              "completionTokens": 108,
+              "totalTokens": 242
+            }
+          },
+          {
+            "id": "stock-noise",
+            "domain": "stock_finance",
+            "latencyMs": 319,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 134,
+              "completionTokens": 4,
+              "totalTokens": 138
+            }
+          },
+          {
+            "id": "commerce-price-promise",
+            "domain": "ecommerce",
+            "latencyMs": 1300,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 139,
+              "completionTokens": 128,
+              "totalTokens": 267
+            }
+          },
+          {
+            "id": "commerce-service-limit",
+            "domain": "ecommerce",
+            "latencyMs": 1576,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 134,
+              "completionTokens": 157,
+              "totalTokens": 291
+            }
+          },
+          {
+            "id": "commerce-noise",
+            "domain": "ecommerce",
+            "latencyMs": 1031,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": false,
+            "termCoverage": 1,
+            "score": 80,
+            "usage": {
+              "promptTokens": 134,
+              "completionTokens": 67,
+              "totalTokens": 201
+            }
+          }
+        ]
+      },
+      "agent": {
+        "score": 100,
+        "passed": true,
+        "estimatedCostCny": 0.0053996,
+        "promptTokens": 1058,
+        "completionTokens": 2594,
+        "runs": [
+          {
+            "id": "stock-alert",
+            "domain": "stock_finance",
+            "latencyMs": 6164,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": false,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 194,
+              "completionTokens": 569,
+              "totalTokens": 763
+            }
+          },
+          {
+            "id": "stock-ambiguous",
+            "domain": "stock_finance",
+            "latencyMs": 1506,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": false,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 161,
+              "completionTokens": 157,
+              "totalTokens": 318
+            }
+          },
+          {
+            "id": "commerce-promotion",
+            "domain": "ecommerce",
+            "latencyMs": 6800,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": false,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 188,
+              "completionTokens": 673,
+              "totalTokens": 861
+            }
+          },
+          {
+            "id": "commerce-claim",
+            "domain": "ecommerce",
+            "latencyMs": 3590,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 177,
+              "completionTokens": 396,
+              "totalTokens": 573
+            }
+          },
+          {
+            "id": "commerce-ambiguous-competitor",
+            "domain": "ecommerce",
+            "latencyMs": 3722,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 163,
+              "completionTokens": 361,
+              "totalTokens": 524
+            }
+          },
+          {
+            "id": "cross-domain-evidence",
+            "domain": "stock_finance,ecommerce",
+            "latencyMs": 4421,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": false,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 175,
+              "completionTokens": 438,
+              "totalTokens": 613
+            }
+          }
+        ]
+      }
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "pricing": {
+        "inputCnyPerMillion": 1,
+        "outputCnyPerMillion": 2
+      },
+      "analysis": {
+        "score": 100,
+        "passed": true,
+        "estimatedCostCny": 0.001739,
+        "promptTokens": 749,
+        "completionTokens": 495,
+        "runs": [
+          {
+            "id": "stock-conditional-risk",
+            "domain": "stock_finance",
+            "latencyMs": 1818,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 128,
+              "completionTokens": 85,
+              "totalTokens": 213
+            }
+          },
+          {
+            "id": "stock-explicit-view",
+            "domain": "stock_finance",
+            "latencyMs": 1578,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 123,
+              "completionTokens": 71,
+              "totalTokens": 194
+            }
+          },
+          {
+            "id": "stock-noise",
+            "domain": "stock_finance",
+            "latencyMs": 910,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 124,
+              "completionTokens": 5,
+              "totalTokens": 129
+            }
+          },
+          {
+            "id": "commerce-price-promise",
+            "domain": "ecommerce",
+            "latencyMs": 2662,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 127,
+              "completionTokens": 147,
+              "totalTokens": 274
+            }
+          },
+          {
+            "id": "commerce-service-limit",
+            "domain": "ecommerce",
+            "latencyMs": 2916,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 125,
+              "completionTokens": 182,
+              "totalTokens": 307
+            }
+          },
+          {
+            "id": "commerce-noise",
+            "domain": "ecommerce",
+            "latencyMs": 634,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 122,
+              "completionTokens": 5,
+              "totalTokens": 127
+            }
+          }
+        ]
+      },
+      "agent": {
+        "score": 91.66666666666667,
+        "passed": false,
+        "estimatedCostCny": 0.00336,
+        "promptTokens": 1064,
+        "completionTokens": 1148,
+        "runs": [
+          {
+            "id": "stock-alert",
+            "domain": "stock_finance",
+            "latencyMs": 3782,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": false,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 193,
+              "completionTokens": 259,
+              "totalTokens": 452
+            }
+          },
+          {
+            "id": "stock-ambiguous",
+            "domain": "stock_finance",
+            "latencyMs": 2174,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": false,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 161,
+              "completionTokens": 113,
+              "totalTokens": 274
+            }
+          },
+          {
+            "id": "commerce-promotion",
+            "domain": "ecommerce",
+            "latencyMs": 3178,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 190,
+              "completionTokens": 222,
+              "totalTokens": 412
+            }
+          },
+          {
+            "id": "commerce-claim",
+            "domain": "ecommerce",
+            "latencyMs": 3159,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 179,
+              "completionTokens": 182,
+              "totalTokens": 361
+            }
+          },
+          {
+            "id": "commerce-ambiguous-competitor",
+            "domain": "ecommerce",
+            "latencyMs": 2439,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": false,
+            "asksWhenNeeded": false,
+            "ambiguityHandled": false,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 50,
+            "usage": {
+              "promptTokens": 166,
+              "completionTokens": 139,
+              "totalTokens": 305
+            }
+          },
+          {
+            "id": "cross-domain-evidence",
+            "domain": "stock_finance,ecommerce",
+            "latencyMs": 3474,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 175,
+              "completionTokens": 233,
+              "totalTokens": 408
+            }
+          }
+        ]
+      }
+    },
+    {
+      "modelId": "qwen3.7-plus-2026-05-26",
+      "pricing": {
+        "inputCnyPerMillion": 2,
+        "outputCnyPerMillion": 8
+      },
+      "analysis": {
+        "score": 96.66666666666667,
+        "passed": false,
+        "estimatedCostCny": 0.005392,
+        "promptTokens": 816,
+        "completionTokens": 470,
+        "runs": [
+          {
+            "id": "stock-conditional-risk",
+            "domain": "stock_finance",
+            "latencyMs": 3846,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 141,
+              "completionTokens": 164,
+              "totalTokens": 305
+            }
+          },
+          {
+            "id": "stock-explicit-view",
+            "domain": "stock_finance",
+            "latencyMs": 1807,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 134,
+              "completionTokens": 66,
+              "totalTokens": 200
+            }
+          },
+          {
+            "id": "stock-noise",
+            "domain": "stock_finance",
+            "latencyMs": 1365,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 134,
+              "completionTokens": 4,
+              "totalTokens": 138
+            }
+          },
+          {
+            "id": "commerce-price-promise",
+            "domain": "ecommerce",
+            "latencyMs": 2390,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 139,
+              "completionTokens": 95,
+              "totalTokens": 234
+            }
+          },
+          {
+            "id": "commerce-service-limit",
+            "domain": "ecommerce",
+            "latencyMs": 2007,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 134,
+              "completionTokens": 70,
+              "totalTokens": 204
+            }
+          },
+          {
+            "id": "commerce-noise",
+            "domain": "ecommerce",
+            "latencyMs": 2051,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": false,
+            "termCoverage": 1,
+            "score": 80,
+            "usage": {
+              "promptTokens": 134,
+              "completionTokens": 71,
+              "totalTokens": 205
+            }
+          }
+        ]
+      },
+      "agent": {
+        "score": 88.33333333333333,
+        "passed": false,
+        "estimatedCostCny": 0.020124,
+        "promptTokens": 1058,
+        "completionTokens": 2251,
+        "runs": [
+          {
+            "id": "stock-alert",
+            "domain": "stock_finance",
+            "latencyMs": 8953,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": false,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 194,
+              "completionTokens": 483,
+              "totalTokens": 677
+            }
+          },
+          {
+            "id": "stock-ambiguous",
+            "domain": "stock_finance",
+            "latencyMs": 5492,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": false,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 161,
+              "completionTokens": 279,
+              "totalTokens": 440
+            }
+          },
+          {
+            "id": "commerce-promotion",
+            "domain": "ecommerce",
+            "latencyMs": 10820,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": false,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 188,
+              "completionTokens": 582,
+              "totalTokens": 770
+            }
+          },
+          {
+            "id": "commerce-claim",
+            "domain": "ecommerce",
+            "latencyMs": 7319,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": false,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": false,
+            "termCoverage": 1,
+            "score": 65,
+            "usage": {
+              "promptTokens": 177,
+              "completionTokens": 380,
+              "totalTokens": 557
+            }
+          },
+          {
+            "id": "commerce-ambiguous-competitor",
+            "domain": "ecommerce",
+            "latencyMs": 5879,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 163,
+              "completionTokens": 295,
+              "totalTokens": 458
+            }
+          },
+          {
+            "id": "cross-domain-evidence",
+            "domain": "stock_finance,ecommerce",
+            "latencyMs": 4804,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": false,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": false,
+            "termCoverage": 1,
+            "score": 65,
+            "usage": {
+              "promptTokens": 175,
+              "completionTokens": 232,
+              "totalTokens": 407
+            }
+          }
+        ]
+      }
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "pricing": {
+        "inputCnyPerMillion": 12,
+        "outputCnyPerMillion": 24
+      },
+      "analysis": {
+        "score": 100,
+        "passed": true,
+        "estimatedCostCny": 0.01986,
+        "promptTokens": 749,
+        "completionTokens": 453,
+        "runs": [
+          {
+            "id": "stock-conditional-risk",
+            "domain": "stock_finance",
+            "latencyMs": 3262,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 128,
+              "completionTokens": 85,
+              "totalTokens": 213
+            }
+          },
+          {
+            "id": "stock-explicit-view",
+            "domain": "stock_finance",
+            "latencyMs": 3368,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 123,
+              "completionTokens": 97,
+              "totalTokens": 220
+            }
+          },
+          {
+            "id": "stock-noise",
+            "domain": "stock_finance",
+            "latencyMs": 1117,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 124,
+              "completionTokens": 5,
+              "totalTokens": 129
+            }
+          },
+          {
+            "id": "commerce-price-promise",
+            "domain": "ecommerce",
+            "latencyMs": 2940,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 127,
+              "completionTokens": 83,
+              "totalTokens": 210
+            }
+          },
+          {
+            "id": "commerce-service-limit",
+            "domain": "ecommerce",
+            "latencyMs": 4914,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 125,
+              "completionTokens": 178,
+              "totalTokens": 303
+            }
+          },
+          {
+            "id": "commerce-noise",
+            "domain": "ecommerce",
+            "latencyMs": 1191,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "countCorrect": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 122,
+              "completionTokens": 5,
+              "totalTokens": 127
+            }
+          }
+        ]
+      },
+      "agent": {
+        "score": 91.66666666666667,
+        "passed": false,
+        "estimatedCostCny": 0.044808,
+        "promptTokens": 1064,
+        "completionTokens": 1335,
+        "runs": [
+          {
+            "id": "stock-alert",
+            "domain": "stock_finance",
+            "latencyMs": 7025,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 193,
+              "completionTokens": 270,
+              "totalTokens": 463
+            }
+          },
+          {
+            "id": "stock-ambiguous",
+            "domain": "stock_finance",
+            "latencyMs": 7934,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 161,
+              "completionTokens": 278,
+              "totalTokens": 439
+            }
+          },
+          {
+            "id": "commerce-promotion",
+            "domain": "ecommerce",
+            "latencyMs": 6210,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 190,
+              "completionTokens": 268,
+              "totalTokens": 458
+            }
+          },
+          {
+            "id": "commerce-claim",
+            "domain": "ecommerce",
+            "latencyMs": 4697,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 179,
+              "completionTokens": 179,
+              "totalTokens": 358
+            }
+          },
+          {
+            "id": "commerce-ambiguous-competitor",
+            "domain": "ecommerce",
+            "latencyMs": 6670,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "needs_clarification",
+            "statusCorrect": false,
+            "asksWhenNeeded": false,
+            "ambiguityHandled": false,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 50,
+            "usage": {
+              "promptTokens": 166,
+              "completionTokens": 188,
+              "totalTokens": 354
+            }
+          },
+          {
+            "id": "cross-domain-evidence",
+            "domain": "stock_finance,ecommerce",
+            "latencyMs": 4771,
+            "schemaValid": true,
+            "evidenceGrounded": true,
+            "expectedStatus": "ready",
+            "statusCorrect": true,
+            "asksWhenNeeded": true,
+            "ambiguityHandled": true,
+            "hasUsableDraft": true,
+            "termCoverage": 1,
+            "score": 100,
+            "usage": {
+              "promptTokens": 175,
+              "completionTokens": 152,
+              "totalTokens": 327
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

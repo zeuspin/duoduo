@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  AnalyzerAgentResponseSchema,
   AsrEventSchema,
   AsrProviderConfigSchema,
   LlmProviderConfigSchema,
@@ -23,7 +24,6 @@ describe("room contracts", () => {
       roomId: "123",
       canonicalUrl: "https://live.douyin.com/123",
       schedule: null,
-      probeIntervalMinutes: null,
       monitoring: false,
       groupId: "group-a",
       positionInGroup: 0,
@@ -93,8 +93,11 @@ describe("room contracts", () => {
     expect(parsed).toMatchObject({ mode: "verification_paused", taskType: "monitor_start" });
   });
 
-  it("keeps monitoring settings limited to in-page health checks", () => {
-    expect(MonitoringSettingsSchema.parse({ monitoredCheckSeconds: 30 })).toEqual({ monitoredCheckSeconds: 30 });
+  it("defaults the global prepared-room check interval", () => {
+    expect(MonitoringSettingsSchema.parse({ monitoredCheckSeconds: 30 })).toEqual({
+      monitoredCheckSeconds: 30,
+      preparedCheckMinutes: 5,
+    });
   });
 
   it("validates bounded metric evidence without page data", () => {
@@ -155,6 +158,21 @@ describe("room contracts", () => {
 });
 
 describe("LLM parser contracts", () => {
+  it("requires clarification questions or a testable analyzer draft", () => {
+    const draft = {
+      name: "价格提醒",
+      purpose: "记录价格变化",
+      resultTypes: [{ id: "price_change", label: "价格变化", definition: "主播明确提到价格变化" }],
+      fields: [{ id: "product", label: "商品", type: "string" as const }],
+      inclusionRules: ["主播明确提到新价格"],
+      exclusionRules: ["忽略观众猜测"],
+      alertRules: ["降价时提醒"],
+    };
+    expect(AnalyzerAgentResponseSchema.parse({ status: "ready", draft, questions: [] }).draft.name).toBe("价格提醒");
+    expect(() => AnalyzerAgentResponseSchema.parse({ status: "needs_clarification", draft, questions: [] })).toThrow();
+    expect(() => AnalyzerAgentResponseSchema.parse({ status: "ready", draft: { ...draft, resultTypes: [] }, questions: [] })).toThrow();
+  });
+
   it("accepts legacy and visible-prompt parser specs", () => {
     expect(
       ParserSpecSchema.parse({
@@ -182,23 +200,29 @@ describe("LLM parser contracts", () => {
     });
   });
 
-  it("rejects empty prompts and unverified models for new parsers", () => {
+  it("uses model-free V3 specs and rejects empty prompts", () => {
     expect(() =>
       ParserSpecSchema.parse({
-        schemaVersion: 2,
+        schemaVersion: 3,
         name: "空提示词",
-        model: "qwen-plus",
         prompt: "   ",
       }),
     ).toThrow();
-    expect(() =>
-      ParserSpecSchema.parse({
-        schemaVersion: 2,
-        name: "未知模型",
-        model: "unknown-model",
-        prompt: "返回 JSON",
-      }),
-    ).toThrow();
+    expect(ParserSpecSchema.parse({ schemaVersion: 3, name: "新规范", prompt: "返回 JSON" }))
+      .toEqual({ schemaVersion: 3, name: "新规范", prompt: "返回 JSON" });
+  });
+
+  it("accepts a system-controlled V4 analyzer definition without a raw prompt", () => {
+    const definition = {
+      name: "价格变化提醒",
+      purpose: "记录价格变化",
+      resultTypes: [{ id: "price_change", label: "价格变化", definition: "价格发生明确变化" }],
+      fields: [{ id: "product", label: "商品", type: "string" }],
+      inclusionRules: ["主播明确说明价格变化"],
+      exclusionRules: ["忽略寒暄"],
+      alertRules: ["降价时提醒"],
+    };
+    expect(ParserSpecSchema.parse({ schemaVersion: 4, name: "价格变化提醒", definition })).toMatchObject({ schemaVersion: 4, definition });
   });
 
   it("accepts only supported insight notification timeouts", () => {
@@ -206,11 +230,11 @@ describe("LLM parser contracts", () => {
     for (const timeoutSeconds of [10, 30, 60]) expect(InsightNotificationSettingsSchema.parse({ timeoutSeconds }).timeoutSeconds).toBe(timeoutSeconds);
     expect(() => InsightNotificationSettingsSchema.parse({ timeoutSeconds: 20 })).toThrow();
   });
-  it("accepts Bailian and OpenAI-compatible model providers without secrets", () => {
-    expect(LlmProviderConfigSchema.parse({ type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: "llm-main" }).type).toBe("bailian");
-    const compatible = LlmProviderConfigSchema.parse({ type: "openai-compatible", endpoint: "https://llm.example/v1/chat/completions", model: "market-model", auth: "x-api-key", secretId: "custom-main" });
-    expect(compatible.type === "openai-compatible" && compatible.auth).toBe("x-api-key");
-    expect(() => LlmProviderConfigSchema.parse({ type: "openai-compatible", endpoint: "ws://bad", model: "x", auth: "bearer" })).toThrow();
+  it("accepts only scene-approved Bailian system models", () => {
+    expect(LlmProviderConfigSchema.parse({ type: "bailian", analysisModel: "qwen-plus", agentModel: "qwen3.5-flash-2026-02-23", secretId: "bailian-main" }).type).toBe("bailian");
+    expect(() => LlmProviderConfigSchema.parse({ type: "bailian", analysisModel: "qwen-flash-2025-07-28", agentModel: "qwen3.5-flash-2026-02-23", secretId: "bailian-main" })).toThrow();
+    expect(() => LlmProviderConfigSchema.parse({ type: "bailian", analysisModel: "qwen3.5-flash-2026-02-23", agentModel: "qwen3.5-flash-2026-02-23", secretId: "bailian-main" })).toThrow();
+    expect(() => LlmProviderConfigSchema.parse({ type: "openai-compatible", model: "x", secretId: "main" })).toThrow();
   });
 
   it("requires natural time and supporting evidence on every insight", () => {
@@ -222,9 +246,10 @@ describe("LLM parser contracts", () => {
 });
 
 describe("ASR contracts", () => {
-  it("accepts both built-in provider modes", () => {
+  it("accepts only scene-approved Bailian models", () => {
     expect(AsrProviderConfigSchema.parse({ type: "bailian", model: "paraformer-realtime-v2", secretId: "main" }).type).toBe("bailian");
-    expect(AsrProviderConfigSchema.parse({ type: "duoduo-streaming-asr-v1", endpoint: "wss://asr.example/ws", auth: "bearer", secretId: "gateway" }).type).toBe("duoduo-streaming-asr-v1");
+    expect(AsrProviderConfigSchema.parse({ type: "bailian", model: "fun-asr-realtime", secretId: "main" }).model).toBe("fun-asr-realtime");
+    expect(() => AsrProviderConfigSchema.parse({ type: "duoduo-streaming-asr-v1", endpoint: "wss://asr.example/ws" })).toThrow();
   });
 
   it("requires room-scoped timestamped ASR events", () => {

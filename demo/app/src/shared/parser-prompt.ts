@@ -44,6 +44,17 @@ export const DEFAULT_PARSER_PROMPT = `${promptStart}
 ${promptEnd}`;
 
 export function materializeParserPrompt(spec: ParserSpec): string {
+  if ("schemaVersion" in spec && spec.schemaVersion === 4)
+    return `系统受控内容分析器（结构化定义）
+名称：${spec.definition.name}
+目标：${spec.definition.purpose}
+记录类型：${spec.definition.resultTypes.map((item) => `${item.label}（${item.definition}）`).join("；")}
+字段：${spec.definition.fields.map((item) => `${item.label}[${item.type}]`).join("；")}
+收录规则：${spec.definition.inclusionRules.join("；")}
+排除规则：${spec.definition.exclusionRules.join("；") || "无"}
+提醒规则：${spec.definition.alertRules.join("；") || "无"}
+
+执行提示词由系统在运行时生成，用户不能直接修改。`;
   if ("schemaVersion" in spec) return spec.prompt;
   const normalization =
     spec.normalization === "preserve"

@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 import {
   estimateSafeBatchDurationMs,
   ProbeScheduler,
-  splitPreparedStartupRooms,
 } from "../../src/main/rooms/probe-scheduler";
 import type { PreparedProbeState } from "../../src/shared/contracts";
 
@@ -15,7 +14,6 @@ describe("ProbeScheduler", () => {
       jitterRatio: 0,
     });
     scheduler.schedule("a", {
-      probeIntervalMinutes: 5,
       schedule: { days: [1], ranges: [{ start: "09:00", end: "10:00" }] },
     });
     expect(scheduler.state().nextRunAt).toBe(
@@ -23,17 +21,6 @@ describe("ProbeScheduler", () => {
     );
     void scheduler.stop();
     vi.useRealTimers();
-  });
-  it("restores rooms without a final snapshot as prioritized initial probes", () => {
-    expect(
-      splitPreparedStartupRooms(
-        ["new", "stuck", "known"],
-        [
-          { roomId: "stuck", status: "checking" },
-          { roomId: "known", status: "offline" },
-        ],
-      ),
-    ).toEqual({ initialRoomIds: ["new", "stuck"], refreshRoomIds: ["known"] });
   });
   it("estimates the earliest safe batch completion across rolling-hour limits", () => {
     expect(estimateSafeBatchDurationMs(1, 60_000, 10)).toBe(0);
@@ -58,19 +45,18 @@ describe("ProbeScheduler", () => {
     await Promise.all([first, second]);
   });
 
-  it("uses the room interval override or global default", () => {
+  it("uses the global interval", () => {
     const scheduler = new ProbeScheduler(async () => undefined, {
       defaultIntervalMinutes: 5,
     });
-    expect(scheduler.intervalMs({ probeIntervalMinutes: 1 })).toBe(60_000);
-    expect(scheduler.intervalMs({ probeIntervalMinutes: null })).toBe(300_000);
+    expect(scheduler.intervalMs()).toBe(300_000);
   });
 
   it("cancels delayed initial probes during shutdown", async () => {
     vi.useFakeTimers();
     const probe = vi.fn(async () => undefined);
     const scheduler = new ProbeScheduler(probe);
-    scheduler.schedule("123", { probeIntervalMinutes: null }, 500);
+    scheduler.schedule("123", {}, 500);
     await scheduler.stop();
     await vi.advanceTimersByTimeAsync(500);
     expect(probe).not.toHaveBeenCalled();
@@ -81,10 +67,10 @@ describe("ProbeScheduler", () => {
     vi.useFakeTimers();
     const probe = vi.fn(async () => undefined);
     const scheduler = new ProbeScheduler(probe, { defaultIntervalMinutes: 5 });
-    scheduler.schedule("123", { probeIntervalMinutes: null });
+    scheduler.schedule("123", {});
     scheduler.setDefaultIntervalMinutes(10);
-    scheduler.schedule("123", { probeIntervalMinutes: null });
-    expect(scheduler.intervalMs({ probeIntervalMinutes: null })).toBe(600_000);
+    scheduler.schedule("123", {});
+    expect(scheduler.intervalMs()).toBe(600_000);
     vi.advanceTimersByTime(300_000);
     expect(probe).not.toHaveBeenCalled();
     vi.useRealTimers();
@@ -312,7 +298,7 @@ describe("ProbeScheduler", () => {
       jitterRatio: 0.2,
       random: () => 0,
     });
-    expect(scheduler.jitteredIntervalMs({ probeIntervalMinutes: null })).toBe(
+    expect(scheduler.jitteredIntervalMs({})).toBe(
       240_000,
     );
   });
@@ -418,7 +404,7 @@ describe("ProbeScheduler", () => {
       now: () => Date.now(),
       jitterRatio: 0,
     });
-    scheduler.schedule("a", { probeIntervalMinutes: 1 }, 1_000);
+    scheduler.schedule("a", {}, 1_000);
     expect(scheduler.state().nextRunAt).toBe(
       new Date(Date.now() + 1_000).toISOString(),
     );
@@ -434,7 +420,7 @@ describe("ProbeScheduler", () => {
       now: () => Date.now(),
       jitterRatio: 0,
     });
-    scheduler.schedule("a", { probeIntervalMinutes: 1 }, 1_000);
+    scheduler.schedule("a", {}, 1_000);
 
     await vi.advanceTimersByTimeAsync(1_000);
     expect(scheduler.state().nextRunAt).toBe(
@@ -458,7 +444,7 @@ describe("ProbeScheduler", () => {
       now: () => Date.now(),
       jitterRatio: 0,
     });
-    scheduler.schedule("a", { probeIntervalMinutes: 1 }, 1_000);
+    scheduler.schedule("a", {}, 1_000);
     await vi.advanceTimersByTimeAsync(1_000);
     expect(scheduler.state().nextRunAt).toBe(
       new Date(Date.now() + 10 * 60_000).toISOString(),
@@ -473,7 +459,7 @@ describe("ProbeScheduler", () => {
       now: () => Date.now(),
       jitterRatio: 0,
     });
-    scheduler.schedule("a", { probeIntervalMinutes: 1 }, 60_000);
+    scheduler.schedule("a", {}, 60_000);
     await scheduler.runStartup(["a"]);
     expect(scheduler.state().nextRunAt).toBe(
       new Date(Date.now() + 30 * 60_000).toISOString(),

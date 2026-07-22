@@ -38,7 +38,7 @@ async function activePids(pids) { if (!pids.length) return []; const { stdout } 
   wss.on("connection", (socket) => { let room=""; let lastSent=0; let index=0; socket.on("message", (data,binary) => { if(!binary){room=JSON.parse(data).room||room;return;} if(Date.now()-lastSent<1000)return; lastSent=Date.now(); socket.send(JSON.stringify({type:"final",room,segment:`soak-${index++}`,startMs:index*1000,endMs:index*1000+900,text:`房间 ${room} 的持续压力识别文本 ${index}`})); }); });
   const asrPort = await listen(asrHttp);
   const userData = await mkdtemp(join(tmpdir(), "duoduo-soak-")); const now = new Date().toISOString();
-  await writeFile(join(userData,"rooms.json"),JSON.stringify(rooms.map((roomId)=>({roomId,canonicalUrl:`https://live.douyin.com/${roomId}`,schedule:null,probeIntervalMinutes:null,monitoring:true,createdAt:now,updatedAt:now}))));
+  await writeFile(join(userData,"rooms.json"),JSON.stringify(rooms.map((roomId)=>({roomId,canonicalUrl:`https://live.douyin.com/${roomId}`,schedule:null,monitoring:true,createdAt:now,updatedAt:now}))));
   await writeFile(join(userData,"settings.json"),JSON.stringify({provider:{type:"duoduo-streaming-asr-v1",endpoint:`ws://127.0.0.1:${asrPort}`,auth:"none"},secrets:{}}));
   const executable=resolve("out/Duoduo Live-darwin-arm64/Duoduo Live.app/Contents/MacOS/Duoduo Live");
   const child=spawn(executable,[`--user-data-dir=${userData}`,"--disable-renderer-backgrounding","--disable-background-timer-throttling"],{cwd:resolve("."),env:{...process.env,DUODUO_FIXTURE_ORIGIN:`http://127.0.0.1:${httpPort}`},stdio:"ignore"});

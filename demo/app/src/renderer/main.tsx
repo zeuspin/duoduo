@@ -9,4 +9,5 @@ import "./parser.css";
 import "./usage.css";
 import "./group-workspace.css";
 import "./theme.css";
+import "./settings-center.css";
 createRoot(document.getElementById("root")!).render(<React.StrictMode><App /></React.StrictMode>);

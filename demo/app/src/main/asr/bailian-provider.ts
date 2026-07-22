@@ -15,6 +15,7 @@ interface SocketLike {
 export interface AsrUsageMeter { duration(seconds: number): void; succeed(): void; fail(status: "provider_failed" | "timed_out" | "interrupted", errorCode?: string): void }
 interface Options {
   apiKey: string;
+  model?: string;
   endpoint?: string;
   meter?: (roomId: string, taskId: string) => AsrUsageMeter;
   responseTimeoutMs?: number;
@@ -47,7 +48,7 @@ export class BailianProvider implements AsrProvider {
       socket.on("error", (error: unknown) => {
         if (!settled) reject(redact(error, this.options.apiKey));
       });
-      socket.on("open", () => socket.send(JSON.stringify(runTask(taskId))));
+      socket.on("open", () => socket.send(JSON.stringify(runTask(taskId, this.options.model))));
       const session = new BailianSession(
         roomId,
         taskId,
@@ -184,8 +185,8 @@ class BailianSession implements AsrSession {
   }
 }
 
-function runTask(taskId: string) {
-  return { header: { action: "run-task", task_id: taskId, streaming: "duplex" }, payload: { task_group: "audio", task: "asr", function: "recognition", model: "paraformer-realtime-v2", parameters: { format: "pcm", sample_rate: 16000, heartbeat: true }, input: {} } };
+function runTask(taskId: string, model = "paraformer-realtime-v2") {
+  return { header: { action: "run-task", task_id: taskId, streaming: "duplex" }, payload: { task_group: "audio", task: "asr", function: "recognition", model, parameters: { format: "pcm", sample_rate: 16000, heartbeat: true }, input: {} } };
 }
 
 function finishTask(taskId: string) {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getBailianParserModel } from "./bailian-model-catalog";
+import { isModelAvailable } from "./bailian-model-catalog";
 
 const TimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 
@@ -11,12 +11,6 @@ export const ScheduleSchema = z.object({
 export const RoomInputSchema = z.object({
   url: z.string().min(1),
   schedule: ScheduleSchema.nullable().default(null),
-  probeIntervalMinutes: z
-    .number()
-    .int()
-    .refine((value) => [1, 3, 5, 10, 15, 30].includes(value))
-    .nullable()
-    .default(null),
   groupId: z.string().min(1),
 });
 
@@ -24,7 +18,6 @@ export const RoomSchema = z.object({
   roomId: z.string(),
   canonicalUrl: z.url(),
   schedule: ScheduleSchema.nullable(),
-  probeIntervalMinutes: z.number().int().nullable().default(null),
   monitoring: z.boolean(),
   autoMonitorOnLive: z.boolean().default(false),
   groupId: z.string().min(1),
@@ -89,21 +82,13 @@ export const GroupSnapshotSchema = z.object({
   lastRefreshResult: GroupRefreshResultSchema.optional(),
 });
 
-export const AsrProviderConfigSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("bailian"),
-    model: z.literal("paraformer-realtime-v2"),
-    secretId: z.string().min(1),
+export const AsrProviderConfigSchema = z.object({
+  type: z.literal("bailian"),
+  model: z.string().refine((model) => isModelAvailable("asr_extraction", model), {
+    message: "ASR_MODEL_NOT_AVAILABLE",
   }),
-  z.object({
-    type: z.literal("duoduo-streaming-asr-v1"),
-    endpoint: z
-      .url()
-      .refine((url) => url.startsWith("ws://") || url.startsWith("wss://")),
-    auth: z.enum(["none", "bearer", "x-api-key"]),
-    secretId: z.string().min(1).optional(),
-  }),
-]);
+  secretId: z.string().min(1),
+});
 
 export const AsrEventSchema = z.object({
   roomId: z.string().min(1),
@@ -116,34 +101,18 @@ export const AsrEventSchema = z.object({
   occurredAt: z.string().datetime().optional(),
 });
 
-const HttpUrlSchema = z
-  .url()
-  .refine((url) => url.startsWith("https://") || url.startsWith("http://"));
-
-export const LlmProviderConfigSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("bailian"),
-    endpoint: HttpUrlSchema,
-    model: z.string().min(1),
-    secretId: z.string().min(1),
-  }),
-  z
-    .object({
-      type: z.literal("openai-compatible"),
-      endpoint: HttpUrlSchema,
-      model: z.string().min(1),
-      auth: z.enum(["none", "bearer", "x-api-key"]),
-      secretId: z.string().min(1).optional(),
-    })
-    .superRefine((value, context) => {
-      if (value.auth !== "none" && !value.secretId)
-        context.addIssue({
-          code: "custom",
-          message: "LLM_SECRET_REQUIRED",
-          path: ["secretId"],
-        });
-    }),
-]);
+export const LlmProviderConfigSchema = z.object({
+  type: z.literal("bailian"),
+  analysisModel: z.string().refine(
+    (model) => isModelAvailable("asr_analysis", model),
+    { message: "ANALYSIS_MODEL_NOT_AVAILABLE" },
+  ),
+  agentModel: z.string().refine(
+    (model) => isModelAvailable("analyzer_agent", model),
+    { message: "AGENT_MODEL_NOT_AVAILABLE" },
+  ),
+  secretId: z.string().min(1),
+});
 
 export const InsightNotificationSettingsSchema = z.object({
   timeoutSeconds: z.union([
@@ -170,7 +139,7 @@ export const MonitoringSettingsSchema = z.object({
       z.literal(15),
       z.literal(30),
     ])
-    .optional(),
+    .default(5),
 });
 
 export const DouyinTaskTypeSchema = z.enum([
@@ -254,7 +223,7 @@ export const AiUsageQuerySchema = z
     from: z.string().datetime(),
     to: z.string().datetime(),
     usageKind: z.enum(["production", "test"]).optional(),
-    apiKind: z.enum(["chat_completions", "paraformer_realtime"]).optional(),
+    apiKind: z.enum(["chat_completions", "asr_realtime"]).optional(),
     roomId: z.string().min(1).optional(),
     model: z.string().min(1).optional(),
   })
@@ -313,6 +282,27 @@ export const ParserFilterSchema = z.enum([
   "unsupported_sentiment",
   "duplicate_view",
 ]);
+const AnalyzerDefinitionSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  purpose: z.string().trim().min(1).max(500),
+  resultTypes: z.array(
+    z.object({
+      id: z.string().regex(/^[a-z][a-z0-9_]*$/),
+      label: z.string().trim().min(1).max(40),
+      definition: z.string().trim().min(1).max(300),
+    }),
+  ).max(20),
+  fields: z.array(
+    z.object({
+      id: z.string().regex(/^[a-z][a-z0-9_]*$/),
+      label: z.string().trim().min(1).max(40),
+      type: z.enum(["string", "number", "boolean", "enum", "string_array"]),
+    }),
+  ).max(30),
+  inclusionRules: z.array(z.string().trim().min(1).max(500)).max(30),
+  exclusionRules: z.array(z.string().trim().min(1).max(500)).max(30),
+  alertRules: z.array(z.string().trim().min(1).max(500)).max(20),
+});
 export const LegacyParserSpecSchema = z.object({
   name: z.string().min(1).max(80),
   description: z.string().max(300),
@@ -325,15 +315,107 @@ export const LegacyParserSpecSchema = z.object({
 export const ParserSpecV2Schema = z.object({
   schemaVersion: z.literal(2),
   name: z.string().trim().min(1).max(80),
-  model: z.string().refine((model) => Boolean(getBailianParserModel(model)), {
-    message: "PARSER_MODEL_NOT_SELECTABLE",
-  }),
+  model: z.string().min(1),
   prompt: z.string().trim().min(1).max(20_000),
 });
+export const ParserSpecV3Schema = z.object({
+  schemaVersion: z.literal(3),
+  name: z.string().trim().min(1).max(80),
+  prompt: z.string().trim().min(1).max(20_000),
+});
+export const ParserSpecV4Schema = z.object({
+  schemaVersion: z.literal(4),
+  name: z.string().trim().min(1).max(80),
+  definition: AnalyzerDefinitionSchema,
+});
 export const ParserSpecSchema = z.union([
+  ParserSpecV4Schema,
+  ParserSpecV3Schema,
   ParserSpecV2Schema,
   LegacyParserSpecSchema,
 ]);
+
+export const AnalyzerAgentMessageSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string().trim().min(1).max(4_000),
+});
+export const AnalyzerAgentRequestSchema = z.object({
+  messages: z.array(AnalyzerAgentMessageSchema).min(1).max(20),
+});
+export const AnalyzerAgentDraftSchema = AnalyzerDefinitionSchema;
+export const AnalyzerAgentResponseSchema = z.object({
+  status: z.enum(["ready", "needs_clarification"]),
+  draft: AnalyzerAgentDraftSchema,
+  questions: z.array(z.string().trim().min(1).max(500)).max(5),
+}).superRefine((value, context) => {
+  if (value.status === "needs_clarification" && value.questions.length === 0)
+    context.addIssue({
+      code: "custom",
+      path: ["questions"],
+      message: "澄清状态必须包含问题",
+    });
+  if (
+    value.status === "ready" &&
+    (value.draft.resultTypes.length === 0 || value.draft.inclusionRules.length === 0)
+  )
+    context.addIssue({
+      code: "custom",
+      path: ["draft"],
+      message: "可测试草稿必须包含结果类型和收录规则",
+    });
+});
+
+export const AnalyzerSampleOptionSchema = z.object({
+  roomId: z.string().min(1),
+  label: z.string().min(1).max(200),
+  status: z.enum(["live", "offline", "checking", "unavailable"]),
+  source: z.enum(["history", "live_waiting", "no_asr"]),
+  captureState: z.enum(["idle", "checking", "connecting", "audio_ready", "text_ready"]),
+  asrCount: z.number().int().nonnegative(),
+  lastAsrAt: z.string().datetime().optional(),
+});
+export const AnalyzerSampleListSchema = z.object({
+  samples: z.array(AnalyzerSampleOptionSchema),
+});
+export const AnalyzerDraftTestRequestSchema = z.object({
+  draft: AnalyzerAgentDraftSchema,
+  roomId: z.string().min(1),
+});
+const AnalyzerTestFieldValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.array(z.string()),
+]);
+export const AnalyzerTestRecordSchema = z.object({
+  resultTypeId: z.string().regex(/^[a-z][a-z0-9_]*$/),
+  resultTypeLabel: z.string().trim().min(1).max(40),
+  title: z.string().trim().min(1).max(200),
+  summary: z.string().trim().max(800),
+  fields: z.record(z.string(), AnalyzerTestFieldValueSchema),
+  evidence: z.array(z.string().trim().min(1)).min(1).max(8),
+  sourceAsrIds: z.array(z.number().int().positive()).min(1),
+  confidence: z.number().min(0).max(1),
+  alertLevel: z.enum(["none", "normal", "important"]),
+});
+export const AnalyzerDraftTestResponseSchema = z.object({
+  status: z.enum(["passed", "inconclusive"]),
+  roomId: z.string().min(1),
+  sampleCount: z.number().int().positive(),
+  sampleCharacters: z.number().int().positive(),
+  records: z.array(AnalyzerTestRecordSchema).max(30),
+  checks: z.object({
+    schemaValid: z.literal(true),
+    evidenceGrounded: z.literal(true),
+    resultTypesValid: z.literal(true),
+  }),
+  message: z.string().min(1).max(500),
+  testToken: z.string().uuid().optional(),
+});
+export const AnalyzerPublishRequestSchema = z.object({
+  draft: AnalyzerAgentDraftSchema,
+  testToken: z.string().uuid(),
+});
 
 export const ImmutableParserSchema = z.object({
   id: z.string().min(1),
@@ -415,6 +497,25 @@ export const MarketInsightSchema = MarketInsightCandidateSchema.extend({
   createdAt: z.string().datetime(),
 });
 
+export const ContentRecordSchema = z.object({
+  id: z.number().int().positive(),
+  roomId: z.string().min(1),
+  parserId: z.string().min(1),
+  parserVersionId: z.number().int().positive(),
+  resultTypeId: z.string().regex(/^[a-z][a-z0-9_]*$/),
+  resultTypeLabel: z.string().min(1).max(40),
+  title: z.string().min(1).max(200),
+  summary: z.string().max(800),
+  fields: z.record(z.string(), AnalyzerTestFieldValueSchema),
+  evidence: z.array(z.string().min(1)).min(1).max(8),
+  sourceAsrIds: z.array(z.number().int().positive()).min(1),
+  startedAt: z.string().datetime(),
+  endedAt: z.string().datetime(),
+  confidence: z.number().min(0).max(1),
+  alertLevel: z.enum(["none", "normal", "important"]),
+  createdAt: z.string().datetime(),
+});
+
 export const RoomRuntimeSchema = z.object({
   roomId: z.string(),
   state: z.enum([
@@ -436,6 +537,7 @@ export const RoomRuntimeSchema = z.object({
     "page_error",
   ]),
   error: z.string().optional(),
+  audioReady: z.boolean().optional(),
   asr: z.array(AsrEventSchema),
 });
 
@@ -588,6 +690,18 @@ export type RoomIntelligence = z.infer<typeof RoomIntelligenceSchema>;
 export type ParserSpec = z.infer<typeof ParserSpecSchema>;
 export type LegacyParserSpec = z.infer<typeof LegacyParserSpecSchema>;
 export type ParserSpecV2 = z.infer<typeof ParserSpecV2Schema>;
+export type ParserSpecV3 = z.infer<typeof ParserSpecV3Schema>;
+export type ParserSpecV4 = z.infer<typeof ParserSpecV4Schema>;
+export type AnalyzerAgentMessage = z.infer<typeof AnalyzerAgentMessageSchema>;
+export type AnalyzerAgentRequest = z.infer<typeof AnalyzerAgentRequestSchema>;
+export type AnalyzerAgentDraft = z.infer<typeof AnalyzerAgentDraftSchema>;
+export type AnalyzerAgentResponse = z.infer<typeof AnalyzerAgentResponseSchema>;
+export type AnalyzerSampleOption = z.infer<typeof AnalyzerSampleOptionSchema>;
+export type AnalyzerSampleList = z.infer<typeof AnalyzerSampleListSchema>;
+export type AnalyzerDraftTestRequest = z.infer<typeof AnalyzerDraftTestRequestSchema>;
+export type AnalyzerTestRecord = z.infer<typeof AnalyzerTestRecordSchema>;
+export type AnalyzerDraftTestResponse = z.infer<typeof AnalyzerDraftTestResponseSchema>;
+export type AnalyzerPublishRequest = z.infer<typeof AnalyzerPublishRequestSchema>;
 export type ImmutableParser = z.infer<typeof ImmutableParserSchema>;
 export type ParserVersion = z.infer<typeof ParserVersionSchema>;
 export type ParserDefinition = z.infer<typeof ParserDefinitionSchema>;
@@ -596,6 +710,7 @@ export type MarketInsightCandidate = z.infer<
   typeof MarketInsightCandidateSchema
 >;
 export type MarketInsight = z.infer<typeof MarketInsightSchema>;
+export type ContentRecord = z.infer<typeof ContentRecordSchema>;
 
 export function normalizeDouyinUrl(value: string): {
   roomId: string;

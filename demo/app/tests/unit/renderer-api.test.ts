@@ -5,7 +5,7 @@ describe("renderer API", () => {
   it("exposes only settings and rooms namespaces", async () => {
     const invoke = vi.fn().mockResolvedValue(undefined);
     const api = createRendererApi(invoke, vi.fn());
-    expect(Object.keys(api)).toEqual(["app", "settings", "access", "rooms", "groups", "data", "aiUsage", "asr", "player", "llm", "parsers", "insights"]);
+    expect(Object.keys(api)).toEqual(["app", "settings", "access", "rooms", "groups", "data", "aiUsage", "asr", "player", "llm", "parsers", "insights", "contentRecords"]);
     expect(Object.keys(api.app)).toEqual(["getVersion"]);
     await expect(api.app.getVersion()).resolves.toBeUndefined();
     await api.aiUsage.getDashboard({ from: "2026-01-01T00:00:00.000Z", to: "2026-02-01T00:00:00.000Z" });
@@ -47,12 +47,20 @@ describe("renderer API", () => {
     expect(Object.keys(api.asr)).toEqual(["listBefore"]);
     expect(Object.keys(api.player)).toEqual(["getState", "play", "stop", "setBounds", "subscribe"]);
     expect(Object.keys(api.llm)).toEqual(["get", "save", "test"]);
-    expect(Object.keys(api.parsers)).toEqual(["list", "create", "copy", "remove"]);
+    expect(Object.keys(api.parsers)).toEqual(["list", "discuss", "listSamples", "prepareSample", "stopSampleCapture", "testDraft", "publishTested"]);
     expect(Object.keys(api.insights)).toEqual(["list", "subscribe"]);
     await expect(api.asr.listBefore("123", { limit: 50, beforeId: 99 })).resolves.toBeUndefined();
     expect(invoke).toHaveBeenCalledWith("asr:list-before", "123", { limit: 50, beforeId: 99 });
-    await expect(api.parsers.remove("market-insight")).resolves.toBeUndefined();
-    expect(invoke).toHaveBeenCalledWith("parsers:remove-immutable", "market-insight");
+    await expect(api.parsers.discuss({ messages: [{ role: "user", content: "提到降价时提醒" }] })).resolves.toBeUndefined();
+    expect(invoke).toHaveBeenCalledWith("parsers:agent-discuss", { messages: [{ role: "user", content: "提到降价时提醒" }] });
+    await api.parsers.listSamples();
+    expect(invoke).toHaveBeenCalledWith("parsers:list-samples");
+    await api.parsers.prepareSample("123");
+    expect(invoke).toHaveBeenCalledWith("parsers:prepare-sample", "123");
+    await api.parsers.stopSampleCapture("123");
+    expect(invoke).toHaveBeenCalledWith("parsers:stop-sample-capture", "123");
+    await api.contentRecords.list({ limit: 20 });
+    expect(invoke).toHaveBeenCalledWith("content-records:list", { limit: 20 });
     await expect(api.settings.saveInsightNotifications({ timeoutSeconds: 60 })).resolves.toBeUndefined();
     expect(invoke).toHaveBeenCalledWith("settings:save-insight-notifications", { timeoutSeconds: 60 });
   });

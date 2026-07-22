@@ -1,0 +1,86 @@
+/* 观风 App 六套主题变量 */
+:root{--radius-app:22px;--radius-card:18px;--space-page:20px;}
+
+[data-theme="ink"] {
+  color-scheme: light;
+  --color-background: #F3EFE5;
+  --color-surface: #FFFCF5;
+  --color-primary: #111111;
+  --color-primary-hover: #2B2B2B;
+  --color-on-primary: #F3EFE5;
+  --color-text: #171717;
+  --color-text-secondary: #68625A;
+  --color-border: #D8D1C3;
+  --color-selected: #E3DDD1;
+  --color-shadow: #1111111A;
+}
+
+[data-theme="navy"] {
+  color-scheme: light;
+  --color-background: #F2F5F3;
+  --color-surface: #FFFFFF;
+  --color-primary: #163A4A;
+  --color-primary-hover: #0F2D3A;
+  --color-on-primary: #F2F5F3;
+  --color-text: #14252C;
+  --color-text-secondary: #607078;
+  --color-border: #D4DFE1;
+  --color-selected: #DCE8EC;
+  --color-shadow: #163A4A1A;
+}
+
+[data-theme="jade"] {
+  color-scheme: light;
+  --color-background: #DCE9E1;
+  --color-surface: #F4FAF6;
+  --color-primary: #174C43;
+  --color-primary-hover: #103A33;
+  --color-on-primary: #F4FAF6;
+  --color-text: #18332E;
+  --color-text-secondary: #587169;
+  --color-border: #BFD3C8;
+  --color-selected: #C9DED3;
+  --color-shadow: #174C431A;
+}
+
+[data-theme="cinnabar"] {
+  color-scheme: light;
+  --color-background: #F3E8D5;
+  --color-surface: #FFF9ED;
+  --color-primary: #A52D27;
+  --color-primary-hover: #7F211D;
+  --color-on-primary: #FFF9ED;
+  --color-text: #3A211C;
+  --color-text-secondary: #7E6258;
+  --color-border: #E1CBB3;
+  --color-selected: #F0D2C3;
+  --color-shadow: #A52D271A;
+}
+
+[data-theme="gold"] {
+  color-scheme: dark;
+  --color-background: #171717;
+  --color-surface: #232323;
+  --color-primary: #D2AA5A;
+  --color-primary-hover: #E0C079;
+  --color-on-primary: #171717;
+  --color-text: #F4EAD4;
+  --color-text-secondary: #B8A98E;
+  --color-border: #3C372E;
+  --color-selected: #342D20;
+  --color-shadow: #00000066;
+}
+
+[data-theme="violet"] {
+  color-scheme: light;
+  --color-background: #EEEAF2;
+  --color-surface: #FAF8FC;
+  --color-primary: #4A315E;
+  --color-primary-hover: #352243;
+  --color-on-primary: #FAF8FC;
+  --color-text: #2D2434;
+  --color-text-secondary: #74677C;
+  --color-border: #D8CFE0;
+  --color-selected: #E0D7E8;
+  --color-shadow: #4A315E1A;
+}

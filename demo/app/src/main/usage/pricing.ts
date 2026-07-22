@@ -1,13 +1,12 @@
 import type { PricingInput, PricingResult } from "./types";
-import { getBailianParserModel } from "../../shared/bailian-model-catalog";
-
-const PARAFORMER_RULE_KEY = "paraformer-realtime-v2:cn-beijing:seconds:2026-07-19";
+import { getBailianModel } from "../../shared/bailian-model-catalog";
 
 export function calculateCatalogCost(input: PricingInput): PricingResult {
-  if (input.apiKind === "paraformer_realtime") {
-    if (input.model !== "paraformer-realtime-v2" || !validCount(input.billingDurationSeconds)) return { status: "price_missing" };
-    const totalCostMicros = Math.round(input.billingDurationSeconds * 240);
-    return { status: "calculated", ruleKey: PARAFORMER_RULE_KEY, inputCostMicros: totalCostMicros, outputCostMicros: 0, totalCostMicros, currency: "CNY" };
+  if (input.apiKind === "asr_realtime") {
+    const model = getBailianModel(input.model);
+    if (model?.asrCnyPerSecond === undefined || !validCount(input.billingDurationSeconds)) return { status: "price_missing" };
+    const totalCostMicros = Math.round(input.billingDurationSeconds * model.asrCnyPerSecond * 1_000_000);
+    return { status: "calculated", ruleKey: `${model.id}:cn-beijing:seconds:${model.checkedAt}`, inputCostMicros: totalCostMicros, outputCostMicros: 0, totalCostMicros, currency: "CNY" };
   }
 
   if (
@@ -16,8 +15,8 @@ export function calculateCatalogCost(input: PricingInput): PricingResult {
     !validCount(input.completionTokens)
   )
     return { status: "price_missing" };
-  const model = getBailianParserModel(input.model);
-  const prices = model?.nonThinkingPriceTiers.find(
+  const model = getBailianModel(input.model);
+  const prices = model?.nonThinkingPriceTiers?.find(
     (tier) =>
       tier.maxInputTokens === null || input.promptTokens <= tier.maxInputTokens,
   );

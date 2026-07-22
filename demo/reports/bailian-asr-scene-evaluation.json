@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-21T09:30:41.779Z",
+  "provider": "bailian",
+  "region": "cn-beijing",
+  "scene": "asr_extraction",
+  "domains": [
+    "stock_finance",
+    "ecommerce"
+  ],
+  "gate": {
+    "maximumSyntheticCer": 0.15,
+    "timestampCoverage": 1,
+    "allRunsMustSucceed": true
+  },
+  "caveat": "电商与股票基准语句为系统 TTS；股票另含一段真实直播短音频，其参考文本来自既有 Paraformer 转写，只作为协议和稳定性辅助证据。",
+  "results": [
+    {
+      "modelId": "paraformer-realtime-v2",
+      "passed": true,
+      "averageSyntheticCer": 0.09188660801564028,
+      "timestampCoverage": 1,
+      "estimatedCostCny": 0.0059019450000000005,
+      "cnyPerHour": 0.864,
+      "runs": [
+        {
+          "id": "stock-synthetic",
+          "domain": "stock_finance",
+          "kind": "synthetic",
+          "succeeded": true,
+          "latencyMs": 7614,
+          "audioSeconds": 6.8281875,
+          "sentenceCount": 1,
+          "cer": 0.03225806451612903,
+          "timestampCoverage": 1,
+          "hypothesis": "光伏板块现在不要追高，等中保风险释放并且成交量重新放大以后再考虑。"
+        },
+        {
+          "id": "commerce-synthetic",
+          "domain": "ecommerce",
+          "kind": "synthetic",
+          "succeeded": true,
+          "latencyMs": 8637,
+          "audioSeconds": 7.80325,
+          "sentenceCount": 1,
+          "cer": 0.15151515151515152,
+          "timestampCoverage": 1,
+          "hypothesis": "这款防晒霜直播间到手价79元，今天下单赠送旅行装。晚上12点活动结束。"
+        },
+        {
+          "id": "stock-live-short",
+          "domain": "stock_finance",
+          "kind": "live_reference",
+          "succeeded": true,
+          "latencyMs": 10606,
+          "audioSeconds": 9.96,
+          "sentenceCount": 3,
+          "cer": 0.3333333333333333,
+          "timestampCoverage": 1,
+          "hypothesis": "是卖出了68.2，我们去除以成交额，再乘以100。好，那么算出来这个数据是多少呢？就-5.0。好，那么负无。"
+        }
+      ]
+    },
+    {
+      "modelId": "fun-asr-realtime",
+      "passed": true,
+      "averageSyntheticCer": 0.07575757575757576,
+      "timestampCoverage": 1,
+      "estimatedCostCny": 0.008115174375,
+      "cnyPerHour": 1.188,
+      "runs": [
+        {
+          "id": "stock-synthetic",
+          "domain": "stock_finance",
+          "kind": "synthetic",
+          "succeeded": true,
+          "latencyMs": 7893,
+          "audioSeconds": 6.8281875,
+          "sentenceCount": 1,
+          "cer": 0,
+          "timestampCoverage": 1,
+          "hypothesis": "光伏板块现在不要追高，等中报风险释放并且成交量重新放大以后再考虑。"
+        },
+        {
+          "id": "commerce-synthetic",
+          "domain": "ecommerce",
+          "kind": "synthetic",
+          "succeeded": true,
+          "latencyMs": 8547,
+          "audioSeconds": 7.80325,
+          "sentenceCount": 1,
+          "cer": 0.15151515151515152,
+          "timestampCoverage": 1,
+          "hypothesis": "这款防晒霜直播间到手价79元，今天下单赠送旅行装，晚上12点活动结束。"
+        },
+        {
+          "id": "stock-live-short",
+          "domain": "stock_finance",
+          "kind": "live_reference",
+          "succeeded": true,
+          "latencyMs": 10857,
+          "audioSeconds": 9.96,
+          "sentenceCount": 1,
+          "cer": 0.3333333333333333,
+          "timestampCoverage": 1,
+          "hypothesis": "是卖出了 68.2，我们去除以成交额，再乘以 100。好，那么算出来这个数据是多少呢？这负 5.0。好，那么负 5"
+        }
+      ]
+    }
+  ]
+}

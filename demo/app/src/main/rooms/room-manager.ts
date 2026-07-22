@@ -70,7 +70,7 @@ export class RoomManager {
     entry.controller = controller;
     entry.offlineRetryStage = 0;
     entry.accessPausedRetry = undefined;
-    entry.runtime = { ...entry.runtime, state: "starting", liveStatus: "checking", error: undefined, asr: [] };
+    entry.runtime = { ...entry.runtime, state: "starting", liveStatus: "checking", error: undefined, audioReady: false, asr: [] };
     this.entries.set(roomId, entry);
     this.emit();
 
@@ -111,7 +111,7 @@ export class RoomManager {
     if (entry.session) await entry.session.close();
     if (entry.recovering) await entry.recovering.catch(() => undefined);
     entry.session = undefined;
-    entry.runtime = { ...entry.runtime, state: "stopped", liveStatus: "offline" };
+    entry.runtime = { ...entry.runtime, state: "stopped", liveStatus: "offline", audioReady: false };
     this.emit();
   }
 
@@ -126,7 +126,14 @@ export class RoomManager {
       asr[existing] = timestamped;
     } else asr.push(timestamped);
     if (timestamped.isFinal) this.persistFinalAsr?.(timestamped);
-    entry.runtime = { ...entry.runtime, asr: asr.slice(-this.maxHotAsr) };
+    entry.runtime = { ...entry.runtime, audioReady: true, asr: asr.slice(-this.maxHotAsr) };
+    this.emit();
+  }
+
+  markAudioReady(roomId: string): void {
+    const entry = this.entries.get(roomId);
+    if (!entry || entry.runtime.audioReady) return;
+    entry.runtime = { ...entry.runtime, audioReady: true };
     this.emit();
   }
 
@@ -198,7 +205,7 @@ export class RoomManager {
     await entry.session?.close().catch(() => undefined);
     entry.session = undefined;
     if (entry.controller?.signal.aborted) return;
-    entry.runtime = { ...entry.runtime, state: "waiting_for_live", liveStatus: "offline", error: undefined };
+    entry.runtime = { ...entry.runtime, state: "waiting_for_live", liveStatus: "offline", error: undefined, audioReady: false };
     entry.offlineRetryStage = 0;
     this.emit();
     this.scheduleOfflineRetry(entry);
@@ -216,6 +223,7 @@ export class RoomManager {
 
   private async retryOfflineRoom(entry: Entry): Promise<void> {
     if (entry.controller?.signal.aborted || entry.runtime.state !== "waiting_for_live") return;
+    entry.runtime = { ...entry.runtime, audioReady: false };
     let session: MonitorSession | undefined;
     try {
       session = await this.createSession(entry.runtime.roomId, entry.controller!.signal, "offline_retry");
@@ -243,7 +251,7 @@ export class RoomManager {
   }
 
   private async recover(entry: Entry, initialError: Error): Promise<void> {
-    entry.runtime = { ...entry.runtime, state: "recovering", error: initialError.message };
+    entry.runtime = { ...entry.runtime, state: "recovering", error: initialError.message, audioReady: false };
     this.emit();
     entry.unsubscribeFailure?.();
     entry.unsubscribeFailure = undefined;

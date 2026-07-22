@@ -1,4 +1,4 @@
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -25,8 +25,8 @@ describe("SettingsStore", () => {
     const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-"));
     const path = join(dir, "settings.json");
     const store = new SettingsStore(path, cipher);
-    await store.saveLlm({ type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: "llm-main" }, "plain-llm-key");
-    expect(await store.getLlmConfig()).toMatchObject({ type: "bailian", model: "qwen-plus", secretId: "llm-main" });
+    await store.saveLlm({ type: "bailian", analysisModel: "qwen-plus", agentModel: "qwen3.5-flash-2026-02-23", secretId: "llm-main" }, "plain-llm-key");
+    expect(await store.getLlmConfig()).toMatchObject({ type: "bailian", analysisModel: "qwen-plus", agentModel: "qwen3.5-flash-2026-02-23", secretId: "llm-main" });
     expect(await store.getSecret("llm-main")).toBe("plain-llm-key");
     expect(await readFile(path, "utf8")).not.toContain("plain-llm-key");
   });
@@ -45,14 +45,29 @@ describe("SettingsStore", () => {
     const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-")); const path = join(dir, "settings.json"); const store = new SettingsStore(path, cipher);
     await store.save({ type: "bailian", model: "paraformer-realtime-v2", secretId: "bailian-main" }, "one-shared-key");
     expect(await store.ensureDefaultBailianLlm()).toBe(true);
-    expect(await store.getLlmConfig()).toEqual({ type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: "bailian-main" });
+    expect(await store.getLlmConfig()).toEqual({ type: "bailian", analysisModel: "qwen-plus", agentModel: "qwen3.5-flash-2026-02-23", secretId: "bailian-main" });
     expect(await store.ensureDefaultBailianLlm()).toBe(false);
     expect(await readFile(path, "utf8")).not.toContain("one-shared-key");
   });
 
+  it("keeps the legacy qwen-plus model when normalizing old LLM settings", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-"));
+    const path = join(dir, "settings.json");
+    await writeFile(path, JSON.stringify({
+      llmProvider: { type: "bailian", model: "qwen-plus", secretId: "bailian-main" },
+      secrets: {},
+    }));
+    expect(await new SettingsStore(path, cipher).getLlmConfig()).toEqual({
+      type: "bailian",
+      analysisModel: "qwen-plus",
+      agentModel: "qwen3.5-flash-2026-02-23",
+      secretId: "bailian-main",
+    });
+  });
+
   it("replaces a conflicting LLM key reference with the Bailian key from system settings", async () => {
     const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-")); const path = join(dir, "settings.json"); const store = new SettingsStore(path, cipher);
-    await store.saveLlm({ type: "bailian", endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", secretId: "llm-main" }, "old-key");
+    await store.saveLlm({ type: "bailian", analysisModel: "qwen-plus", agentModel: "qwen3.5-flash-2026-02-23", secretId: "llm-main" }, "old-key");
     await store.save({ type: "bailian", model: "paraformer-realtime-v2", secretId: "bailian-main" }, "shared-key");
 
     expect(await store.ensureDefaultBailianLlm()).toBe(true);
@@ -64,9 +79,9 @@ describe("SettingsStore", () => {
     const dir = await mkdtemp(join(tmpdir(), "duoduo-settings-"));
     const path = join(dir, "settings.json");
     const store = new SettingsStore(path, cipher);
-    expect(await store.getMonitoringSettings()).toEqual({ monitoredCheckSeconds: 30 });
-    await store.saveMonitoringSettings({ monitoredCheckSeconds: 15 });
-    expect(await new SettingsStore(path, cipher).getMonitoringSettings()).toEqual({ monitoredCheckSeconds: 15 });
+    expect(await store.getMonitoringSettings()).toEqual({ monitoredCheckSeconds: 30, preparedCheckMinutes: 5 });
+    await store.saveMonitoringSettings({ monitoredCheckSeconds: 15, preparedCheckMinutes: 10 });
+    expect(await new SettingsStore(path, cipher).getMonitoringSettings()).toEqual({ monitoredCheckSeconds: 15, preparedCheckMinutes: 10 });
     await expect(store.saveMonitoringSettings({ monitoredCheckSeconds: 1 } as never)).rejects.toThrow();
   });
 

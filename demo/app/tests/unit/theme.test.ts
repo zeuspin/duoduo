@@ -11,29 +11,35 @@ describe("visual themes", () => {
 
   it("provides the initialized theme catalog", () => {
     expect(themes.map((theme) => theme.id)).toEqual([
-      "cloud",
-      "sand",
-      "graphite",
-      "midnight",
-      "mac-glass",
+      "ink",
+      "navy",
+      "jade",
+      "cinnabar",
+      "gold",
+      "violet",
     ]);
   });
 
   it("applies and persists a light theme", () => {
-    applyTheme("mac-glass");
-    expect(document.documentElement.dataset.theme).toBe("mac-glass");
+    applyTheme("jade");
+    expect(document.documentElement.dataset.theme).toBe("jade");
     expect(document.documentElement.style.colorScheme).toBe("light");
-    expect(getStoredTheme()).toBe("mac-glass");
+    expect(getStoredTheme()).toBe("jade");
   });
 
   it("uses dark native controls for dark themes", () => {
-    applyTheme("midnight");
+    applyTheme("gold");
     expect(document.documentElement.style.colorScheme).toBe("dark");
-    expect(getStoredTheme()).toBe("midnight");
+    expect(getStoredTheme()).toBe("gold");
+  });
+
+  it("migrates the previous glass theme to the new default palette", () => {
+    window.localStorage.setItem("duoduo.visual-theme", "mac-glass");
+    expect(getStoredTheme()).toBe("ink");
   });
 
   it("falls back safely when stored data is invalid", () => {
     window.localStorage.setItem("duoduo.visual-theme", "unknown");
-    expect(getStoredTheme()).toBe("cloud");
+    expect(getStoredTheme()).toBe("ink");
   });
 });

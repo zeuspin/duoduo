@@ -1,4 +1,7 @@
 import type {
+  AnalyzerAgentRequest,
+  AnalyzerDraftTestRequest,
+  AnalyzerPublishRequest,
   AiUsageQuery,
   AsrProviderConfig,
   CleanupRequest,
@@ -6,7 +9,6 @@ import type {
   InsightNotificationSettings,
   LlmProviderConfig,
   MonitoringSettings,
-  ParserSpec,
   RoomInput,
 } from "../shared/contracts";
 
@@ -137,17 +139,29 @@ export function createRendererApi(invoke: Invoke, subscribe: Subscribe) {
     },
     parsers: {
       list: () => invoke("parsers:list-immutable"),
-      create: (spec: ParserSpec) => invoke("parsers:create-immutable", spec),
-      copy: (parserId: string, spec: ParserSpec) =>
-        invoke("parsers:copy-immutable", parserId, spec),
-      remove: (parserId: string) =>
-        invoke("parsers:remove-immutable", parserId),
+      discuss: (request: AnalyzerAgentRequest) =>
+        invoke("parsers:agent-discuss", request),
+      listSamples: () => invoke("parsers:list-samples"),
+      prepareSample: (roomId: string) =>
+        invoke("parsers:prepare-sample", roomId),
+      stopSampleCapture: (roomId?: string) =>
+        invoke("parsers:stop-sample-capture", roomId),
+      testDraft: (request: AnalyzerDraftTestRequest) =>
+        invoke("parsers:test-draft", request),
+      publishTested: (request: AnalyzerPublishRequest) =>
+        invoke("parsers:publish-tested", request),
     },
     insights: {
       list: (options: { roomId?: string; limit: number; beforeId?: number }) =>
         invoke("insights:list", options),
       subscribe: (listener: (...args: unknown[]) => void) =>
         subscribe("insights:changed", listener),
+    },
+    contentRecords: {
+      list: (options: { roomId?: string; limit: number; beforeId?: number }) =>
+        invoke("content-records:list", options),
+      subscribe: (listener: (...args: unknown[]) => void) =>
+        subscribe("content-records:changed", listener),
     },
   };
 }

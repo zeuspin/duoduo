@@ -94,7 +94,6 @@ async function listen(server) {
         roomId: preparedRoom,
         canonicalUrl: `https://live.douyin.com/${preparedRoom}`,
         schedule: null,
-        probeIntervalMinutes: 1,
         monitoring: false,
         createdAt: now,
         updatedAt: now,

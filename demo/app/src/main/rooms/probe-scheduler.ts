@@ -5,7 +5,6 @@ import type {
 } from "../../shared/contracts";
 
 export interface ProbeSchedule {
-  probeIntervalMinutes: number | null;
   schedule?: {
     days: number[];
     ranges: Array<{ start: string; end: string }>;
@@ -62,24 +61,6 @@ export function estimateSafeBatchDurationMs(
     transitions * gapMs +
     fullBudgetBoundaries * Math.max(0, 3_600_000 - budgetPerHour * gapMs)
   );
-}
-
-export function splitPreparedStartupRooms(
-  roomIds: string[],
-  snapshots: Array<{ roomId: string; status: string }>,
-): { initialRoomIds: string[]; refreshRoomIds: string[] } {
-  const statusByRoom = new Map(
-    snapshots.map((snapshot) => [snapshot.roomId, snapshot.status]),
-  );
-  const initialRoomIds = roomIds.filter((roomId) => {
-    const status = statusByRoom.get(roomId);
-    return status === undefined || status === "checking";
-  });
-  const initialSet = new Set(initialRoomIds);
-  return {
-    initialRoomIds,
-    refreshRoomIds: roomIds.filter((roomId) => !initialSet.has(roomId)),
-  };
 }
 
 export class ProbeScheduler {
@@ -424,8 +405,8 @@ export class ProbeScheduler {
     this.emit();
   }
 
-  intervalMs(room: ProbeSchedule): number {
-    return (room.probeIntervalMinutes ?? this.defaultIntervalMinutes) * 60_000;
+  intervalMs(): number {
+    return this.defaultIntervalMinutes * 60_000;
   }
 
   setDefaultIntervalMinutes(value: number): void {
@@ -433,7 +414,7 @@ export class ProbeScheduler {
   }
 
   jitteredIntervalMs(room: ProbeSchedule): number {
-    const base = this.intervalMs(room);
+    const base = this.intervalMs();
     return Math.round(
       base * (1 - this.jitterRatio + this.random() * this.jitterRatio * 2),
     );
@@ -562,7 +543,7 @@ export class ProbeScheduler {
       this.armSchedule(
         roomId,
         room,
-        this.safeJitter(Math.max(this.intervalMs(room), 10 * 60_000)),
+        this.safeJitter(Math.max(this.intervalMs(), 10 * 60_000)),
         version,
       );
       return;

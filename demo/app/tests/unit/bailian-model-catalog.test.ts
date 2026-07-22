@@ -1,49 +1,38 @@
 import { describe, expect, it } from "vitest";
 import {
-  BAILIAN_PARSER_MODELS,
-  DEFAULT_PARSER_MODEL_ID,
-  getBailianParserModel,
+  DEFAULT_AGENT_MODEL_ID,
+  DEFAULT_ANALYSIS_MODEL_ID,
+  DEFAULT_ASR_MODEL_ID,
+  getAvailableModels,
+  getBailianModel,
+  isModelAvailable,
 } from "../../src/shared/bailian-model-catalog";
 
-describe("Bailian parser model catalog", () => {
-  it("contains only the approved Beijing parser models", () => {
-    expect(BAILIAN_PARSER_MODELS.map((model) => model.id)).toEqual([
-      "qwen3.7-plus-2026-05-26",
-      "qwen-plus",
-      "qwen3.7-max-2026-05-20",
-      "qwen3.5-flash-2026-02-23",
-      "deepseek-v4-pro",
-      "deepseek-v4-flash",
-      "deepseek-v3.2",
-      "glm-5.2",
-      "kimi-k2.6",
+describe("Bailian scene model catalog", () => {
+  it("only exposes models that passed each scene gate", () => {
+    expect(getAvailableModels("asr_extraction").map((model) => model.id)).toEqual([
+      "paraformer-realtime-v2",
+      "fun-asr-realtime",
     ]);
-    expect(DEFAULT_PARSER_MODEL_ID).toBe("qwen3.7-plus-2026-05-26");
-    expect(
-      BAILIAN_PARSER_MODELS.every(
-        (model) =>
-          model.region === "cn-beijing" &&
-          model.checkedAt === "2026-07-20" &&
-          model.sourceUrl ===
-            "https://help.aliyun.com/zh/model-studio/model-pricing" &&
-          model.nonThinkingPriceTiers.length > 0,
-      ),
-    ).toBe(true);
+    expect(getAvailableModels("asr_analysis").map((model) => model.id)).toEqual([
+      "qwen-plus",
+      "deepseek-v4-flash",
+    ]);
+    expect(getAvailableModels("analyzer_agent").map((model) => model.id)).toEqual([
+      "qwen3.5-flash-2026-02-23",
+    ]);
   });
 
-  it("marks qwen-plus as rolling and exposes every official price tier", () => {
-    expect(getBailianParserModel("qwen-plus")).toMatchObject({
-      versionKind: "rolling",
-      currentEquivalent: "qwen-plus-2025-12-01",
-      nonThinkingPriceTiers: [
-        { maxInputTokens: 131_072, inputCnyPerMillion: 0.8, outputCnyPerMillion: 2 },
-        { maxInputTokens: 262_144, inputCnyPerMillion: 2.4, outputCnyPerMillion: 20 },
-        { maxInputTokens: 1_048_576, inputCnyPerMillion: 4.8, outputCnyPerMillion: 48 },
-      ],
-    });
+  it("uses the cheapest passed model as every default", () => {
+    expect(DEFAULT_ASR_MODEL_ID).toBe(getAvailableModels("asr_extraction", "cost")[0].id);
+    expect(DEFAULT_ANALYSIS_MODEL_ID).toBe(getAvailableModels("asr_analysis", "cost")[0].id);
+    expect(DEFAULT_AGENT_MODEL_ID).toBe(getAvailableModels("analyzer_agent", "cost")[0].id);
   });
 
-  it("returns undefined for an unverified model", () => {
-    expect(getBailianParserModel("made-up-model")).toBeUndefined();
+  it("supports effect sorting without exposing failed models", () => {
+    expect(getAvailableModels("asr_extraction", "effect")[0].id).toBe("fun-asr-realtime");
+    expect(isModelAvailable("asr_analysis", "qwen-flash-2025-07-28")).toBe(false);
+    expect(isModelAvailable("asr_analysis", "qwen3.5-flash-2026-02-23")).toBe(false);
+    expect(getBailianModel("deepseek-v4-pro")?.evaluations.asr_analysis?.status).toBe("failed");
   });
 });

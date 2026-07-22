@@ -13,7 +13,6 @@ import {
   Play,
   Plus,
   RadioButton,
-  SlidersHorizontal,
   SquaresFour,
   Stop,
   Trash,
@@ -30,6 +29,7 @@ import {
 } from "react";
 import type {
   AsrProviderConfig,
+  ContentRecord,
   DouyinAccessState,
   InsightNotificationSettings,
   MarketInsight,
@@ -45,7 +45,7 @@ import type {
 } from "../shared/contracts";
 import { ParserManagement } from "./components/ParserManagement";
 import { InsightCenter } from "./components/InsightCenter";
-import { InsightNotificationRail } from "./components/InsightNotificationRail";
+import { InsightNotificationRail, type InsightNotificationItem } from "./components/InsightNotificationRail";
 import { LiveRoomWorkspace } from "./components/LiveRoomWorkspace";
 import { DataManagement } from "./components/DataManagement";
 import { AiUsageDashboard } from "./components/AiUsageDashboard";
@@ -53,6 +53,11 @@ import { RoomGroupWorkspace } from "./components/RoomGroupWorkspace";
 import { PreparedRoomHeader } from "./components/PreparedRoomHeader";
 import { RoomCardActions } from "./components/RoomCardActions";
 import { RoomMetricsActions } from "./components/RoomMetricsActions";
+import {
+  SettingsCenter,
+  settingsSectionMeta,
+  type SettingsSection,
+} from "./components/SettingsCenter";
 import { applyTheme, getStoredTheme, themes, type ThemeId } from "./theme";
 
 type ParserSnapshot = { llmConfigured: boolean };
@@ -96,9 +101,7 @@ export function App() {
   const [intelligenceLoadingRoomId, setIntelligenceLoadingRoomId] =
     useState<string>();
   const [query, setQuery] = useState("");
-  const [dialog, setDialog] = useState<
-    "room" | "settings" | "monitoring" | null
-  >(null);
+  const [dialog, setDialog] = useState<"room" | null>(null);
   const [editingRoomId, setEditingRoomId] = useState<string>();
   const [activeGroupId, setActiveGroupId] = useState<string>();
   const [selectedGroupId, setSelectedGroupId] = useState<string>();
@@ -110,16 +113,9 @@ export function App() {
   const [ranges, setRanges] = useState<TimeRange[]>([
     { start: "09:00", end: "12:00" },
   ]);
-  const [probeInterval, setProbeInterval] = useState("default");
   const [roomGroups, setRoomGroups] = useState<RoomGroup[]>([]);
   const [roomGroupId, setRoomGroupId] = useState("");
   const [provider, setProvider] = useState<AsrProviderConfig | undefined>();
-  const [secret, setSecret] = useState("");
-  const [providerType, setProviderType] = useState<
-    "bailian" | "duoduo-streaming-asr-v1"
-  >("bailian");
-  const [endpoint, setEndpoint] = useState("wss://");
-  const [auth, setAuth] = useState<"none" | "bearer" | "x-api-key">("bearer");
   const [message, setMessage] = useState("");
   const [deletingRoomIds, setDeletingRoomIds] = useState<Set<string>>(
     () => new Set(),
@@ -136,12 +132,12 @@ export function App() {
     status: "stopped",
   });
   const [view, setView] = useState<
-    "rooms" | "parsers" | "insights" | "usage" | "data"
+    "rooms" | "parsers" | "insights" | "usage" | "data" | "settings"
   >("rooms");
   const [parsers, setParsers] = useState<ParserSnapshot>({
     llmConfigured: false,
   });
-  const [notifications, setNotifications] = useState<MarketInsight[]>([]);
+  const [notifications, setNotifications] = useState<InsightNotificationItem[]>([]);
   const [notificationTimeout, setNotificationTimeout] =
     useState<InsightNotificationSettings["timeoutSeconds"]>(30);
   const [monitoringSettings, setMonitoringSettings] =
@@ -150,6 +146,10 @@ export function App() {
       preparedCheckMinutes: 5,
     });
   const [theme, setTheme] = useState<ThemeId>(() => getStoredTheme());
+  const activeTheme = themes.find((item) => item.id === theme) ?? themes[0];
+  const [settingsSection, setSettingsSection] =
+    useState<SettingsSection>("appearance");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [focusInsight, setFocusInsight] = useState<{
     roomId: string;
     insightId: number;
@@ -169,8 +169,20 @@ export function App() {
   const [verificationFeedback, setVerificationFeedback] = useState("");
   const verificationSurface = useRef<HTMLDivElement>(null);
   const latestInsightId = useRef<number | undefined>(undefined);
+  const latestContentRecordId = useRef<number | undefined>(undefined);
 
   useEffect(() => applyTheme(theme), [theme]);
+
+  const pageContext =
+    view === "settings"
+      ? settingsSectionMeta[settingsSection]
+      : {
+          rooms: { label: "直播监看", description: "直播间状态与实时内容", icon: <RadioButton weight="fill" /> },
+          parsers: { label: "内容洞察", description: "分析器与洞察规则", icon: <TreeStructure /> },
+          insights: { label: "观点中心", description: "聚合主播观点与证据", icon: <Lightbulb /> },
+          usage: { label: "AI 用量", description: "模型调用与费用统计", icon: <ChartLineUp /> },
+          data: { label: "数据管理", description: "本地数据、备份与保留", icon: <Database /> },
+        }[view];
 
   function applySnapshot(value: unknown) {
     const snapshot = value as {
@@ -199,12 +211,6 @@ export function App() {
     void window.duoduo.settings.getAsrProvider().then((value) => {
       const config = value as AsrProviderConfig | undefined;
       setProvider(config);
-      if (!config) return;
-      setProviderType(config.type);
-      if (config.type === "duoduo-streaming-asr-v1") {
-        setEndpoint(config.endpoint);
-        setAuth(config.auth);
-      }
     });
     void window.duoduo.settings
       .getInsightNotifications()
@@ -302,12 +308,59 @@ export function App() {
       if (incoming.length)
         setNotifications((current) =>
           [
-            ...incoming,
+            ...incoming.map((item) => ({
+              key: `market-${item.id}`,
+              kind: "market" as const,
+              id: item.id,
+              roomId: item.roomId,
+              startedAt: item.startedAt,
+              summary: item.summary,
+              alertLevel: item.alertLevel,
+            })),
             ...current.filter(
-              (item) => !incoming.some((next) => next.id === item.id),
+              (item) => !incoming.some((next) => item.key === `market-${next.id}`),
             ),
           ].slice(0, 20),
         );
+    });
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, []);
+  useEffect(() => {
+    const contentRecords = window.duoduo.contentRecords;
+    if (!contentRecords) return;
+    let active = true;
+    void contentRecords.list({ limit: 50 }).then((value) => {
+      if (!active) return;
+      const page = value as { items: ContentRecord[] };
+      latestContentRecordId.current = Math.max(0, ...page.items.map((item) => item.id));
+    });
+    const unsubscribe = contentRecords.subscribe((value) => {
+      const page = value as { items: ContentRecord[] };
+      const maxId = Math.max(0, ...page.items.map((item) => item.id));
+      if (latestContentRecordId.current === undefined) {
+        latestContentRecordId.current = maxId;
+        return;
+      }
+      const incoming = page.items
+        .filter((item) => item.id > latestContentRecordId.current! && item.alertLevel !== "none")
+        .sort((a, b) => b.id - a.id);
+      latestContentRecordId.current = Math.max(latestContentRecordId.current, maxId);
+      if (incoming.length)
+        setNotifications((current) => [
+          ...incoming.map((item) => ({
+            key: `content-${item.id}`,
+            kind: "content" as const,
+            id: item.id,
+            roomId: item.roomId,
+            startedAt: item.startedAt,
+            summary: item.title,
+            alertLevel: item.alertLevel,
+          })),
+          ...current.filter((item) => !incoming.some((next) => item.key === `content-${next.id}`)),
+        ].slice(0, 20));
     });
     return () => {
       active = false;
@@ -358,7 +411,6 @@ export function App() {
     setScheduleMode("uncertain");
     setDays([1, 2, 3, 4, 5]);
     setRanges([{ start: "09:00", end: "12:00" }]);
-    setProbeInterval("default");
     setDialog("room");
   }
   async function openEditRoom(room: Room) {
@@ -374,7 +426,6 @@ export function App() {
     setScheduleMode(room.schedule ? "fixed" : "uncertain");
     setDays(room.schedule?.days ?? [1, 2, 3, 4, 5]);
     setRanges(room.schedule?.ranges ?? [{ start: "09:00", end: "12:00" }]);
-    setProbeInterval(room.probeIntervalMinutes?.toString() ?? "default");
     setDialog("room");
   }
   async function saveRoom(event: FormEvent) {
@@ -383,8 +434,6 @@ export function App() {
       const input = {
         url,
         schedule: scheduleMode === "fixed" ? { days, ranges } : null,
-        probeIntervalMinutes:
-          probeInterval === "default" ? null : Number(probeInterval),
         groupId: roomGroupId,
       };
       if (editingRoomId) {
@@ -400,57 +449,6 @@ export function App() {
       setMessage(
         String(error).replace(/^Error invoking remote method '[^']+': /, ""),
       );
-    }
-  }
-
-  function draftProvider(): AsrProviderConfig {
-    return providerType === "bailian"
-      ? {
-          type: "bailian",
-          model: "paraformer-realtime-v2",
-          secretId: "bailian-main",
-        }
-      : {
-          type: "duoduo-streaming-asr-v1",
-          endpoint,
-          auth,
-          ...(auth === "none" ? {} : { secretId: "gateway-main" }),
-        };
-  }
-  async function saveProvider(event: FormEvent) {
-    event.preventDefault();
-    const config = draftProvider();
-    await window.duoduo.settings.saveAsrProvider(config, secret || undefined);
-    setProvider(config);
-    setSecret("");
-    setDialog(null);
-    setMessage("语音转文字设置已保存");
-  }
-  async function saveNotificationSettings() {
-    await window.duoduo.settings.saveInsightNotifications({
-      timeoutSeconds: notificationTimeout,
-    });
-    setMessage("新观点提醒设置已保存");
-  }
-  async function saveMonitoringSettings(event: FormEvent) {
-    event.preventDefault();
-    setMonitoringSettings(
-      (await window.duoduo.settings.saveMonitoring(
-        monitoringSettings,
-      )) as MonitoringSettings,
-    );
-    setDialog(null);
-    setMessage("监看频率已更新并立即生效");
-  }
-  async function testProvider() {
-    try {
-      const result = (await window.duoduo.settings.testAsrProvider(
-        draftProvider(),
-        secret,
-      )) as { ok: boolean; message: string };
-      setMessage(result.message);
-    } catch (error) {
-      setMessage(`连接失败：${String(error)}`);
     }
   }
 
@@ -556,13 +554,18 @@ export function App() {
       setMessage(`停止后续更新失败：${String(error)}`);
     }
   }
-  function dismissNotification(id: number) {
-    setNotifications((current) => current.filter((item) => item.id !== id));
+  function dismissNotification(key: string) {
+    setNotifications((current) => current.filter((item) => item.key !== key));
   }
-  function openNotification(item: MarketInsight) {
+  function openNotification(item: InsightNotificationItem) {
+    if (item.kind === "content") {
+      setView("parsers");
+      dismissNotification(item.key);
+      return;
+    }
     setView("rooms");
     setFocusInsight({ roomId: item.roomId, insightId: item.id });
-    dismissNotification(item.id);
+    dismissNotification(item.key);
     setTimeout(
       () =>
         document
@@ -680,32 +683,39 @@ export function App() {
 
   return (
     <div
-      className={`shell ${notifications.length ? "has-insight-notifications" : ""}`}
+      className={`shell ${sidebarCollapsed ? "sidebar-collapsed" : ""} ${notifications.length ? "has-insight-notifications" : ""}`}
     >
       <aside className="sidebar">
         <div className="brand">
-          <span>
-            <Broadcast weight="fill" />
+          <span className="brand-icon">
+            <img src={activeTheme.icon} alt="" />
           </span>
-          <strong>多多直播</strong>
+          <strong>观风-直播观察 Agent</strong>
         </div>
         <nav className="sidebar-nav" aria-label="主导航">
           <SidebarSection label="工作台">
             <SidebarItem icon={<RadioButton weight="fill" />} label="直播监看" badge={rooms.length} active={view === "rooms"} onClick={() => setView("rooms")} />
-            <SidebarItem icon={<TreeStructure />} label="内容分析规则" active={view === "parsers"} onClick={() => setView("parsers")} />
             <SidebarItem icon={<Lightbulb />} label="观点中心" active={view === "insights"} onClick={() => setView("insights")} />
-            <SidebarItem icon={<ChartLineUp />} label="AI 用量" active={view === "usage"} onClick={() => setView("usage")} />
+            <SidebarItem icon={<TreeStructure />} label="内容洞察" active={view === "parsers"} onClick={() => setView("parsers")} />
           </SidebarSection>
           <SidebarSection label="系统">
+            <SidebarItem icon={<ChartLineUp />} label="AI 用量" active={view === "usage"} onClick={() => setView("usage")} />
             <SidebarItem icon={<Database />} label="数据管理" active={view === "data"} onClick={() => setView("data")} />
-            <SidebarItem icon={<SlidersHorizontal />} label="监看设置" onClick={() => setDialog("monitoring")} />
-            <SidebarItem icon={<Gear />} label="系统设置" onClick={() => setDialog("settings")} />
+            <SidebarItem icon={<Gear />} label="系统设置" active={view === "settings"} onClick={() => setView("settings")} />
           </SidebarSection>
         </nav>
         <div className="app-version">{appVersion ? `v${appVersion}` : ""}</div>
       </aside>
       <header>
-        <List />
+        <button
+          type="button"
+          className="sidebar-toggle"
+          aria-label={sidebarCollapsed ? "展开左侧菜单" : "收起左侧菜单"}
+          aria-expanded={!sidebarCollapsed}
+          onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+        >
+          <List />
+        </button>
         {view === "rooms" && (
           <label>
             <MagnifyingGlass />
@@ -716,7 +726,14 @@ export function App() {
             />
           </label>
         )}
-        {!provider && <span>语音转文字未设置</span>}
+        {!provider && <span className="header-status">语音转文字未设置</span>}
+        <div className="header-context" aria-label={`当前菜单：${pageContext.label}`}>
+          <span className="header-context-icon">{pageContext.icon}</span>
+          <span className="header-context-copy">
+            <strong>{pageContext.label}</strong>
+            <small>{pageContext.description}</small>
+          </span>
+        </div>
       </header>
       {accessBlocked && (
         <div
@@ -1011,8 +1028,22 @@ export function App() {
             };
           })}
         />
-      ) : (
+      ) : view === "data" ? (
         <DataManagement />
+      ) : (
+        <SettingsCenter
+          section={settingsSection}
+          onSectionChange={setSettingsSection}
+          theme={theme}
+          onThemeChange={setTheme}
+          provider={provider}
+          onProviderChange={setProvider}
+          monitoring={monitoringSettings}
+          onMonitoringChange={setMonitoringSettings}
+          notificationTimeout={notificationTimeout}
+          onNotificationTimeoutChange={setNotificationTimeout}
+          onMessage={setMessage}
+        />
       )}
       {player.activeRoomId && (
         <PlayerDrawer
@@ -1079,184 +1110,40 @@ export function App() {
         <div className="backdrop" onMouseDown={() => setDialog(null)}>
           <form
             className="modal"
-            onSubmit={
-              dialog === "room"
-                ? saveRoom
-                : dialog === "monitoring"
-                  ? saveMonitoringSettings
-                  : saveProvider
-            }
+            onSubmit={saveRoom}
             onMouseDown={(event) => event.stopPropagation()}
           >
             <div>
-              <h2>
-                {dialog === "room"
-                  ? editingRoomId
-                    ? "编辑直播间"
-                    : "添加直播间"
-                  : dialog === "monitoring"
-                    ? "监看设置"
-                    : "系统设置"}
-              </h2>
+              <h2>{editingRoomId ? "编辑直播间" : "添加直播间"}</h2>
               <button type="button" onClick={() => setDialog(null)}>
                 <X />
               </button>
             </div>
-            {dialog === "room" ? (
-              <RoomFields
-                url={url}
-                setUrl={setUrl}
-                scheduleMode={scheduleMode}
-                setScheduleMode={setScheduleMode}
-                days={days}
-                setDays={setDays}
-                ranges={ranges}
-                setRanges={setRanges}
-                probeInterval={probeInterval}
-                setProbeInterval={setProbeInterval}
-                groups={roomGroups}
-                groupId={roomGroupId}
-                setGroupId={setRoomGroupId}
-                editingGroupId={
-                  editingRoomId
-                    ? rooms.find((room) => room.roomId === editingRoomId)
-                        ?.groupId
-                    : undefined
-                }
-                lockedGroupId={activeGroupId}
-              />
-            ) : dialog === "monitoring" ? (
-              <>
-                <label>
-                  直播状态更新速度
-                  <select
-                    value={monitoringSettings.monitoredCheckSeconds}
-                    onChange={(event) =>
-                      setMonitoringSettings({
-                        ...monitoringSettings,
-                        monitoredCheckSeconds: Number(
-                          event.target.value,
-                        ) as MonitoringSettings["monitoredCheckSeconds"],
-                      })
-                    }
-                  >
-                    {[15, 30, 60, 120].map((seconds) => (
-                      <option value={seconds} key={seconds}>
-                        约 {seconds} 秒内
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  未监看直播间检查频率
-                  <select
-                    value={monitoringSettings.preparedCheckMinutes}
-                    onChange={(event) =>
-                      setMonitoringSettings({
-                        ...monitoringSettings,
-                        preparedCheckMinutes: Number(
-                          event.target.value,
-                        ) as MonitoringSettings["preparedCheckMinutes"],
-                      })
-                    }
-                  >
-                    {[1, 3, 5, 10, 15, 30].map((minutes) => (
-                      <option value={minutes} key={minutes}>
-                        每 {minutes} 分钟
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <p>
-                  修改后立即生效。实时监看优先读取现有页面，不额外刷新抖音页面。
-                </p>
-              </>
-            ) : (
-              <>
-                <section className="theme-setting" aria-labelledby="theme-setting-title">
-                  <div className="theme-setting-head">
-                    <div>
-                      <h3 id="theme-setting-title">界面主题</h3>
-                      <p>即时应用到所有页面，重新打开应用后仍会保留。</p>
-                    </div>
-                    <span>{themes.find((item) => item.id === theme)?.name}</span>
-                  </div>
-                  <div className="theme-options" role="radiogroup" aria-label="界面主题">
-                    {themes.map((item) => (
-                      <button
-                        className={theme === item.id ? "selected" : ""}
-                        type="button"
-                        role="radio"
-                        aria-checked={theme === item.id}
-                        onClick={() => setTheme(item.id)}
-                        key={item.id}
-                      >
-                        <span className="theme-swatch" aria-hidden="true">
-                          {item.colors.map((color) => <i style={{ background: color }} key={color} />)}
-                        </span>
-                        <span>
-                          <b>{item.name}</b>
-                          <small>{item.description}</small>
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </section>
-                <ProviderFields
-                  providerType={providerType}
-                  setProviderType={setProviderType}
-                  endpoint={endpoint}
-                  setEndpoint={setEndpoint}
-                  auth={auth}
-                  setAuth={setAuth}
-                  secret={secret}
-                  setSecret={setSecret}
-                  secretRequired={!provider}
-                />
-                <div className="notification-setting">
-                  <label>
-                    新观点提醒自动关闭
-                    <select
-                      aria-label="新观点提醒自动关闭"
-                      value={notificationTimeout ?? "never"}
-                      onChange={(event) =>
-                        setNotificationTimeout(
-                          event.target.value === "never"
-                            ? null
-                            : (Number(event.target.value) as 10 | 30 | 60),
-                        )
-                      }
-                    >
-                      <option value="never">永不自动关闭</option>
-                      <option value="10">10 秒</option>
-                      <option value="30">30 秒</option>
-                      <option value="60">60 秒</option>
-                    </select>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => void saveNotificationSettings()}
-                  >
-                    保存提醒设置
-                  </button>
-                </div>
-              </>
-            )}
+            <RoomFields
+              url={url}
+              setUrl={setUrl}
+              scheduleMode={scheduleMode}
+              setScheduleMode={setScheduleMode}
+              days={days}
+              setDays={setDays}
+              ranges={ranges}
+              setRanges={setRanges}
+              groups={roomGroups}
+              groupId={roomGroupId}
+              setGroupId={setRoomGroupId}
+              editingGroupId={
+                editingRoomId
+                  ? rooms.find((room) => room.roomId === editingRoomId)?.groupId
+                  : undefined
+              }
+              lockedGroupId={activeGroupId}
+            />
             <footer>
-              {dialog === "settings" && (
-                <button type="button" onClick={() => void testProvider()}>
-                  测试连接
-                </button>
-              )}
               <button type="button" onClick={() => setDialog(null)}>
                 取消
               </button>
               <button className="primary" type="submit">
-                {dialog === "room"
-                  ? "保存直播间"
-                  : dialog === "monitoring"
-                    ? "保存监看设置"
-                    : "保存语音转文字设置"}
+                保存直播间
               </button>
             </footer>
           </form>
@@ -1305,6 +1192,7 @@ function SidebarItem({
       <button
         type="button"
         className="sidebar-item-trigger"
+        title={label}
         aria-current={active ? "page" : undefined}
         aria-expanded={expandable ? expanded : undefined}
         onClick={() => {
@@ -1600,8 +1488,6 @@ interface RoomFieldsProps {
   setDays(value: number[]): void;
   ranges: TimeRange[];
   setRanges(value: TimeRange[]): void;
-  probeInterval: string;
-  setProbeInterval(value: string): void;
   groups: RoomGroup[];
   groupId: string;
   setGroupId(value: string): void;
@@ -1617,8 +1503,6 @@ function RoomFields({
   setDays,
   ranges,
   setRanges,
-  probeInterval,
-  setProbeInterval,
   groups,
   groupId,
   setGroupId,
@@ -1748,101 +1632,6 @@ function RoomFields({
             增加时段
           </button>
         </div>
-      )}
-      <label>
-        检查开播状态频率
-        <select
-          value={probeInterval}
-          onChange={(event) => setProbeInterval(event.target.value)}
-        >
-          <option value="default">跟随全局监看设置</option>
-          {[1, 3, 5, 10, 15, 30].map((minutes) => (
-            <option value={minutes} key={minutes}>
-              每 {minutes} 分钟
-            </option>
-          ))}
-        </select>
-      </label>
-    </>
-  );
-}
-
-interface ProviderFieldsProps {
-  providerType: "bailian" | "duoduo-streaming-asr-v1";
-  setProviderType(value: "bailian" | "duoduo-streaming-asr-v1"): void;
-  endpoint: string;
-  setEndpoint(value: string): void;
-  auth: "none" | "bearer" | "x-api-key";
-  setAuth(value: "none" | "bearer" | "x-api-key"): void;
-  secret: string;
-  setSecret(value: string): void;
-  secretRequired: boolean;
-}
-function ProviderFields({
-  providerType,
-  setProviderType,
-  endpoint,
-  setEndpoint,
-  auth,
-  setAuth,
-  secret,
-  setSecret,
-  secretRequired,
-}: ProviderFieldsProps) {
-  return (
-    <>
-      <label>
-        语音转文字服务
-        <select
-          value={providerType}
-          onChange={(event) =>
-            setProviderType(event.target.value as typeof providerType)
-          }
-        >
-          <option value="bailian">阿里云百炼</option>
-          <option value="duoduo-streaming-asr-v1">
-            通用语音转文字网关（ASR）
-          </option>
-        </select>
-      </label>
-      {providerType === "duoduo-streaming-asr-v1" && (
-        <>
-          <label>
-            WebSocket URL
-            <input
-              required
-              value={endpoint}
-              onChange={(event) => setEndpoint(event.target.value)}
-            />
-          </label>
-          <label>
-            鉴权
-            <select
-              value={auth}
-              onChange={(event) => setAuth(event.target.value as typeof auth)}
-            >
-              <option value="none">无鉴权</option>
-              <option value="bearer">Bearer Token</option>
-              <option value="x-api-key">X-API-Key</option>
-            </select>
-          </label>
-        </>
-      )}
-      {(providerType === "bailian" || auth !== "none") && (
-        <label>
-          {providerType === "bailian" ? "API Key" : "访问凭据"}
-          <input
-            autoFocus
-            required={secretRequired}
-            type="password"
-            value={secret}
-            onChange={(event) => setSecret(event.target.value)}
-            autoComplete="off"
-            placeholder={
-              secretRequired ? "请输入 API Key" : "留空则继续使用已保存凭据"
-            }
-          />
-        </label>
       )}
     </>
   );

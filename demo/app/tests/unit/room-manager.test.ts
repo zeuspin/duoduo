@@ -13,6 +13,15 @@ class FakeSession implements MonitorSession {
 afterEach(() => vi.useRealTimers());
 
 describe("RoomManager", () => {
+  it("marks a room ready as soon as the first audio chunk is captured", async () => {
+    const manager = new RoomManager(async () => new FakeSession());
+    await manager.startMonitoring("a");
+    expect(manager.snapshot()[0].audioReady).toBe(false);
+    manager.markAudioReady("a");
+    expect(manager.snapshot()[0].audioReady).toBe(true);
+    await manager.shutdown();
+  });
+
   it("starts each room once and stops it independently", async () => {
     const created: FakeSession[] = [];
     const manager = new RoomManager(async () => { const session = new FakeSession(); created.push(session); return session; });

@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import {
   ImmutableParserSchema,
+  ContentRecordSchema,
   MarketInsightSchema,
   ParserDefinitionSchema,
   ParserSpecSchema,
@@ -14,6 +15,7 @@ import {
   normalizeDouyinUrl,
   type AsrEvent,
   type ImmutableParser,
+  type ContentRecord,
   type MarketInsight,
   type ParserDefinition,
   type ParserSpec,
@@ -28,6 +30,7 @@ import { AiUsageRepository } from "../usage/usage-repository";
 import { GroupRepository } from "../groups/group-repository";
 import { GroupRunRepository } from "../groups/group-run-repository";
 import { ProbeAccessRepository } from "../rooms/probe-access-repository";
+import { DEFAULT_PARSER_PROMPT } from "../../shared/parser-prompt";
 
 export interface StoredAsrEvent extends AsrEvent {
   occurredAt: string;
@@ -44,28 +47,15 @@ export interface InsightPage {
   nextCursor?: number;
 }
 
+export interface ContentRecordPage {
+  items: ContentRecord[];
+  nextCursor?: number;
+}
+
 export const BUILT_IN_MARKET_PARSER_SPEC: ParserSpec = ParserSpecSchema.parse({
-  name: "市场观点与情绪提炼",
-  description: "提炼板块方向、大盘指标、量价资金、市场情绪、条件判断和风险信号",
-  objectives: [
-    "sector_direction",
-    "market_indicator",
-    "volume_and_funds",
-    "market_sentiment",
-    "conditional_view",
-    "risk_signal",
-  ],
-  filters: [
-    "greeting",
-    "audience_question",
-    "unendorsed_quote",
-    "advertising",
-    "unsupported_sentiment",
-    "duplicate_view",
-  ],
-  normalization: "suggest",
-  model: "qwen-plus",
-  advancedPrompt: "",
+  schemaVersion: 3,
+  name: "股票盯盘直播内容洞察",
+  prompt: DEFAULT_PARSER_PROMPT,
 });
 
 export class DuoduoDatabase {
@@ -74,6 +64,7 @@ export class DuoduoDatabase {
   readonly snapshots: SqliteSnapshotRepository;
   readonly parsers: SqliteParserRepository;
   readonly insights: SqliteInsightRepository;
+  readonly contentRecords: SqliteContentRecordRepository;
   readonly maintenance: DataMaintenance;
   readonly aiUsage: AiUsageRepository;
   readonly groups: GroupRepository;
@@ -95,6 +86,10 @@ export class DuoduoDatabase {
         position INTEGER NOT NULL,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS app_migrations (
+        key TEXT PRIMARY KEY,
+        applied_at TEXT NOT NULL
       );
       CREATE TABLE IF NOT EXISTS rooms (
         room_id TEXT PRIMARY KEY,
@@ -241,6 +236,25 @@ export class DuoduoDatabase {
         created_at TEXT NOT NULL
       );
       CREATE INDEX IF NOT EXISTS insights_room_id_index ON market_insights(room_id, id DESC);
+      CREATE TABLE IF NOT EXISTS content_records (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        room_id TEXT NOT NULL REFERENCES rooms(room_id) ON DELETE CASCADE,
+        parser_id TEXT NOT NULL REFERENCES parser_definitions(id),
+        parser_version_id INTEGER NOT NULL REFERENCES parser_versions(id),
+        result_type_id TEXT NOT NULL,
+        result_type_label TEXT NOT NULL,
+        title TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        fields_json TEXT NOT NULL,
+        evidence_json TEXT NOT NULL,
+        source_asr_ids_json TEXT NOT NULL,
+        started_at TEXT NOT NULL,
+        ended_at TEXT NOT NULL,
+        confidence REAL NOT NULL,
+        alert_level TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS content_records_room_id_index ON content_records(room_id, id DESC);
       CREATE TABLE IF NOT EXISTS ai_runs (
         id TEXT PRIMARY KEY,
         feature_key TEXT NOT NULL,
@@ -395,11 +409,13 @@ export class DuoduoDatabase {
     this.snapshots = new SqliteSnapshotRepository(this.database);
     this.parsers = new SqliteParserRepository(this.database);
     this.insights = new SqliteInsightRepository(this.database);
+    this.contentRecords = new SqliteContentRecordRepository(this.database);
     this.maintenance = new DataMaintenance(this.database);
     this.aiUsage = new AiUsageRepository(this.database);
     this.aiUsage.markRunningInterrupted();
     this.parsers.ensureBuiltIn();
     this.parsers.migrateImmutableDefinitions();
+    this.parsers.resetToSystemAnalyzerV3Once();
   }
 
   async migrateLegacyRooms(path: string): Promise<void> {
@@ -569,7 +585,6 @@ class SqliteRoomRepository {
       const room = RoomSchema.parse({
         ...normalized,
         schedule: parsed.schedule,
-        probeIntervalMinutes: parsed.probeIntervalMinutes,
         monitoring: false,
         autoMonitorOnLive: false,
         groupId,
@@ -599,17 +614,15 @@ class SqliteRoomRepository {
       ...rowToRoom(existing),
       canonicalUrl: normalized.canonicalUrl,
       schedule: parsed.schedule,
-      probeIntervalMinutes: parsed.probeIntervalMinutes,
       updatedAt: new Date().toISOString(),
     });
     this.database
       .prepare(
-        "UPDATE rooms SET canonical_url=?, schedule_json=?, probe_interval_minutes=?, updated_at=? WHERE room_id=?",
+        "UPDATE rooms SET canonical_url=?, schedule_json=?, updated_at=? WHERE room_id=?",
       )
       .run(
         updated.canonicalUrl,
         encodeSchedule(updated.schedule),
-        updated.probeIntervalMinutes,
         updated.updatedAt,
         roomId,
       );
@@ -688,13 +701,12 @@ class SqliteRoomRepository {
       ).id;
     this.database
       .prepare(
-        "INSERT OR IGNORE INTO rooms(room_id,canonical_url,schedule_json,probe_interval_minutes,monitoring,auto_monitor_on_live,group_id,position_in_group,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)",
+        "INSERT OR IGNORE INTO rooms(room_id,canonical_url,schedule_json,monitoring,auto_monitor_on_live,group_id,position_in_group,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)",
       )
       .run(
         room.roomId,
         room.canonicalUrl,
         encodeSchedule(room.schedule),
-        room.probeIntervalMinutes,
         room.monitoring ? 1 : 0,
         room.autoMonitorOnLive ? 1 : 0,
         groupId,
@@ -1058,6 +1070,64 @@ export class SqliteParserRepository {
         .run(row.spec_json, row.id);
   }
 
+  resetToSystemAnalyzerV3Once(): void {
+    const migrationKey = "system-analyzer-v3-2026-07-21";
+    if (this.database.prepare("SELECT 1 FROM app_migrations WHERE key=?").get(migrationKey)) return;
+    const now = new Date().toISOString();
+    const serialized = JSON.stringify(BUILT_IN_MARKET_PARSER_SPEC);
+    this.database.exec("BEGIN IMMEDIATE");
+    try {
+      this.database.prepare("UPDATE room_groups SET parser_id=NULL").run();
+      this.database.prepare("UPDATE parser_definitions SET deleted_at=? WHERE id<>?").run(now, "market-insight");
+      this.database.prepare(
+        "UPDATE parser_definitions SET name=?,description='',built_in=0,immutable_spec_json=?,deleted_at=NULL WHERE id=?",
+      ).run(BUILT_IN_MARKET_PARSER_SPEC.name, serialized, "market-insight");
+      this.database.prepare("UPDATE parser_versions SET spec_json=? WHERE parser_id=?").run(serialized, "market-insight");
+      this.database.prepare("INSERT INTO app_migrations(key,applied_at) VALUES(?,?)").run(migrationKey, now);
+      this.database.exec("COMMIT");
+    } catch (error) {
+      this.database.exec("ROLLBACK");
+      throw error;
+    }
+  }
+
+  replaceSystemAnalyzer(input: ParserSpec): ImmutableParser {
+    const spec = ParserSpecSchema.parse(input);
+    const parserId = "market-insight";
+    const now = new Date().toISOString();
+    const current = this.database.prepare(
+      "SELECT COALESCE(MAX(version),0) version FROM parser_versions WHERE parser_id=?",
+    ).get(parserId) as { version: number };
+    const nextVersion = Number(current.version) + 1;
+    this.database.exec("BEGIN IMMEDIATE");
+    try {
+      this.database.prepare(
+        "UPDATE parser_versions SET state='archived' WHERE parser_id=? AND state='published'",
+      ).run(parserId);
+      this.database.prepare(
+        "DELETE FROM parser_versions WHERE parser_id=? AND state='draft'",
+      ).run(parserId);
+      const result = this.database.prepare(
+        "INSERT INTO parser_versions(parser_id,version,state,spec_json,created_at,published_at) VALUES(?,?,'published',?,?,?)",
+      ).run(parserId, nextVersion, JSON.stringify(spec), now, now);
+      const versionId = Number(result.lastInsertRowid);
+      this.database.prepare(
+        "UPDATE parser_definitions SET name=?,description='',immutable_spec_json=?,deleted_at=NULL WHERE id=?",
+      ).run(spec.name, JSON.stringify(spec), parserId);
+      this.database.prepare(
+        "UPDATE parser_definitions SET deleted_at=? WHERE id<>? AND deleted_at IS NULL",
+      ).run(now, parserId);
+      this.database.prepare(
+        "UPDATE room_parser_bindings SET parser_version_id=?,updated_at=? WHERE parser_id=?",
+      ).run(versionId, now, parserId);
+      this.database.exec("COMMIT");
+    } catch (error) {
+      this.database.exec("ROLLBACK");
+      throw error;
+    }
+    return this.getImmutable(parserId)!;
+  }
+
   createImmutable(input: ParserSpec): ImmutableParser {
     const spec = ParserSpecSchema.parse(input);
     const id = randomUUID();
@@ -1411,6 +1481,71 @@ export class SqliteInsightRepository {
   }
 }
 
+export class SqliteContentRecordRepository {
+  constructor(private readonly database: DatabaseSync) {}
+
+  insert(input: Omit<ContentRecord, "id">): ContentRecord {
+    const parsed = ContentRecordSchema.omit({ id: true }).parse(input);
+    const result = this.database.prepare(
+      `INSERT INTO content_records(room_id,parser_id,parser_version_id,result_type_id,result_type_label,title,summary,fields_json,evidence_json,source_asr_ids_json,started_at,ended_at,confidence,alert_level,created_at)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    ).run(
+      parsed.roomId,
+      parsed.parserId,
+      parsed.parserVersionId,
+      parsed.resultTypeId,
+      parsed.resultTypeLabel,
+      parsed.title,
+      parsed.summary,
+      JSON.stringify(parsed.fields),
+      JSON.stringify(parsed.evidence),
+      JSON.stringify(parsed.sourceAsrIds),
+      parsed.startedAt,
+      parsed.endedAt,
+      parsed.confidence,
+      parsed.alertLevel,
+      parsed.createdAt,
+    );
+    return ContentRecordSchema.parse({
+      ...parsed,
+      id: Number(result.lastInsertRowid),
+    });
+  }
+
+  hasDuplicate(candidate: Pick<ContentRecord, "roomId" | "parserVersionId" | "resultTypeId" | "title" | "sourceAsrIds">): boolean {
+    return this.list({ roomId: candidate.roomId, limit: 100 }).items.some(
+      (existing) =>
+        existing.parserVersionId === candidate.parserVersionId &&
+        (existing.title === candidate.title ||
+          (existing.resultTypeId === candidate.resultTypeId &&
+            candidate.sourceAsrIds.some((id) => existing.sourceAsrIds.includes(id)))),
+    );
+  }
+
+  list(options: { roomId?: string; limit: number; beforeId?: number }): ContentRecordPage {
+    const limit = Math.max(1, Math.min(options.limit, 100));
+    const clauses: string[] = [];
+    const params: Array<string | number> = [];
+    if (options.roomId) {
+      clauses.push("room_id=?");
+      params.push(options.roomId);
+    }
+    if (options.beforeId) {
+      clauses.push("id<?");
+      params.push(options.beforeId);
+    }
+    const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
+    const rows = this.database.prepare(
+      `SELECT * FROM content_records ${where} ORDER BY id DESC LIMIT ?`,
+    ).all(...params, limit) as Record<string, unknown>[];
+    const items = rows.map(rowToContentRecord);
+    return {
+      items,
+      ...(items.length === limit ? { nextCursor: items.at(-1)!.id } : {}),
+    };
+  }
+}
+
 function optionalString(value: unknown): string | null {
   return typeof value === "string" ? value : null;
 }
@@ -1476,10 +1611,6 @@ function rowToRoom(row: Record<string, unknown>): Room {
     roomId: row.room_id,
     canonicalUrl: row.canonical_url,
     schedule: row.schedule_json ? JSON.parse(String(row.schedule_json)) : null,
-    probeIntervalMinutes:
-      row.probe_interval_minutes == null
-        ? null
-        : Number(row.probe_interval_minutes),
     monitoring: Boolean(row.monitoring),
     autoMonitorOnLive: Boolean(row.auto_monitor_on_live),
     groupId: row.group_id,
@@ -1552,6 +1683,27 @@ function rowToInsight(row: Record<string, unknown>): MarketInsight {
     startedAt: row.started_at,
     endedAt: row.ended_at,
     confidence: Number(row.confidence),
+    alertLevel: row.alert_level,
+    createdAt: row.created_at,
+  });
+}
+
+function rowToContentRecord(row: Record<string, unknown>): ContentRecord {
+  return ContentRecordSchema.parse({
+    id: row.id,
+    roomId: row.room_id,
+    parserId: row.parser_id,
+    parserVersionId: row.parser_version_id,
+    resultTypeId: row.result_type_id,
+    resultTypeLabel: row.result_type_label,
+    title: row.title,
+    summary: row.summary,
+    fields: JSON.parse(String(row.fields_json)),
+    evidence: JSON.parse(String(row.evidence_json)),
+    sourceAsrIds: JSON.parse(String(row.source_asr_ids_json)),
+    startedAt: row.started_at,
+    endedAt: row.ended_at,
+    confidence: row.confidence,
     alertLevel: row.alert_level,
     createdAt: row.created_at,
   });

@@ -31,7 +31,7 @@ describe("DuoduoDatabase", () => {
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
     await database.migrateLegacyRooms(legacyPath);
-    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/456", schedule: null, probeIntervalMinutes: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/456", schedule: null });
     expect((await database.rooms.list()).map((room) => [room.roomId, room.schedule])).toEqual([
       ["123", { days: [1], ranges: [{ start: "09:00", end: "10:00" }] }],
       ["456", null],
@@ -42,7 +42,7 @@ describe("DuoduoDatabase", () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
     const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
     databases.push(database);
-    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: null });
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
     for (let index = 0; index < 4; index += 1) {
       database.asr.insert({ roomId: "123", sessionId: "session", segmentId: `segment-${index}`, startMs: index * 1000, endMs: index * 1000 + 500, text: `文本 ${index}`, isFinal: true, occurredAt: `2026-07-12T00:00:0${index}.000Z` });
     }
@@ -229,6 +229,55 @@ describe("DuoduoDatabase", () => {
     expect(published.version).toBe(2);
     expect(database.parsers.list()[0].draftVersion).toBeUndefined();
     expect(() => database.parsers.updateDraft(published.id, published.spec)).toThrow("PARSER_VERSION_NOT_DRAFT");
+  });
+
+  it("atomically replaces the one system analyzer and preserves the previous version", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
+    const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
+    databases.push(database);
+    const replacement = database.parsers.replaceSystemAnalyzer({
+      schemaVersion: 4,
+      name: "商品价格内容洞察",
+      definition: {
+        name: "商品价格内容洞察",
+        purpose: "记录商品价格变化",
+        resultTypes: [{ id: "price_change", label: "价格变化", definition: "主播明确提到价格变化" }],
+        fields: [{ id: "product", label: "商品", type: "string" }],
+        inclusionRules: ["主播明确提到价格变化"],
+        exclusionRules: ["忽略寒暄"],
+        alertRules: ["降价时提醒"],
+      },
+    });
+    expect(replacement.id).toBe("market-insight");
+    expect(database.parsers.listImmutable()).toHaveLength(1);
+    expect(database.parsers.list()[0].publishedVersion).toMatchObject({ version: 2, state: "published" });
+  });
+
+  it("stores generic content records independently from market viewpoints", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "duoduo-db-"));
+    const database = new DuoduoDatabase(join(directory, "duoduo.sqlite"));
+    databases.push(database);
+    await database.rooms.add({ groupId: database.groups.list()[0].id, url: "https://live.douyin.com/123", schedule: null });
+    const version = database.parsers.list()[0].publishedVersion!;
+    const record = database.contentRecords.insert({
+      roomId: "123",
+      parserId: "market-insight",
+      parserVersionId: version.id,
+      resultTypeId: "price_change",
+      resultTypeLabel: "价格变化",
+      title: "防晒霜降价",
+      summary: "价格降至七十九元",
+      fields: { product: "防晒霜", price: 79 },
+      evidence: ["这款防晒霜今天七十九元"],
+      sourceAsrIds: [1],
+      startedAt: "2026-07-21T08:00:00.000Z",
+      endedAt: "2026-07-21T08:00:01.000Z",
+      confidence: 0.96,
+      alertLevel: "important",
+      createdAt: "2026-07-21T08:00:02.000Z",
+    });
+    expect(database.contentRecords.list({ roomId: "123", limit: 20 }).items[0]).toEqual(record);
+    expect(database.insights.list({ roomId: "123", limit: 20 }).items).toEqual([]);
   });
 
   it("binds at most one published parser per room and keeps formal insights separate", async () => {

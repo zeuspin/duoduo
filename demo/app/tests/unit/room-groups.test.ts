@@ -14,7 +14,6 @@ const addRoom = (database: DuoduoDatabase, id: number, groupId?: string) =>
   database.rooms.add({
     url: `https://live.douyin.com/${id}`,
     schedule: null,
-    probeIntervalMinutes: null,
     groupId: groupId ?? database.groups.list()[0].id,
   });
 
@@ -35,7 +34,6 @@ describe("room groups", () => {
           roomId: String(800 + index),
           canonicalUrl: `https://live.douyin.com/${800 + index}`,
           schedule: null,
-          probeIntervalMinutes: null,
           monitoring: true,
           autoMonitorOnLive: false,
           groupId: initialGroupId,
@@ -145,7 +143,6 @@ describe("room groups", () => {
         roomId: String(id),
         canonicalUrl: `https://live.douyin.com/${id}`,
         schedule: null,
-        probeIntervalMinutes: null,
         monitoring: true,
         autoMonitorOnLive: false,
         groupId: initialGroupId,

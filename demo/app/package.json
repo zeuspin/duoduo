@@ -25,6 +25,8 @@
     "test:e2e-insights": "npm run build --silent && node tests/electron/insight-parser-e2e.cjs",
     "test:real-insights": "npm run build --silent && node tests/electron/real-insight-smoke.cjs",
     "evaluate:parser": "node scripts/evaluate-parser.mjs",
+    "evaluate:models": "node scripts/evaluate-model-scenes.mjs",
+    "evaluate:asr-models": "node scripts/evaluate-asr-models.mjs",
     "test:resource-soak": "node tests/electron/resource-soak.cjs",
     "scan:secrets": "node scripts/scan-secrets.mjs"
   },

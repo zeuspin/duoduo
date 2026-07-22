@@ -27,6 +27,11 @@ import {
 } from "node:fs/promises";
 import { z } from "zod";
 import {
+  AnalyzerDraftTestRequestSchema,
+  AnalyzerAgentRequestSchema,
+  AnalyzerAgentResponseSchema,
+  AnalyzerPublishRequestSchema,
+  AnalyzerSampleListSchema,
   AiUsageQuerySchema,
   AsrProviderConfigSchema,
   CleanupRequestSchema,
@@ -34,10 +39,10 @@ import {
   InsightNotificationSettingsSchema,
   LlmProviderConfigSchema,
   MonitoringSettingsSchema,
-  ParserSpecSchema,
+  ParserSpecV4Schema,
   RoomInputSchema,
 } from "../shared/contracts";
-import { DuoduoDatabase } from "./storage/database";
+import { DuoduoDatabase, type StoredAsrEvent } from "./storage/database";
 import { SettingsStore } from "./storage/settings-store";
 import { createAsrProvider } from "./asr/provider-factory";
 import { CaptureRouter } from "./audio/capture-router";
@@ -55,13 +60,19 @@ import { BackupService } from "./storage/backup-service";
 import { probeRoom } from "./rooms/live-probe";
 import type { RoomProbeResult } from "./rooms/live-probe";
 import type {
+  ContentRecord,
   GroupRefreshResult,
   GroupStopProgress,
+  MarketInsight,
 } from "../shared/contracts";
 import { PlaybackController } from "./player/playback-controller";
 import { createLlmProvider } from "./llm/provider-factory";
 import { InsightEngine } from "./insights/insight-engine";
 import { InsightCoordinator } from "./insights/insight-coordinator";
+import { AnalyzerDraftEngine } from "./insights/analyzer-draft-engine";
+import { AnalyzerTestPassStore } from "./insights/analyzer-test-pass-store";
+import { ANALYZER_AGENT_SYSTEM_PROMPT, sanitizeAnalyzerAgentResponse } from "./insights/analyzer-agent-prompt";
+import { mergeAnalyzerSampleEvents } from "./insights/analyzer-live-sample";
 import {
   createDiagnosticLog,
   createNetworkErrorSampler,
@@ -131,6 +142,22 @@ function broadcastRooms(rooms: unknown) {
     !mainWindow.webContents.isDestroyed()
   )
     mainWindow.webContents.send("rooms:changed", rooms);
+}
+
+function selectAnalyzerSample(
+  events: StoredAsrEvent[],
+  maxCharacters: number,
+): StoredAsrEvent[] {
+  const selected: StoredAsrEvent[] = [];
+  let characters = 0;
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const event = events[index];
+    if (selected.length > 0 && characters + event.text.length > maxCharacters)
+      break;
+    selected.unshift(event);
+    characters += event.text.length;
+  }
+  return selected;
 }
 
 async function createWindow() {
@@ -397,7 +424,17 @@ app.whenReady().then(async () => {
         database.insights.list({ limit: 50 }),
       );
   };
-  const insightCoordinator = new InsightCoordinator({
+  const broadcastContentRecords = () => {
+    if (mainWindow && !mainWindow.isDestroyed())
+      mainWindow.webContents.send(
+        "content-records:changed",
+        database.contentRecords.list({ limit: 50 }),
+      );
+  };
+  type RoutedAnalysis =
+    | { kind: "market"; value: Omit<MarketInsight, "id"> }
+    | { kind: "content"; value: Omit<ContentRecord, "id"> };
+  const insightCoordinator = new InsightCoordinator<RoutedAnalysis>({
     analyze: async (roomId, events) => {
       const parser = database.parsers.getForRoom(roomId);
       if (!parser) return [];
@@ -417,28 +454,37 @@ app.whenReady().then(async () => {
         (config.secretId
           ? await settings.getSecret(config.secretId)
           : undefined);
-      return new InsightEngine(
-        createLlmProvider(
-          { ...config, model: version.spec.model },
-          secret,
-          aiUsageGateway,
-          {
-            featureKey: "live_insight",
-            usageKind: "production",
-            apiKind: "chat_completions",
-            requestedModel: version.spec.model,
-            region: "cn-beijing",
-            thinkingEnabled: false,
-            roomId,
-            parserId: version.parserId,
-            parserVersionId: version.id,
-          },
-        ),
-      ).analyze(roomId, version, events);
+      const provider = createLlmProvider(
+        config,
+        config.analysisModel,
+        secret,
+        aiUsageGateway,
+        {
+          featureKey: "live_insight",
+          usageKind: "production",
+          apiKind: "chat_completions",
+          requestedModel: config.analysisModel,
+          region: "cn-beijing",
+          thinkingEnabled: false,
+          roomId,
+          parserId: version.parserId,
+          parserVersionId: version.id,
+        },
+      );
+      if ("schemaVersion" in version.spec && version.spec.schemaVersion === 4)
+        return (await new AnalyzerDraftEngine(provider).analyze(roomId, version, events))
+          .map((value) => ({ kind: "content" as const, value }));
+      return (await new InsightEngine(provider).analyze(roomId, version, events))
+        .map((value) => ({ kind: "market" as const, value }));
     },
-    persist: (insight) => {
-      if (!database.insights.hasDuplicate(insight)) {
-        database.insights.insert(insight);
+    persist: (analysis) => {
+      if (analysis.kind === "content") {
+        if (!database.contentRecords.hasDuplicate(analysis.value)) {
+          database.contentRecords.insert(analysis.value);
+          broadcastContentRecords();
+        }
+      } else if (!database.insights.hasDuplicate(analysis.value)) {
+        database.insights.insert(analysis.value);
         broadcastInsights();
       }
     },
@@ -520,8 +566,8 @@ app.whenReady().then(async () => {
       const asrUsageContext = {
         featureKey: "live_asr",
         usageKind: "production" as const,
-        apiKind: "paraformer_realtime" as const,
-        requestedModel: "paraformer-realtime-v2",
+        apiKind: "asr_realtime" as const,
+        requestedModel: config?.model ?? "paraformer-realtime-v2",
         region: "cn-beijing" as const,
         roomId,
       };
@@ -588,6 +634,7 @@ app.whenReady().then(async () => {
         300_000,
         Date.now,
         preparedPage,
+        () => manager.markAudioReady(roomId),
       );
     },
     {
@@ -903,7 +950,7 @@ app.whenReady().then(async () => {
       return undefined;
     },
     {
-      defaultIntervalMinutes: monitoringSettings.preparedCheckMinutes ?? 5,
+      defaultIntervalMinutes: monitoringSettings.preparedCheckMinutes,
       maxConcurrency: 1,
       jitterRatio: 0.2,
       manualCooldownMs: 60_000,
@@ -943,7 +990,7 @@ app.whenReady().then(async () => {
   }
   const reschedulePreparedRooms = async () => {
     probeScheduler.setDefaultIntervalMinutes(
-      monitoringSettings.preparedCheckMinutes ?? 5,
+      monitoringSettings.preparedCheckMinutes,
     );
     const active = database.groupRuns.active();
     if (active?.status === "running")
@@ -1091,9 +1138,8 @@ app.whenReady().then(async () => {
         {
           featureKey: "connection_test",
           usageKind: "test",
-          apiKind: "paraformer_realtime",
-          requestedModel:
-            parsed.type === "bailian" ? parsed.model : "generic-asr",
+          apiKind: "asr_realtime",
+          requestedModel: parsed.model,
           region: "cn-beijing",
         },
       ).testConnection();
@@ -1180,13 +1226,14 @@ app.whenReady().then(async () => {
       : undefined;
     return createLlmProvider(
       parsed,
+      parsed.analysisModel,
       typeof secret === "string" && secret ? secret : stored,
       aiUsageGateway,
       {
         featureKey: "connection_test",
         usageKind: "test",
         apiKind: "chat_completions",
-        requestedModel: parsed.model,
+        requestedModel: parsed.analysisModel,
         region: "cn-beijing",
         thinkingEnabled: false,
       },
@@ -1393,20 +1440,197 @@ app.whenReady().then(async () => {
     parsers: database.parsers.listImmutable(),
     llmConfigured: Boolean(await settings.getLlmConfig()),
   });
+  const analyzerTestPasses = new AnalyzerTestPassStore();
   ipcMain.handle("parsers:list-immutable", parserSnapshot);
-  ipcMain.handle("parsers:create-immutable", async (_event, spec) => {
-    database.parsers.createImmutable(ParserSpecSchema.parse(spec));
-    return parserSnapshot();
-  });
-  ipcMain.handle("parsers:copy-immutable", async (_event, parserId, spec) => {
-    database.parsers.copyImmutable(
-      z.string().min(1).parse(parserId),
-      ParserSpecSchema.parse(spec),
+  ipcMain.handle("parsers:agent-discuss", async (_event, request) => {
+    const parsed = AnalyzerAgentRequestSchema.parse(request);
+    const config = await settings.getLlmConfig();
+    if (!config) throw new Error("LLM_NOT_CONFIGURED");
+    const secret = config.secretId
+      ? await settings.getSecret(config.secretId)
+      : undefined;
+    const provider = createLlmProvider(
+      config,
+      config.agentModel,
+      secret,
+      aiUsageGateway,
+      {
+        featureKey: "analyzer_agent",
+        usageKind: "production",
+        apiKind: "chat_completions",
+        requestedModel: config.agentModel,
+        region: "cn-beijing",
+        thinkingEnabled: false,
+      },
     );
-    return parserSnapshot();
+    const completion = await provider.complete({
+      system: ANALYZER_AGENT_SYSTEM_PROMPT,
+      user: JSON.stringify({ conversation: parsed.messages }),
+      temperature: 0.1,
+    });
+    const response = AnalyzerAgentResponseSchema.safeParse(completion.output);
+    if (!response.success) {
+      completion.metering.markBusinessOutputInvalid?.();
+      throw new Error("ANALYZER_AGENT_RESPONSE_INVALID");
+    }
+    return AnalyzerAgentResponseSchema.parse(sanitizeAnalyzerAgentResponse(response.data));
   });
-  ipcMain.handle("parsers:remove-immutable", async (_event, parserId) => {
-    database.parsers.removeImmutable(z.string().min(1).parse(parserId));
+  let analyzerSampleCapture: { roomId: string; owned: boolean } | undefined;
+  const stopAnalyzerSampleCapture = async (requestedRoomId?: string) => {
+    if (
+      !analyzerSampleCapture ||
+      (requestedRoomId && analyzerSampleCapture.roomId !== requestedRoomId)
+    ) return;
+    const capture = analyzerSampleCapture;
+    analyzerSampleCapture = undefined;
+    if (capture.owned) {
+      const latestRoom = (await rooms.list()).find(
+        (item) => item.roomId === capture.roomId,
+      );
+      if (!latestRoom?.monitoring) await manager.stopMonitoring(capture.roomId);
+    }
+  };
+  const listAnalyzerSamples = async () => {
+    const roomList = await database.rooms.list();
+    const snapshotByRoom = new Map(
+      database.snapshots.list().map((item) => [item.roomId, item]),
+    );
+    const runtimeByRoom = new Map(
+      manager.snapshot().map((item) => [item.roomId, item]),
+    );
+    const samples = roomList.flatMap((room) => {
+      const snapshot = snapshotByRoom.get(room.roomId);
+      const runtime = runtimeByRoom.get(room.roomId);
+      const page = database.asr.listBefore(room.roomId, { limit: 100 });
+      const liveText = runtime?.asr.filter((event) => event.text.trim()) ?? [];
+      const effectiveStatus = runtime && !["idle", "stopped"].includes(runtime.state)
+        ? runtime.liveStatus
+        : snapshot?.status;
+      const status =
+        effectiveStatus === "live"
+          ? "live"
+          : effectiveStatus === "offline"
+            ? "offline"
+            : effectiveStatus === "checking"
+              ? "checking"
+              : "unavailable";
+      const captureState = page.items.length > 0 || liveText.length > 0
+        ? "text_ready" as const
+        : runtime?.audioReady
+          ? "audio_ready" as const
+          : runtime?.state === "starting" || runtime?.state === "monitoring"
+            ? "connecting" as const
+            : status === "checking"
+              ? "checking" as const
+              : "idle" as const;
+      return [{
+        roomId: room.roomId,
+        label:
+          snapshot?.anchorName ??
+          snapshot?.title ??
+          `直播间 ${room.roomId}`,
+        status,
+        source:
+          page.items.length > 0
+            ? "history" as const
+            : status === "live" || captureState === "audio_ready" || captureState === "connecting"
+              ? "live_waiting" as const
+              : "no_asr" as const,
+        captureState,
+        asrCount: page.items.length || liveText.length,
+        ...((page.items.at(-1)?.occurredAt ?? liveText.at(-1)?.occurredAt)
+          ? { lastAsrAt: (page.items.at(-1)?.occurredAt ?? liveText.at(-1)!.occurredAt)! }
+          : {}),
+      }];
+    }).sort((left, right) => {
+      if (left.source !== right.source) {
+        const rank = { history: 0, live_waiting: 1, no_asr: 2 } as const;
+        return rank[left.source] - rank[right.source];
+      }
+      return (right.lastAsrAt ?? "").localeCompare(left.lastAsrAt ?? "");
+    });
+    return AnalyzerSampleListSchema.parse({ samples });
+  };
+  ipcMain.handle("parsers:list-samples", listAnalyzerSamples);
+  ipcMain.handle("parsers:prepare-sample", async (_event, requestedRoomId) => {
+    const roomId = z.string().min(1).parse(requestedRoomId);
+    const room = (await rooms.list()).find((item) => item.roomId === roomId);
+    if (!room) throw new Error("ROOM_NOT_FOUND");
+    if (analyzerSampleCapture?.roomId !== roomId)
+      await stopAnalyzerSampleCapture();
+
+    try {
+      await probeScheduler.runNow(roomId, "manual");
+    } catch (error) {
+      if (!(error instanceof Error && error.message === "PROBE_COOLDOWN"))
+        throw error;
+    }
+    const latestStatus = database.snapshots
+      .list()
+      .find((item) => item.roomId === roomId)?.status;
+    if (latestStatus === "live") {
+      const latestRoom = (await rooms.list()).find((item) => item.roomId === roomId)!;
+      const runtime = manager.snapshot().find((item) => item.roomId === roomId);
+      const alreadyCapturing = runtime?.state === "starting" || runtime?.state === "monitoring";
+      if (!alreadyCapturing) await manager.startMonitoring(roomId);
+      analyzerSampleCapture = { roomId, owned: !latestRoom.monitoring };
+    }
+    return listAnalyzerSamples();
+  });
+  ipcMain.handle("parsers:stop-sample-capture", async (_event, requestedRoomId) => {
+    const roomId = requestedRoomId === undefined
+      ? undefined
+      : z.string().min(1).parse(requestedRoomId);
+    await stopAnalyzerSampleCapture(roomId);
+    return listAnalyzerSamples();
+  });
+  ipcMain.handle("parsers:test-draft", async (_event, request) => {
+    const parsed = AnalyzerDraftTestRequestSchema.parse(request);
+    const room = (await database.rooms.list()).find(
+      (item) => item.roomId === parsed.roomId,
+    );
+    if (!room) throw new Error("ROOM_NOT_FOUND");
+    const stored = database.asr.listBefore(parsed.roomId, { limit: 100 }).items;
+    const hot = manager.snapshot().find((item) => item.roomId === parsed.roomId)?.asr ?? [];
+    const available = mergeAnalyzerSampleEvents(stored, hot);
+    const events = selectAnalyzerSample(available, 6_000);
+    if (!events.length) throw new Error("ANALYZER_SAMPLE_EMPTY");
+    const config = await settings.getLlmConfig();
+    if (!config) throw new Error("LLM_NOT_CONFIGURED");
+    const secret = config.secretId
+      ? await settings.getSecret(config.secretId)
+      : undefined;
+    const result = await new AnalyzerDraftEngine(
+      createLlmProvider(
+        config,
+        config.analysisModel,
+        secret,
+        aiUsageGateway,
+        {
+          featureKey: "analyzer_sample_test",
+          usageKind: "test",
+          apiKind: "chat_completions",
+          requestedModel: config.analysisModel,
+          region: "cn-beijing",
+          thinkingEnabled: false,
+          roomId: parsed.roomId,
+        },
+      ),
+    ).test(parsed.roomId, parsed.draft, events);
+    if (result.status !== "passed") return result;
+    const testToken = analyzerTestPasses.issue(parsed.draft, parsed.roomId);
+    return { ...result, testToken };
+  });
+  ipcMain.handle("parsers:publish-tested", async (_event, request) => {
+    const parsed = AnalyzerPublishRequestSchema.parse(request);
+    analyzerTestPasses.consume(parsed.testToken, parsed.draft);
+    database.parsers.replaceSystemAnalyzer(
+      ParserSpecV4Schema.parse({
+        schemaVersion: 4,
+        name: parsed.draft.name,
+        definition: parsed.draft,
+      }),
+    );
     return parserSnapshot();
   });
   ipcMain.handle("insights:list", (_event, options) =>
@@ -1418,6 +1642,15 @@ app.whenReady().then(async () => {
           beforeId: z.number().int().positive().optional(),
         })
         .parse(options),
+    ),
+  );
+  ipcMain.handle("content-records:list", (_event, options) =>
+    database.contentRecords.list(
+      z.object({
+        roomId: z.string().min(1).optional(),
+        limit: z.number().int().min(1).max(100),
+        beforeId: z.number().int().positive().optional(),
+      }).parse(options),
     ),
   );
   ipcMain.handle("rooms:probe", (_event, requestedRoomId) => {

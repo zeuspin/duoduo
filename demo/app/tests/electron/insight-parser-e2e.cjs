@@ -16,7 +16,7 @@ async function listen(server) { await new Promise((done) => server.listen(0, "12
     });
   });
   const port = await listen(llm); const userData = await mkdtemp(join(tmpdir(), "duoduo-insight-e2e-")); const now = new Date().toISOString();
-  await writeFile(join(userData, "rooms.json"), JSON.stringify([{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, probeIntervalMinutes: 30, monitoring: false, createdAt: now, updatedAt: now }]));
+  await writeFile(join(userData, "rooms.json"), JSON.stringify([{ roomId: "123", canonicalUrl: "https://live.douyin.com/123", schedule: null, monitoring: false, createdAt: now, updatedAt: now }]));
   await writeFile(join(userData, "settings.json"), JSON.stringify({ llmProvider: { type: "openai-compatible", endpoint: `http://127.0.0.1:${port}/v1/chat/completions`, model: "fixture-market", auth: "none" }, secrets: {} }));
   await mkdir(resolve("reports"), { recursive: true }); const report = resolve("reports/insight-parser-e2e.json"); const screenshot = resolve("reports/insight-parser-e2e.png");
   const executable = resolve("node_modules/electron/dist/Electron.app/Contents/MacOS/Electron"); await access(executable);

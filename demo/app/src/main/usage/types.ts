@@ -1,13 +1,13 @@
 export type PricingInput =
   | { apiKind: "chat_completions"; model: string; region: "cn-beijing"; thinkingEnabled: boolean; promptTokens: number; completionTokens: number }
-  | { apiKind: "paraformer_realtime"; model: string; region: "cn-beijing"; billingDurationSeconds: number };
+  | { apiKind: "asr_realtime"; model: string; region: "cn-beijing"; billingDurationSeconds: number };
 
 export type PricingResult =
   | { status: "calculated"; ruleKey: string; inputCostMicros: number; outputCostMicros: number; totalCostMicros: number; currency: "CNY" }
   | { status: "price_missing" };
 
 export type AiUsageKind = "production" | "test";
-export type AiApiKind = "chat_completions" | "paraformer_realtime";
+export type AiApiKind = "chat_completions" | "asr_realtime";
 export type AiCallStatus = "running" | "succeeded" | "http_failed" | "provider_failed" | "timed_out" | "cancelled" | "interrupted" | "business_output_invalid";
 
 export interface AiCallContext {

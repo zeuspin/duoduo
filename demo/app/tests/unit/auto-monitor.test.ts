@@ -6,7 +6,6 @@ const room = (autoMonitorOnLive: boolean): Room => ({
   roomId: "123",
   canonicalUrl: "https://live.douyin.com/123",
   schedule: null,
-  probeIntervalMinutes: null,
   monitoring: false,
   autoMonitorOnLive,
   groupId: "default",

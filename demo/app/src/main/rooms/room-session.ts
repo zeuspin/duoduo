@@ -42,6 +42,7 @@ export class RoomSession implements MonitorSession {
     metricSampleIntervalMs = 300_000,
     now: () => number = Date.now,
     private preparedPage?: PreparedRoomPage,
+    private readonly onAudio?: () => void,
   ) {
     this.metricSampler = new RoomMetricSampler({ intervalMs: metricSampleIntervalMs, now });
   }
@@ -119,7 +120,13 @@ export class RoomSession implements MonitorSession {
     this.asr = await this.provider.open(this.roomId);
     this.asr.subscribe(this.onAsr);
     this.asr.subscribeFailure?.((error) => this.fail(error));
-    this.unregisterCapture = this.captureRouter.register(this.captureToken, this.window.webContents.id, (bytes) => this.asr?.write({ bytes, sampleRate: 16000, channels: 1, encoding: "pcm_s16le" }), () => this.fail(new Error("AUDIO_TRACK_ENDED")));
+    this.unregisterCapture = this.captureRouter.register(
+      this.captureToken,
+      this.window.webContents.id,
+      (bytes) => this.asr?.write({ bytes, sampleRate: 16000, channels: 1, encoding: "pcm_s16le" }),
+      () => this.fail(new Error("AUDIO_TRACK_ENDED")),
+      this.onAudio,
+    );
     await evaluateNow(this.window.webContents, START_PAGE_CAPTURE_SCRIPT);
     this.startHealthChecks();
   }

@@ -62,7 +62,6 @@ beforeEach(() => {
                 canonicalUrl: "https://live.douyin.com/123",
                 groupId: "group-a",
                 schedule: null,
-                probeIntervalMinutes: null,
                 monitoring: false,
                 autoMonitorOnLive: false,
                 createdAt: "2026-07-12T00:00:00.000Z",
@@ -185,6 +184,11 @@ beforeEach(() => {
         setBounds: vi.fn(),
         subscribe: vi.fn(() => () => undefined),
       },
+      llm: {
+        get: vi.fn().mockResolvedValue(undefined),
+        save: vi.fn(),
+        test: vi.fn(),
+      },
       parsers: {
         list: vi
           .fn()
@@ -224,7 +228,6 @@ describe("room form", () => {
           canonicalUrl: "https://live.douyin.com/123",
           groupId: "group-a",
           schedule: null,
-          probeIntervalMinutes: null,
           monitoring: false,
           autoMonitorOnLive: false,
           createdAt: "2026-07-12T00:00:00.000Z",
@@ -310,7 +313,6 @@ describe("room form", () => {
           canonicalUrl: "https://live.douyin.com/123",
           groupId: "group-a",
           schedule: null,
-          probeIntervalMinutes: null,
           monitoring: false,
           autoMonitorOnLive: false,
           createdAt: "2026-07-12T00:00:00.000Z",
@@ -529,7 +531,6 @@ describe("room form", () => {
           canonicalUrl: "https://live.douyin.com/123",
           groupId: "group-a",
           schedule: null,
-          probeIntervalMinutes: null,
           monitoring: false,
           createdAt: "2026-07-12T00:00:00.000Z",
           updatedAt: "2026-07-12T00:00:00.000Z",
@@ -568,7 +569,6 @@ describe("room form", () => {
           canonicalUrl: "https://live.douyin.com/123",
           groupId: "group-a",
           schedule: null,
-          probeIntervalMinutes: null,
           monitoring: true,
           autoMonitorOnLive: false,
           createdAt: "2026-07-12T00:00:00.000Z",
@@ -621,7 +621,6 @@ describe("room form", () => {
           canonicalUrl: "https://live.douyin.com/123",
           groupId: "group-a",
           schedule: null,
-          probeIntervalMinutes: null,
           monitoring: true,
           autoMonitorOnLive: false,
           createdAt: "2026-07-12T00:00:00.000Z",
@@ -661,7 +660,6 @@ describe("room form", () => {
           canonicalUrl: "https://live.douyin.com/123",
           groupId: "group-a",
           schedule: null,
-          probeIntervalMinutes: null,
           monitoring: true,
           autoMonitorOnLive: false,
           createdAt: "2026-07-12T00:00:00.000Z",
@@ -778,9 +776,6 @@ describe("room form", () => {
     expect(
       ((await screen.findByLabelText("直播时间")) as HTMLSelectElement).value,
     ).toBe("uncertain");
-    expect(
-      (screen.getByLabelText("检查开播状态频率") as HTMLSelectElement).value,
-    ).toBe("default");
   });
 
   it("adds a room to the currently viewed group instead of the first group", async () => {
@@ -919,6 +914,7 @@ describe("room form", () => {
       });
     render(<App />);
     fireEvent.click(screen.getByText("系统设置"));
+    fireEvent.click(await screen.findByRole("button", { name: /提醒通知/ }));
     const timeout = await screen.findByLabelText("新观点提醒自动关闭");
     expect((timeout as HTMLSelectElement).value).toBe("30");
     fireEvent.change(timeout, { target: { value: "60" } });
@@ -933,7 +929,11 @@ describe("room form", () => {
 
   it("saves monitored and prepared room intervals from monitoring settings", async () => {
     render(<App />);
-    fireEvent.click(screen.getByText("监看设置"));
+    fireEvent.click(screen.getByText("系统设置"));
+    fireEvent.click(
+      within(await screen.findByRole("navigation", { name: "设置分类" }))
+        .getByRole("button", { name: /直播监看/ }),
+    );
     fireEvent.change(await screen.findByLabelText("直播状态更新速度"), {
       target: { value: "15" },
     });
@@ -1028,7 +1028,6 @@ describe("room form", () => {
           canonicalUrl: "https://live.douyin.com/123",
           groupId: "group-a",
           schedule: null,
-          probeIntervalMinutes: null,
           monitoring: false,
           createdAt: "2026-07-12T00:00:00.000Z",
           updatedAt: "2026-07-12T00:00:00.000Z",

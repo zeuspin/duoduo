@@ -4,15 +4,27 @@ import { floatToPcm16, resampleMono } from "./pcm";
 type Listener = (pcm: Buffer) => void | Promise<void>;
 
 export class CaptureRouter {
-  private readonly routes = new Map<string, { senderId: number; listener: Listener; onEnded?: () => void }>();
+  private readonly routes = new Map<string, {
+    senderId: number;
+    listener: Listener;
+    onEnded?: () => void;
+    onAudio?: () => void;
+    audioReceived: boolean;
+  }>();
 
   constructor() {
     ipcMain.on("room-capture:audio", (event, payload) => this.handleAudio(event, payload));
     ipcMain.on("room-capture:ended", (event, payload) => this.handleEnded(event, payload));
   }
 
-  register(token: string, senderId: number, listener: Listener, onEnded?: () => void): () => void {
-    this.routes.set(token, { senderId, listener, onEnded });
+  register(
+    token: string,
+    senderId: number,
+    listener: Listener,
+    onEnded?: () => void,
+    onAudio?: () => void,
+  ): () => void {
+    this.routes.set(token, { senderId, listener, onEnded, onAudio, audioReceived: false });
     return () => this.routes.delete(token);
   }
 
@@ -28,6 +40,10 @@ export class CaptureRouter {
     if (!input || ![16000, 32000, 44100, 48000].includes(sampleRate)) return;
     try {
       const normalized = sampleRate === 16000 ? input : resampleMono(input, sampleRate, 16000);
+      if (!route.audioReceived) {
+        route.audioReceived = true;
+        route.onAudio?.();
+      }
       void route.listener(floatToPcm16(normalized));
     } catch { /* Drop malformed chunks without affecting other rooms. */ }
   }

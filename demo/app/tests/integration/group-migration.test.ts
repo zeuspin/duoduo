@@ -17,7 +17,7 @@ const parserSpec = (name: string) =>
   });
 
 describe("group migration", () => {
-  it("splits 19 legacy rooms, clears monitoring, and never infers group parsers from room bindings", async () => {
+  it("splits 19 legacy rooms, clears monitoring and legacy analyzers, and never infers group parsers", async () => {
     const directory = await mkdtemp(join(tmpdir(), "duoduo-group-migration-"));
     const path = join(directory, "duoduo.sqlite");
     const legacy = new DatabaseSync(path);
@@ -72,7 +72,7 @@ describe("group migration", () => {
       ).toBe(true);
       expect(
         database.parsers.listImmutable().map((parser) => parser.id),
-      ).toEqual(expect.arrayContaining(["a", "b"]));
+      ).toEqual(["market-insight"]);
       expect(database.parsers.getForRoom("100")).toBeUndefined();
       expect(database.parsers.getForRoom("109")).toBeUndefined();
     } finally {
