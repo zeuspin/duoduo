@@ -47,6 +47,7 @@ export interface CurrentRoomEvidence extends ProbeEvidence {
   currentTime: number;
   paused: boolean;
   audioTrackState?: string;
+  captureVideoConnected?: boolean;
   viewerCount?: number;
   followerCount?: number;
   totalViewerCount?: number;
@@ -480,14 +481,14 @@ export function classifyProbe(evidence: ProbeEvidence): LiveStatus {
 
 export function classifyCurrentHealth(evidence: CurrentRoomEvidence, previousTime: number | undefined): "live" | "offline" | "unknown" {
   if (/直播已结束|暂未开播|休息中|已下播/.test(evidence.text)) return "offline";
-  if (evidence.audioTrackState === "ended") return "offline";
   if (evidence.hasVideo && evidence.videoReadyState >= 2 && !evidence.paused && evidence.audioTrackState === "live" && previousTime !== undefined && evidence.currentTime > previousTime + 0.1) return "live";
   return "unknown";
 }
 
 export async function inspectCurrentRoom(webContents: ProbeWebContents): Promise<CurrentRoomEvidence> {
   const evidence = await evaluateNow<CurrentRoomEvidence>(webContents, `(() => {
-    const video = document.querySelector('video');
+    const video = window.__duoduoCaptureVideo?.isConnected ? window.__duoduoCaptureVideo
+      : [...document.querySelectorAll('video')].find((item) => !item.paused && item.readyState >= 2) || document.querySelector('video');
     const track = window.__duoduoCaptureStream?.getAudioTracks?.()[0];
     const metricCandidates = Array.from(document.querySelectorAll('[aria-label],[title],[data-e2e="live-room-audience"],[data-e2e*="fans" i],[data-e2e*="viewer" i],[data-e2e*="like" i]')).slice(0, 100).flatMap((item) => {
       const values = [item.getAttribute('aria-label'), item.getAttribute('title'), item.textContent].filter((value) => typeof value === 'string' && value.trim()).map((value) => value.trim().slice(0, 160));
@@ -496,7 +497,7 @@ export async function inspectCurrentRoom(webContents: ProbeWebContents): Promise
     const audience = document.querySelector('[data-e2e="live-room-audience"]')?.textContent?.trim();
     if (audience) metricCandidates.push({ text: '在线 ' + audience, source: 'accessibility' });
     ${profileCandidateDiagnosticsExpression()}
-    return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, currentTime: video?.currentTime ?? 0, paused: video?.paused ?? true, audioTrackState: track?.readyState, text: document.body?.innerText?.slice(0, 20000) ?? '', metricCandidates, profileTrigger: Boolean(document.querySelector('[data-e2e="rooom-info-bar-anchor"],[data-e2e="room-info-bar-anchor"]')), profileCandidateDiagnostics, profilePageDiagnostics };
+    return { hasVideo: Boolean(video), videoReadyState: video?.readyState ?? 0, currentTime: video?.currentTime ?? 0, paused: video?.paused ?? true, audioTrackState: track?.readyState, captureVideoConnected: window.__duoduoCaptureVideo?.isConnected, text: document.body?.innerText?.slice(0, 20000) ?? '', metricCandidates, profileTrigger: Boolean(document.querySelector('[data-e2e="rooom-info-bar-anchor"],[data-e2e="room-info-bar-anchor"]')), profileCandidateDiagnostics, profilePageDiagnostics };
   })()`);
   const profile = evidence.profileTrigger ? await inspectProfileCard(webContents) : { status: "trigger_missing" as const };
   const metrics = extractRoomMetrics({ bodyText: [evidence.text, profile?.text].filter(Boolean).join("\n"), candidates: evidence.metricCandidates ?? [] });

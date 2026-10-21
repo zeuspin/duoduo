@@ -19,6 +19,7 @@ interface Options {
   endpoint?: string;
   meter?: (roomId: string, taskId: string) => AsrUsageMeter;
   responseTimeoutMs?: number;
+  connectionTimeoutMs?: number;
 }
 type SocketFactory = (endpoint: string, headers: Record<string, string>) => SocketLike;
 
@@ -36,19 +37,16 @@ export class BailianProvider implements AsrProvider {
     return { ok: true, message: "百炼连接成功", latencyMs: Date.now() - startedAt };
   }
 
-  open(roomId: string): Promise<AsrSession> {
-    return this.openSession(roomId);
+  open(roomId: string, signal?: AbortSignal): Promise<AsrSession> {
+    return this.openSession(roomId, signal);
   }
 
-  private openSession(roomId: string): Promise<BailianSession> {
+  private openSession(roomId: string, signal?: AbortSignal): Promise<BailianSession> {
+    if (signal?.aborted) return Promise.reject(new Error("ASR_OPEN_ABORTED"));
     const socket = this.socketFactory(this.options.endpoint ?? DEFAULT_ENDPOINT, { Authorization: `Bearer ${this.options.apiKey}`, "User-Agent": "duoduo-live/0.1" });
     const taskId = randomUUID();
     return new Promise((resolve, reject) => {
       let settled = false;
-      socket.on("error", (error: unknown) => {
-        if (!settled) reject(redact(error, this.options.apiKey));
-      });
-      socket.on("open", () => socket.send(JSON.stringify(runTask(taskId, this.options.model))));
       const session = new BailianSession(
         roomId,
         taskId,
@@ -56,14 +54,28 @@ export class BailianProvider implements AsrProvider {
         this.options.meter?.(roomId, taskId),
         this.options.responseTimeoutMs,
       );
+      const cleanup = () => { clearTimeout(timer); signal?.removeEventListener("abort", onAbort); };
+      const failOpening = (error: Error) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        session.recordFailure(error.message);
+        session.abort();
+        reject(error);
+      };
+      const onAbort = () => failOpening(new Error("ASR_OPEN_ABORTED"));
+      const timer = setTimeout(() => failOpening(new Error("BAILIAN_OPEN_TIMEOUT")), this.options.connectionTimeoutMs ?? 30_000);
+      timer.unref?.();
+      signal?.addEventListener("abort", onAbort, { once: true });
+      socket.on("error", (error: unknown) => failOpening(redact(error, this.options.apiKey)));
+      socket.on("close", () => failOpening(new Error("BAILIAN_SOCKET_CLOSED")));
+      socket.on("open", () => { if (!settled) socket.send(JSON.stringify(runTask(taskId, this.options.model))); });
       socket.on("message", (data: Buffer | string) => {
         const message = parseMessage(data);
         if (!message || message.header?.task_id !== taskId) return;
-        if (message.header.event === "task-started" && !settled) { settled = true; resolve(session); }
+        if (message.header.event === "task-started" && !settled) { settled = true; cleanup(); resolve(session); }
         if (message.header.event === "task-failed" && !settled) {
-          settled = true;
-          session.recordFailure(String(message.header.error_code ?? "BAILIAN_TASK_FAILED"));
-          reject(new Error(`BAILIAN_TASK_FAILED: ${String(message.header.error_message ?? "unknown")}`));
+          failOpening(redact(new Error(`BAILIAN_TASK_FAILED: ${String(message.header.error_message ?? "unknown")}`), this.options.apiKey));
         }
       });
     });

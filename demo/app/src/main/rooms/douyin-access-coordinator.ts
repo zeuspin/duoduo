@@ -13,6 +13,7 @@ interface CoordinatorOptions {
   cooldownMs?: number;
   minimumGapMs?: number;
   automaticBudgetPerHour?: number;
+  recoveryBudgetPerHour?: number;
   sleep?: (ms: number) => Promise<void>;
   persistState?: (state: DouyinAccessState) => void | Promise<void>;
 }
@@ -39,6 +40,7 @@ export class DouyinAccessCoordinator {
   private readonly cooldownMs: number;
   private readonly minimumGapMs: number;
   private readonly automaticBudgetPerHour: number;
+  private readonly recoveryBudgetPerHour: number;
   private readonly sleep: (ms: number) => Promise<void>;
   private readonly persistState?: CoordinatorOptions["persistState"];
   private readonly listeners = new Set<(state: DouyinAccessState) => void>();
@@ -52,6 +54,7 @@ export class DouyinAccessCoordinator {
   private stopped = false;
   private lastNavigationStartedAt: number | undefined;
   private automaticStarts: number[] = [];
+  private recoveryStarts: number[] = [];
 
   constructor(options: CoordinatorOptions = {}) {
     const initialState = options.initialState ?? { mode: "normal" };
@@ -62,6 +65,7 @@ export class DouyinAccessCoordinator {
     this.cooldownMs = options.cooldownMs ?? 60_000;
     this.minimumGapMs = options.minimumGapMs ?? 0;
     this.automaticBudgetPerHour = options.automaticBudgetPerHour ?? Number.POSITIVE_INFINITY;
+    this.recoveryBudgetPerHour = options.recoveryBudgetPerHour ?? this.automaticBudgetPerHour;
     this.sleep = options.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
     this.persistState = options.persistState;
   }
@@ -79,7 +83,7 @@ export class DouyinAccessCoordinator {
     });
     this.tasks.set(key, promise);
     this.drain();
-    if ((task.traffic ?? "interactive") === "interactive" && (this.activeTask?.traffic ?? "interactive") === "automatic") this.interruptPacing?.();
+    if (this.activeTask && this.compareTasks(task, this.activeTask) < 0) this.interruptPacing?.();
     return promise;
   }
 
@@ -143,6 +147,7 @@ export class DouyinAccessCoordinator {
 
   private drain(): void {
     if (this.active || this.stopped || this.state.mode !== "normal") return;
+    this.pending.sort((left, right) => this.compareTasks(left, right));
     const task = this.pending.shift();
     if (!task) return;
     this.active = true;
@@ -154,9 +159,14 @@ export class DouyinAccessCoordinator {
     });
   }
 
+  private compareTasks(left: AccessTask<unknown>, right: AccessTask<unknown>): number {
+    // A task waiting for an exhausted budget must not block the other pool.
+    return this.pacingDelay(left) - this.pacingDelay(right) || priority[left.type] - priority[right.type];
+  }
+
   private async execute(task: QueuedTask): Promise<void> {
     try {
-      const delay = this.pacingDelay(task.traffic ?? "interactive");
+      const delay = this.pacingDelay(task);
       if (delay > 0) {
         let interrupted = false;
         const interruption = new Promise<void>((resolve) => {
@@ -176,7 +186,9 @@ export class DouyinAccessCoordinator {
       if (this.state.mode !== "normal") throw new Error("ACCESS_CANCELED_BY_VERIFICATION");
       const startedAt = this.now();
       this.lastNavigationStartedAt = startedAt;
-      if ((task.traffic ?? "interactive") === "automatic") this.automaticStarts.push(startedAt);
+      if ((task.traffic ?? "interactive") === "automatic") {
+        (task.type === "monitor_reconnect" ? this.recoveryStarts : this.automaticStarts).push(startedAt);
+      }
       if (task.type === "manual_probe" || task.type === "avatar_refresh") this.cooldowns.set(task.key, startedAt);
       const { value, verificationRequired, protectionReason } = await task.run();
       if (verificationRequired || protectionReason) this.pauseForVerification(task, protectionReason ?? "verification_required");
@@ -188,13 +200,17 @@ export class DouyinAccessCoordinator {
     }
   }
 
-  private pacingDelay(traffic: "interactive" | "automatic"): number {
+  private pacingDelay(task: AccessTask<unknown>): number {
     const now = this.now();
     const hourAgo = now - 3_600_000;
     this.automaticStarts = this.automaticStarts.filter((startedAt) => startedAt > hourAgo);
+    this.recoveryStarts = this.recoveryStarts.filter((startedAt) => startedAt > hourAgo);
+    const reconnect = task.type === "monitor_reconnect";
+    const starts = reconnect ? this.recoveryStarts : this.automaticStarts;
+    const budget = reconnect ? this.recoveryBudgetPerHour : this.automaticBudgetPerHour;
     const gapDeadline = this.lastNavigationStartedAt === undefined ? now : this.lastNavigationStartedAt + this.minimumGapMs;
-    const budgetDeadline = traffic === "automatic" && this.automaticStarts.length >= this.automaticBudgetPerHour
-      ? this.automaticStarts[0] + 3_600_000
+    const budgetDeadline = (task.traffic ?? "interactive") === "automatic" && starts.length >= budget
+      ? starts[0] + 3_600_000
       : now;
     return Math.max(0, gapDeadline, budgetDeadline) - now;
   }

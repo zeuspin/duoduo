@@ -2,6 +2,56 @@ import { describe, expect, it, vi } from "vitest";
 import { DouyinAccessCoordinator } from "../../src/main/rooms/douyin-access-coordinator";
 
 describe("DouyinAccessCoordinator", () => {
+  it("uses a reserved reconnect budget after scheduled probes exhaust their budget", async () => {
+    let now = 0;
+    const waits: number[] = [];
+    const starts: string[] = [];
+    const coordinator = new DouyinAccessCoordinator({
+      now: () => now, minimumGapMs: 60_000, automaticBudgetPerHour: 1, recoveryBudgetPerHour: 1,
+      sleep: async (ms) => { waits.push(ms); now += ms; },
+    });
+    const run = (name: string) => async () => { starts.push(name); return { value: now }; };
+    await coordinator.submit({ roomId: "probe", type: "startup_probe", traffic: "automatic", run: run("probe") });
+    await expect(coordinator.submit({ roomId: "live", type: "monitor_reconnect", traffic: "automatic", run: run("reconnect") })).resolves.toBe(60_000);
+    await expect(coordinator.submit({ roomId: "live-2", type: "monitor_reconnect", traffic: "automatic", run: run("reconnect-2") })).resolves.toBe(3_660_000);
+    expect(starts).toEqual(["probe", "reconnect", "reconnect-2"]);
+    expect(waits).toEqual([60_000, 3_600_000]);
+  });
+
+  it("lets recovery interrupt a probe waiting for its hourly budget", async () => {
+    const coordinator = new DouyinAccessCoordinator({
+      automaticBudgetPerHour: 1, recoveryBudgetPerHour: 1,
+      sleep: () => new Promise<void>(() => undefined),
+    });
+    await coordinator.submit({ roomId: "probe-a", type: "startup_probe", traffic: "automatic", run: async () => ({ value: true }) });
+    const probeRun = vi.fn(async () => ({ value: true }));
+    const waiting = coordinator.submit({ roomId: "probe-b", type: "startup_probe", traffic: "automatic", run: probeRun });
+    const recovered = vi.fn();
+    void coordinator.submit({ roomId: "live", type: "monitor_reconnect", traffic: "automatic", run: async () => ({ value: "restored" }) }).then(recovered);
+    await vi.waitFor(() => expect(recovered).toHaveBeenCalledWith("restored"));
+    expect(probeRun).not.toHaveBeenCalled();
+    const canceled = expect(waiting).rejects.toThrow("ACCESS_ROOM_CANCELED");
+    coordinator.cancelRoom("probe-b");
+    await canceled;
+    await coordinator.stop();
+  });
+
+  it("continues ordinary probes when the recovery reserve is exhausted", async () => {
+    const coordinator = new DouyinAccessCoordinator({
+      automaticBudgetPerHour: 30, recoveryBudgetPerHour: 1,
+      sleep: () => new Promise<void>(() => undefined),
+    });
+    await coordinator.submit({ roomId: "live-a", type: "monitor_reconnect", traffic: "automatic", run: async () => ({ value: true }) });
+    const waiting = coordinator.submit({ roomId: "live-b", type: "monitor_reconnect", traffic: "automatic", run: async () => ({ value: true }) });
+    const completed = vi.fn();
+    void coordinator.submit({ roomId: "probe", type: "startup_probe", traffic: "automatic", run: async () => ({ value: "checked" }) }).then(completed);
+    await vi.waitFor(() => expect(completed).toHaveBeenCalledWith("checked"));
+    const canceled = expect(waiting).rejects.toThrow("ACCESS_ROOM_CANCELED");
+    coordinator.cancelRoom("live-b");
+    await canceled;
+    await coordinator.stop();
+  });
+
   it("restores an interrupted recovery check as verification paused", () => {
     const coordinator = new DouyinAccessCoordinator({
       initialState: {

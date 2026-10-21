@@ -309,6 +309,9 @@ app.whenReady().then(async () => {
     minimumGapMs: process.env.DUODUO_FIXTURE_ORIGIN ? 0 : 60_000,
     automaticBudgetPerHour: process.env.DUODUO_FIXTURE_ORIGIN
       ? Number.POSITIVE_INFINITY
+      : 30,
+    recoveryBudgetPerHour: process.env.DUODUO_FIXTURE_ORIGIN
+      ? Number.POSITIVE_INFINITY
       : 10,
     persistState: (state) => settings.saveDouyinAccessState(state),
   });
@@ -589,8 +592,13 @@ app.whenReady().then(async () => {
       const taskType =
         reason === "user_start" ? "monitor_start" : "monitor_reconnect";
       const traffic = reason === "user_start" ? "interactive" : "automatic";
-      const navigationGate: RoomNavigationGate = (run) =>
-        coordinator.submit({ roomId, type: taskType, traffic, run });
+      const navigationGate: RoomNavigationGate = async (run) => {
+        if (signal.aborted) throw new Error("ROOM_START_ABORTED");
+        const cancel = () => coordinator.cancelRoom(roomId);
+        signal.addEventListener("abort", cancel, { once: true });
+        try { return await coordinator.submit({ roomId, type: taskType, traffic, run }); }
+        finally { signal.removeEventListener("abort", cancel); }
+      };
       const preparedPage =
         reason === "user_start" ? preparedPageLeases.take(roomId) : undefined;
       const monitoringSession = session.fromPartition(
@@ -641,6 +649,27 @@ app.whenReady().then(async () => {
       persistFinalAsr: (event) => {
         const stored = database.asr.insert(event);
         if (stored) insightCoordinator.accept(stored);
+      },
+      onOffline: async (roomId) => {
+        try {
+          const room = (await rooms.list()).find(
+            (item) => item.roomId === roomId,
+          );
+          if (!room) return;
+          const updated = await rooms.setMonitoring(roomId, false);
+          const active = database.groupRuns.active();
+          if (
+            active?.status === "running" &&
+            active.groupId === updated.groupId
+          )
+            schedulePreparedRoom(updated);
+          await broadcastSnapshot();
+        } catch (error) {
+          diagnostic("monitoring_offline_exit_failed", {
+            roomId,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
       },
     },
   );

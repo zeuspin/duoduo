@@ -12,6 +12,36 @@ class FakeSocket extends EventEmitter {
 afterEach(() => vi.useRealTimers());
 
 describe("BailianProvider", () => {
+  it("times out and closes a connection that never acknowledges the ASR task", async () => {
+    vi.useFakeTimers();
+    const socket = new FakeSocket();
+    const provider = new BailianProvider({ apiKey: "test", connectionTimeoutMs: 1_000 }, () => socket);
+    const opening = provider.open("room-a");
+    const rejected = expect(opening).rejects.toThrow("BAILIAN_OPEN_TIMEOUT");
+    socket.emit("open");
+    await vi.advanceTimersByTimeAsync(1_000);
+    await rejected;
+    expect(socket.readyState).toBe(3);
+  });
+
+  it("cancels an in-flight connection when monitoring stops", async () => {
+    const socket = new FakeSocket();
+    const provider = new BailianProvider({ apiKey: "test" }, () => socket);
+    const controller = new AbortController();
+    const opening = provider.open("room-a", controller.signal);
+    const rejected = expect(opening).rejects.toThrow("ASR_OPEN_ABORTED");
+    controller.abort();
+    await rejected;
+    expect(socket.readyState).toBe(3);
+  });
+
+  it("rejects instead of hanging if the socket closes before task-started", async () => {
+    const socket = new FakeSocket();
+    const provider = new BailianProvider({ apiKey: "test" }, () => socket);
+    const rejected = expect(provider.open("room-a")).rejects.toThrow("BAILIAN_SOCKET_CLOSED");
+    socket.close();
+    await rejected;
+  });
   it("treats task-started as a successful connection test without finishing an empty task", async () => {
     const socket = new FakeSocket();
     const provider = new BailianProvider({ apiKey: "test-secret" }, () => socket);

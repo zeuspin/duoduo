@@ -36,6 +36,36 @@ vi.mock("../../src/main/rooms/live-probe", async (importOriginal) => {
 });
 
 import { RoomSession, type RoomNavigationGate } from "../../src/main/rooms/room-session";
+import { RoomManager } from "../../src/main/rooms/room-manager";
+import type { AsrSession } from "../../src/main/asr/types";
+import { START_PAGE_CAPTURE_SCRIPT, STOP_PAGE_CAPTURE_SCRIPT } from "../../src/main/audio/capture-script";
+
+function recoveryFixture(retryDelayMs = 0) {
+  const makeAsr = () => {
+    const events = new Set<Parameters<AsrSession["subscribe"]>[0]>();
+    const failures = new Set<(error: Error) => void>();
+    return {
+      write: vi.fn(async () => undefined), close: vi.fn(async () => undefined),
+      subscribe(listener: Parameters<AsrSession["subscribe"]>[0]) { events.add(listener); return () => events.delete(listener); },
+      subscribeFailure(listener: (error: Error) => void) { failures.add(listener); return () => failures.delete(listener); },
+      fail(message: string) { for (const listener of failures) listener(new Error(message)); },
+      emit(text: string) { for (const listener of events) listener({ roomId: "123", sessionId: text, segmentId: text, startMs: 0, endMs: 100, text, isFinal: true }); },
+    };
+  };
+  const first = makeAsr();
+  const replacement = makeAsr();
+  const provider = { testConnection: vi.fn(), open: vi.fn().mockResolvedValueOnce(first).mockResolvedValue(replacement) };
+  let audio!: (bytes: Buffer) => void | Promise<void>;
+  let ended!: () => void;
+  const router = { register: vi.fn((_token, _sender, listener, onEnded) => { audio = listener; ended = onEnded; return vi.fn(); }) };
+  const controller = new AbortController();
+  const gate = vi.fn(async (run) => (await run()).value);
+  const onAsr = vi.fn();
+  const session = new RoomSession("123", "https://live.douyin.com/123", provider, router as never, onAsr, controller.signal, {} as never, gate);
+  const factory = vi.fn(async () => session);
+  const manager = new RoomManager(factory, { retryDelayMs });
+  return { first, replacement, provider, router, controller, gate, onAsr, session, factory, manager, audio: (bytes: Buffer) => audio(bytes), ended: () => ended() };
+}
 
 afterEach(() => vi.useRealTimers());
 
@@ -53,6 +83,151 @@ describe("RoomSession", () => {
     });
     harness.evaluateNow.mockResolvedValue(true);
     harness.inspectCurrentRoom.mockResolvedValue({ hasVideo: true, videoReadyState: 4, currentTime: 20, paused: false, audioTrackState: "live", text: "", viewerCount: 200, metricQuality: "partial" });
+  });
+
+  it("reconnects ASR and routes audio and text through the replacement while preserving capture and the page", async () => {
+    const fixture = recoveryFixture();
+    await fixture.manager.startMonitoring("123");
+    fixture.first.fail("BAILIAN_RESPONSE_TIMEOUT");
+    await vi.waitFor(() => expect(fixture.provider.open).toHaveBeenCalledTimes(2));
+    await fixture.audio(Buffer.from([1, 2]));
+    fixture.replacement.emit("恢复后的文字");
+    expect(fixture.replacement.write).toHaveBeenCalledWith(expect.objectContaining({ bytes: Buffer.from([1, 2]) }));
+    expect(fixture.onAsr).toHaveBeenCalledWith(expect.objectContaining({ text: "恢复后的文字" }));
+    fixture.first.emit("旧连接的文字");
+    expect(fixture.onAsr).toHaveBeenCalledTimes(1);
+    expect(fixture.first.close).toHaveBeenCalledOnce();
+    expect(fixture.gate).toHaveBeenCalledOnce();
+    expect(fixture.factory).toHaveBeenCalledOnce();
+    expect(fixture.router.register).toHaveBeenCalledOnce();
+    expect(harness.events).not.toContain("window:destroy");
+    expect(harness.evaluateNow.mock.calls.map((call) => call[1])).toEqual([START_PAGE_CAPTURE_SCRIPT]);
+    expect(fixture.manager.snapshot()[0].state).toBe("monitoring");
+    await fixture.manager.shutdown();
+  });
+
+  it("rebinds an ended capture track on a live page without reopening ASR or navigating", async () => {
+    const fixture = recoveryFixture();
+    await fixture.manager.startMonitoring("123");
+    fixture.ended();
+    await vi.waitFor(() => expect(harness.evaluateNow).toHaveBeenCalledTimes(3));
+    expect(harness.evaluateNow.mock.calls.map((call) => call[1])).toEqual([START_PAGE_CAPTURE_SCRIPT, STOP_PAGE_CAPTURE_SCRIPT, START_PAGE_CAPTURE_SCRIPT]);
+    expect(fixture.provider.open).toHaveBeenCalledOnce();
+    expect(fixture.gate).toHaveBeenCalledOnce();
+    expect(harness.events).not.toContain("window:destroy");
+    expect(fixture.manager.snapshot()[0]).toMatchObject({ state: "monitoring", liveStatus: "live" });
+    await fixture.manager.shutdown();
+  });
+
+  it("exits only when a capture failure is accompanied by explicit broadcast-end evidence", async () => {
+    const fixture = recoveryFixture();
+    await fixture.manager.startMonitoring("123");
+    harness.inspectCurrentRoom.mockResolvedValue({ hasVideo: true, videoReadyState: 4, currentTime: 20, paused: true, audioTrackState: "ended", text: "直播已结束" });
+    fixture.ended();
+    await vi.waitFor(() => expect(fixture.manager.snapshot()[0].state).toBe("stopped"));
+    expect(fixture.provider.open).toHaveBeenCalledOnce();
+    expect(fixture.factory).toHaveBeenCalledOnce();
+    expect(harness.events).toContain("window:destroy");
+    await fixture.manager.shutdown();
+  });
+
+  it("detects missing PCM callbacks even while the video keeps progressing", async () => {
+    vi.useFakeTimers();
+    const fixture = recoveryFixture();
+    let videoTime = 0;
+    harness.inspectCurrentRoom.mockImplementation(async () => ({ hasVideo: true, videoReadyState: 4, currentTime: ++videoTime, paused: false, audioTrackState: "live", text: "" }));
+    await fixture.manager.startMonitoring("123");
+    await vi.advanceTimersByTimeAsync(45_000);
+    expect(harness.evaluateNow.mock.calls.map((call) => call[1])).toContain(STOP_PAGE_CAPTURE_SCRIPT);
+    expect(fixture.factory).toHaveBeenCalledOnce();
+    expect(fixture.manager.snapshot()[0].state).toBe("monitoring");
+    await fixture.manager.shutdown();
+  });
+
+  it("rebinds a replaced video even if the old live audio track keeps sending PCM", async () => {
+    vi.useFakeTimers();
+    const fixture = recoveryFixture();
+    let videoTime = 0;
+    harness.inspectCurrentRoom.mockImplementation(async () => ({ hasVideo: true, videoReadyState: 4, currentTime: ++videoTime, paused: false, audioTrackState: "live", captureVideoConnected: false, text: "" }));
+    await fixture.manager.startMonitoring("123");
+    const pcm = setInterval(() => { void fixture.audio(Buffer.from([1, 2])); }, 1_000);
+    await vi.advanceTimersByTimeAsync(30_000);
+    clearInterval(pcm);
+    expect(harness.evaluateNow.mock.calls.map((call) => call[1])).toContain(STOP_PAGE_CAPTURE_SCRIPT);
+    expect(fixture.factory).toHaveBeenCalledOnce();
+    expect(fixture.provider.open).toHaveBeenCalledOnce();
+    await fixture.manager.shutdown();
+  });
+
+  it("bounds capture reset so an unresponsive renderer falls back to a page restart", async () => {
+    vi.useFakeTimers();
+    const fixture = recoveryFixture();
+    await fixture.session.start();
+    harness.evaluateNow.mockImplementation((_contents, script) => script === STOP_PAGE_CAPTURE_SCRIPT ? new Promise(() => undefined) : Promise.resolve(true));
+    const recovering = fixture.session.recover(new Error("AUDIO_TRACK_ENDED"));
+    await vi.advanceTimersByTimeAsync(5_000);
+    await expect(recovering).resolves.toBe(false);
+    harness.evaluateNow.mockResolvedValue(true);
+    await fixture.session.close();
+  });
+
+  it("allows stop to cancel ASR opening during a local reconnect", async () => {
+    const fixture = recoveryFixture();
+    await fixture.manager.startMonitoring("123");
+    fixture.provider.open.mockImplementationOnce((_roomId: string, signal: AbortSignal) => new Promise((_resolve, reject) => {
+      signal.addEventListener("abort", () => reject(new Error("ASR_OPEN_ABORTED")), { once: true });
+    }));
+    fixture.first.fail("BAILIAN_RESPONSE_TIMEOUT");
+    await vi.waitFor(() => expect(fixture.provider.open).toHaveBeenCalledTimes(2));
+    await fixture.manager.stopMonitoring("123");
+    expect(fixture.manager.snapshot()[0].state).toBe("stopped");
+    expect(harness.events.filter((event) => event === "window:destroy")).toHaveLength(1);
+  });
+
+  it("does not lose an ASR failure arriving while capture recovery is in progress", async () => {
+    const fixture = recoveryFixture();
+    await fixture.manager.startMonitoring("123");
+    harness.evaluateNow.mockImplementation(async (_contents, script) => {
+      if (script === STOP_PAGE_CAPTURE_SCRIPT) fixture.first.fail("BAILIAN_RESPONSE_TIMEOUT");
+      return true;
+    });
+    fixture.ended();
+    await vi.waitFor(() => expect(fixture.provider.open).toHaveBeenCalledTimes(2));
+    await fixture.audio(Buffer.from([1, 2]));
+    expect(fixture.replacement.write).toHaveBeenCalledOnce();
+    expect(fixture.manager.snapshot()[0].state).toBe("monitoring");
+    await fixture.manager.shutdown();
+  });
+
+  it("preserves an ASR failure arriving during the retry delay before capture recovery", async () => {
+    vi.useFakeTimers();
+    const fixture = recoveryFixture(500);
+    await fixture.manager.startMonitoring("123");
+    fixture.ended();
+    fixture.first.fail("BAILIAN_RESPONSE_TIMEOUT");
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(fixture.provider.open).toHaveBeenCalledTimes(2);
+    expect(fixture.manager.snapshot()[0].state).toBe("monitoring");
+    expect(fixture.factory).toHaveBeenCalledOnce();
+    await fixture.manager.shutdown();
+  });
+
+  it("requests a page restart when the capture page can no longer be inspected", async () => {
+    const fixture = recoveryFixture();
+    await fixture.session.start();
+    harness.inspectCurrentRoom.mockRejectedValue(new Error("Execution context destroyed"));
+    await expect(fixture.session.recover(new Error("AUDIO_TRACK_ENDED"))).resolves.toBe(false);
+    await fixture.session.close();
+  });
+
+  it("does not hang stopping while a page restart waits in the navigation queue", async () => {
+    const controller = new AbortController();
+    const session = new RoomSession("123", "https://live.douyin.com/123", { testConnection: vi.fn(), open: vi.fn() }, { register: vi.fn() } as never, vi.fn(), controller.signal, {} as never, () => new Promise(() => undefined));
+    const starting = session.start();
+    const rejected = expect(starting).rejects.toThrow("ROOM_START_ABORTED");
+    controller.abort();
+    await rejected;
+    expect(harness.events).not.toContain("window:create");
   });
 
   it("creates and probes the room inside the navigation gate before opening ASR", async () => {

@@ -83,38 +83,20 @@ describe("RoomManager", () => {
     expect(manager.snapshot()[0].state).toBe("error");
   });
 
-  it("waits when a monitored broadcaster is offline and resumes when live again", async () => {
-    const sessions: FakeSession[] = [];
+  it("exits monitoring when the initial room check finds the broadcaster offline", async () => {
+    vi.useFakeTimers();
     let attempts = 0;
+    const onOffline = vi.fn();
     const manager = new RoomManager(async () => {
       attempts += 1;
-      if (attempts === 1) throw new Error("ROOM_NOT_LIVE:offline");
-      const session = new FakeSession();
-      sessions.push(session);
-      return session;
-    }, { offlineRetryDelayMs: 5 });
+      throw new Error("ROOM_NOT_LIVE:offline");
+    }, { offlineRetryDelayMs: 5, onOffline });
 
     await manager.startMonitoring("a");
-    expect(manager.snapshot()[0]).toMatchObject({ state: "waiting_for_live", liveStatus: "offline" });
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(attempts).toBe(2);
-    expect(sessions).toHaveLength(1);
-    expect(manager.snapshot()[0]).toMatchObject({ state: "monitoring", liveStatus: "live" });
-    await manager.shutdown();
-  });
-
-  it("identifies a user start and the later automatic offline retry", async () => {
-    const reasons: Array<string | undefined> = [];
-    let attempts = 0;
-    const manager = new RoomManager(async (_roomId, _signal, reason) => {
-      reasons.push(reason);
-      attempts += 1;
-      if (attempts === 1) throw new Error("ROOM_NOT_LIVE:offline");
-      return new FakeSession();
-    }, { offlineRetryDelayMs: 5 });
-
-    await manager.startMonitoring("a");
-    await vi.waitFor(() => expect(reasons).toEqual(["user_start", "offline_retry"]));
+    expect(onOffline).toHaveBeenCalledOnce();
+    expect(manager.snapshot()[0]).toMatchObject({ state: "stopped", liveStatus: "offline", error: undefined });
+    await vi.advanceTimersByTimeAsync(100);
+    expect(attempts).toBe(1);
     await manager.shutdown();
   });
 
@@ -136,21 +118,88 @@ describe("RoomManager", () => {
     await manager.shutdown();
   });
 
-  it("treats an ended live audio track as offline instead of a technical error", async () => {
+  it("exits monitoring when a technical recovery finds the broadcast ended", async () => {
+    vi.useFakeTimers();
+    let attempts = 0;
+    const first = new FakeSession();
+    const onOffline = vi.fn();
+    const manager = new RoomManager(async () => {
+      attempts += 1;
+      if (attempts === 1) return first;
+      throw new Error("ROOM_NOT_LIVE:offline");
+    }, { retryDelayMs: 0, maxRetries: 1, offlineRetryDelayMs: 50, onOffline });
+
+    await manager.startMonitoring("a");
+    first.fail("BAILIAN_RESPONSE_TIMEOUT");
+    await vi.waitFor(() => expect(onOffline).toHaveBeenCalledOnce());
+
+    expect(manager.snapshot()[0]).toMatchObject({
+      state: "stopped",
+      liveStatus: "offline",
+      error: undefined,
+    });
+    expect(attempts).toBe(2);
+    await vi.advanceTimersByTimeAsync(500);
+    expect(attempts).toBe(2);
+    await manager.shutdown();
+  });
+
+  it("recovers a lost audio track without treating it as broadcaster offline", async () => {
     const sessions: FakeSession[] = [];
+    const onOffline = vi.fn();
     const manager = new RoomManager(async () => {
       const session = new FakeSession();
       sessions.push(session);
       return session;
-    }, { offlineRetryDelayMs: 50 });
+    }, { retryDelayMs: 0, onOffline });
 
     await manager.startMonitoring("a");
     sessions[0].fail("AUDIO_TRACK_ENDED");
-    await new Promise((resolve) => setTimeout(resolve, 5));
+    await vi.waitFor(() => expect(sessions).toHaveLength(2));
+    expect(onOffline).not.toHaveBeenCalled();
     expect(sessions[0].closed).toBe(true);
-    expect(manager.snapshot()[0]).toMatchObject({ state: "waiting_for_live", liveStatus: "offline" });
-    expect(sessions).toHaveLength(1);
+    expect(manager.snapshot()[0]).toMatchObject({ state: "monitoring", liveStatus: "live", error: undefined });
     await manager.shutdown();
+  });
+
+  it("tries session recovery without closing the page or creating another session", async () => {
+    const first = Object.assign(new FakeSession(), { recover: vi.fn(async () => true) });
+    const factory = vi.fn(async () => first);
+    const manager = new RoomManager(factory, { retryDelayMs: 0 });
+    await manager.startMonitoring("a");
+    first.fail("BAILIAN_RESPONSE_TIMEOUT");
+    await vi.waitFor(() => expect(first.recover).toHaveBeenCalledOnce());
+    expect(first.closed).toBe(false);
+    expect(factory).toHaveBeenCalledOnce();
+    expect(manager.snapshot()[0]).toMatchObject({ state: "monitoring", liveStatus: "live" });
+    await manager.shutdown();
+  });
+
+  it("retries local ASR recovery on the same page when opening the replacement fails", async () => {
+    const first = Object.assign(new FakeSession(), { recover: vi.fn().mockRejectedValueOnce(new Error("ASR_OPEN_TIMEOUT")).mockResolvedValue(true) });
+    const factory = vi.fn(async () => first);
+    const manager = new RoomManager(factory, { retryDelayMs: 0 });
+    await manager.startMonitoring("a");
+    first.fail("BAILIAN_RESPONSE_TIMEOUT");
+    await vi.waitFor(() => expect(first.recover).toHaveBeenCalledTimes(2));
+    expect(first.closed).toBe(false);
+    expect(factory).toHaveBeenCalledOnce();
+    expect(manager.snapshot()[0].state).toBe("monitoring");
+    await manager.shutdown();
+  });
+
+  it("does not restore monitoring after stop cancels an in-flight local recovery", async () => {
+    let resolveRecovery!: (recovered: boolean) => void;
+    const first = Object.assign(new FakeSession(), { recover: vi.fn(() => new Promise<boolean>((resolve) => { resolveRecovery = resolve; })) });
+    const manager = new RoomManager(async () => first, { retryDelayMs: 0 });
+    await manager.startMonitoring("a");
+    first.fail("BAILIAN_RESPONSE_TIMEOUT");
+    await vi.waitFor(() => expect(first.recover).toHaveBeenCalledOnce());
+    const stopping = manager.stopMonitoring("a");
+    resolveRecovery(true);
+    await stopping;
+    expect(first.closed).toBe(true);
+    expect(manager.snapshot()[0].state).toBe("stopped");
   });
 
   it("cancels the offline retry when monitoring is disabled", async () => {
@@ -165,53 +214,6 @@ describe("RoomManager", () => {
     await new Promise((resolve) => setTimeout(resolve, 30));
     expect(attempts).toBe(1);
     expect(manager.snapshot()[0].state).toBe("stopped");
-  });
-
-  it("does not loop offline retries while global access is verification paused", async () => {
-    vi.useFakeTimers();
-    let attempts = 0;
-    let accessPaused = true;
-    const manager = new RoomManager(async () => {
-      attempts += 1;
-      if (attempts === 1) throw new Error("ROOM_NOT_LIVE:offline");
-      if (accessPaused) throw new Error("ACCESS_VERIFICATION_PAUSED");
-      return new FakeSession();
-    }, { offlineRetryDelayMs: 5 });
-
-    await manager.startMonitoring("a");
-    await vi.advanceTimersByTimeAsync(5);
-    expect(attempts).toBe(2);
-    await vi.advanceTimersByTimeAsync(100);
-    expect(attempts).toBe(2);
-    expect(manager.snapshot()[0]).toMatchObject({ state: "waiting_for_live", liveStatus: "offline" });
-    accessPaused = false;
-    manager.resumeAccessRetries();
-    await vi.advanceTimersByTimeAsync(5);
-    expect(attempts).toBe(3);
-    expect(manager.snapshot()[0]).toMatchObject({ state: "monitoring", liveStatus: "live" });
-    await manager.shutdown();
-  });
-
-  it("backs monitored offline rooms off for 30, 60, then 120 minutes", async () => {
-    vi.useFakeTimers();
-    let attempts = 0;
-    const manager = new RoomManager(async () => {
-      attempts += 1;
-      if (attempts < 4) throw new Error("ROOM_NOT_LIVE:offline");
-      return new FakeSession();
-    }, { offlineRetryBackoffMs: [30 * 60_000, 60 * 60_000, 120 * 60_000] });
-
-    await manager.startMonitoring("a");
-    await vi.advanceTimersByTimeAsync(30 * 60_000 - 1);
-    expect(attempts).toBe(1);
-    await vi.advanceTimersByTimeAsync(1);
-    expect(attempts).toBe(2);
-    await vi.advanceTimersByTimeAsync(60 * 60_000);
-    expect(attempts).toBe(3);
-    await vi.advanceTimersByTimeAsync(120 * 60_000);
-    expect(attempts).toBe(4);
-    expect(manager.snapshot()[0]).toMatchObject({ state: "monitoring", liveStatus: "live" });
-    await manager.shutdown();
   });
 
   it("stops technical retry attempts while access is paused and resumes only after confirmation", async () => {

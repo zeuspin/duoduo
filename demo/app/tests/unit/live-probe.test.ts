@@ -174,6 +174,9 @@ describe("classifyProbe", () => {
 });
 
 describe("classifyCurrentHealth", () => {
+  it("keeps a lost capture track unknown until the broadcaster is confirmed offline", () => {
+    expect(classifyCurrentHealth({ hasVideo: true, videoReadyState: 4, text: "正在直播", currentTime: 101, paused: false, audioTrackState: "ended" }, 100)).toBe("unknown");
+  });
   it("detects explicit offline copy", () => {
     expect(classifyCurrentHealth({ hasVideo: true, videoReadyState: 4, text: "本场直播已结束", currentTime: 100, paused: true, audioTrackState: "ended" }, 99)).toBe("offline");
   });

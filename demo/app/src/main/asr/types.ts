@@ -22,5 +22,5 @@ export interface AsrSession {
 
 export interface AsrProvider {
   testConnection(): Promise<ConnectionTestResult>;
-  open(roomId: string): Promise<AsrSession>;
+  open(roomId: string, signal?: AbortSignal): Promise<AsrSession>;
 }

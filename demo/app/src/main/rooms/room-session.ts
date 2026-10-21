@@ -6,7 +6,7 @@ import { START_PAGE_CAPTURE_SCRIPT, STOP_PAGE_CAPTURE_SCRIPT } from "../audio/ca
 import type { CaptureRouter } from "../audio/capture-router";
 import { classifyCurrentHealth, evaluateNow, inspectCurrentRoom, probeRoom, type RoomProbeResult } from "./live-probe";
 import type { MonitorSession } from "./room-manager";
-import { disposeRoomResources } from "./room-session-resources";
+import { disposeRoomResources, withRoomTimeout } from "./room-session-resources";
 import { RoomMetricSampler } from "./metric-sampler";
 import type { PreparedRoomPage } from "./prepared-page-lease";
 
@@ -17,13 +17,20 @@ export type RoomNavigationGate = (
 export class RoomSession implements MonitorSession {
   private window?: BrowserWindow;
   private asr?: AsrSession;
+  private unsubscribeAsr?: () => void;
+  private unsubscribeAsrFailure?: () => void;
   private unregisterCapture?: () => void;
   private readonly failureListeners = new Set<(error: Error) => void>();
+  private pendingFailure?: Error;
   private closed = false;
   private healthTimer?: NodeJS.Timeout;
   private healthCheckRunning = false;
   private lastVideoTime?: number;
   private consecutiveOfflineSignals = 0;
+  private recovering = false;
+  private readonly closeController = new AbortController();
+  private lastAudioAt = 0;
+  private consecutiveUnhealthySignals = 0;
   private readonly metricSampler: RoomMetricSampler;
 
   constructor(
@@ -40,7 +47,7 @@ export class RoomSession implements MonitorSession {
     private readonly onNetworkError?: (event: { url: string; error: string; resourceType: string }) => void,
     private healthCheckSeconds = 30,
     metricSampleIntervalMs = 300_000,
-    now: () => number = Date.now,
+    private readonly now: () => number = Date.now,
     private preparedPage?: PreparedRoomPage,
     private readonly onAudio?: () => void,
   ) {
@@ -49,11 +56,12 @@ export class RoomSession implements MonitorSession {
 
   async start(): Promise<void> {
     try {
+      if (this.closed || this.signal.aborted) throw new Error("ROOM_START_ABORTED");
       const prepared = this.takePreparedPage();
-      const probe = prepared ?? await this.navigationGate(async () => {
+      const probe = prepared ?? await this.waitForNavigation(this.navigationGate(async () => {
         const value = await this.startPage();
         return { value, ...(value.status === "verification_required" ? { verificationRequired: true } : {}) };
-      });
+      }));
       if (probe.status !== "live") throw new Error(`ROOM_NOT_LIVE:${probe.status}`);
       if (this.signal.aborted) throw new Error("ROOM_START_ABORTED");
       await this.startAsr();
@@ -63,8 +71,23 @@ export class RoomSession implements MonitorSession {
     }
   }
 
+  private async waitForNavigation(operation: Promise<RoomProbeResult>): Promise<RoomProbeResult> {
+    const signal = AbortSignal.any([this.signal, this.closeController.signal]);
+    if (signal.aborted) throw new Error("ROOM_START_ABORTED");
+    let onAbort!: () => void;
+    try {
+      return await Promise.race([
+        operation,
+        new Promise<never>((_, reject) => {
+          onAbort = () => reject(new Error("ROOM_START_ABORTED"));
+          signal.addEventListener("abort", onAbort, { once: true });
+        }),
+      ]);
+    } finally { signal.removeEventListener("abort", onAbort); }
+  }
+
   private async startPage(): Promise<RoomProbeResult> {
-    if (this.signal.aborted) throw new Error("ROOM_START_ABORTED");
+    if (this.closed || this.signal.aborted) throw new Error("ROOM_START_ABORTED");
     const token = randomUUID();
     this.window = new BrowserWindow({
       show: false,
@@ -117,18 +140,72 @@ export class RoomSession implements MonitorSession {
 
   private async startAsr(): Promise<void> {
     if (!this.window || this.window.isDestroyed() || !this.captureToken) throw new Error("ROOM_PAGE_UNAVAILABLE");
-    this.asr = await this.provider.open(this.roomId);
-    this.asr.subscribe(this.onAsr);
-    this.asr.subscribeFailure?.((error) => this.fail(error));
+    await this.openAsr();
     this.unregisterCapture = this.captureRouter.register(
       this.captureToken,
       this.window.webContents.id,
-      (bytes) => this.asr?.write({ bytes, sampleRate: 16000, channels: 1, encoding: "pcm_s16le" }),
+      async (bytes) => {
+        this.lastAudioAt = this.now();
+        const asr = this.asr;
+        try {
+          if (!asr) return;
+          await asr.write({ bytes, sampleRate: 16000, channels: 1, encoding: "pcm_s16le" });
+          this.onAudio?.();
+        } catch (error) { if (this.asr === asr) this.fail(error instanceof Error ? error : new Error(String(error))); }
+      },
       () => this.fail(new Error("AUDIO_TRACK_ENDED")),
       this.onAudio,
     );
-    await evaluateNow(this.window.webContents, START_PAGE_CAPTURE_SCRIPT);
+    await withRoomTimeout(evaluateNow(this.window.webContents, START_PAGE_CAPTURE_SCRIPT));
+    this.lastAudioAt = this.now();
     this.startHealthChecks();
+  }
+
+  private async openAsr(): Promise<void> {
+    const asr = await this.provider.open(this.roomId, AbortSignal.any([this.signal, this.closeController.signal]));
+    if (this.closed || this.signal.aborted) {
+      await withRoomTimeout(asr.close()).catch(() => undefined);
+      throw new Error("ROOM_START_ABORTED");
+    }
+    this.asr = asr;
+    this.unsubscribeAsr = asr.subscribe(this.onAsr);
+    this.unsubscribeAsrFailure = asr.subscribeFailure?.((error) => this.fail(error));
+  }
+
+  async recover(error: Error): Promise<boolean> {
+    if (this.closed || this.signal.aborted) throw new Error("ROOM_START_ABORTED");
+    if (!this.window || this.window.isDestroyed() || error.message.startsWith("ROOM_RENDERER_GONE:")) return false;
+    this.recovering = true;
+    if (this.pendingFailure === error) this.pendingFailure = undefined;
+    try {
+      const captureFailure = ["AUDIO_TRACK_ENDED", "VIDEO_NOT_FOUND", "AUDIO_TRACK_NOT_FOUND", "AUDIO_CAPTURE_STALLED"].includes(error.message);
+      if (captureFailure) {
+        try {
+          const evidence = await withRoomTimeout(inspectCurrentRoom(this.window.webContents));
+          if (classifyCurrentHealth(evidence, this.lastVideoTime) === "offline") throw new Error("ROOM_NOT_LIVE:offline");
+          await withRoomTimeout(evaluateNow(this.window.webContents, STOP_PAGE_CAPTURE_SCRIPT));
+          if (this.closed || this.signal.aborted) throw new Error("ROOM_START_ABORTED");
+          await withRoomTimeout(evaluateNow(this.window.webContents, START_PAGE_CAPTURE_SCRIPT));
+          this.lastVideoTime = undefined;
+          this.lastAudioAt = this.now();
+          this.consecutiveUnhealthySignals = 0;
+        } catch (error) {
+          if (error instanceof Error && error.message === "ROOM_NOT_LIVE:offline") throw error;
+          return false;
+        }
+      } else {
+        this.unsubscribeAsr?.();
+        this.unsubscribeAsrFailure?.();
+        this.unsubscribeAsr = undefined;
+        this.unsubscribeAsrFailure = undefined;
+        const previous = this.asr;
+        this.asr = undefined;
+        if (previous) await withRoomTimeout(previous.close()).catch(() => undefined);
+        if (this.closed || this.signal.aborted) throw new Error("ROOM_START_ABORTED");
+        await this.openAsr();
+      }
+      return true;
+    } finally { this.recovering = false; }
   }
 
   updateHealthCheckInterval(seconds: number): void {
@@ -144,11 +221,13 @@ export class RoomSession implements MonitorSession {
   }
 
   private async checkCurrentHealth(): Promise<void> {
-    if (this.closed || this.healthCheckRunning || !this.window || this.window.isDestroyed()) return;
+    if (this.closed || this.recovering || this.healthCheckRunning || !this.window || this.window.isDestroyed()) return;
     this.healthCheckRunning = true;
     try {
-      const evidence = await inspectCurrentRoom(this.window.webContents);
+      const evidence = await withRoomTimeout(inspectCurrentRoom(this.window.webContents));
       const status = classifyCurrentHealth(evidence, this.lastVideoTime);
+      const stalled = !evidence.hasVideo || evidence.paused || evidence.videoReadyState < 2 || evidence.audioTrackState === "ended" || evidence.captureVideoConnected === false
+        || (this.lastVideoTime !== undefined && evidence.currentTime <= this.lastVideoTime);
       this.lastVideoTime = evidence.currentTime;
       if (this.metricSampler.accept(evidence)) {
         await this.onMetricSnapshot?.({
@@ -167,7 +246,12 @@ export class RoomSession implements MonitorSession {
       if (this.consecutiveOfflineSignals >= 2) {
         if (this.healthTimer) clearInterval(this.healthTimer);
         this.healthTimer = undefined;
-        this.fail(new Error("AUDIO_TRACK_ENDED"));
+        this.fail(new Error("ROOM_NOT_LIVE:offline"));
+      } else if (status !== "offline") {
+        this.consecutiveUnhealthySignals = stalled ? this.consecutiveUnhealthySignals + 1 : 0;
+        if (this.consecutiveUnhealthySignals >= 2 || this.now() - this.lastAudioAt >= 30_000) {
+          this.fail(new Error("AUDIO_CAPTURE_STALLED"));
+        }
       }
     } catch { /* A transient inspection failure must not restart the room. */ }
     finally { this.healthCheckRunning = false; }
@@ -176,10 +260,15 @@ export class RoomSession implements MonitorSession {
   async close(): Promise<void> {
     if (this.closed) return;
     this.closed = true;
+    this.closeController.abort();
     if (this.healthTimer) clearInterval(this.healthTimer);
     this.healthTimer = undefined;
     this.unregisterCapture?.();
     this.unregisterCapture = undefined;
+    this.unsubscribeAsr?.();
+    this.unsubscribeAsrFailure?.();
+    this.unsubscribeAsr = undefined;
+    this.unsubscribeAsrFailure = undefined;
     const window = this.window;
     const asr = this.asr;
     this.asr = undefined;
@@ -196,11 +285,16 @@ export class RoomSession implements MonitorSession {
 
   subscribeFailure(listener: (error: Error) => void): () => void {
     this.failureListeners.add(listener);
+    const pending = this.pendingFailure;
+    if (pending) queueMicrotask(() => {
+      if (this.pendingFailure === pending && this.failureListeners.has(listener)) listener(pending);
+    });
     return () => this.failureListeners.delete(listener);
   }
 
   private fail(error: Error): void {
     if (this.closed) return;
+    this.pendingFailure = error;
     for (const listener of this.failureListeners) listener(error);
   }
 }
